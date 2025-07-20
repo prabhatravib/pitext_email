@@ -14,7 +14,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 RUN pnpm install -g turbo
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json .//
 RUN mkdir -p apps packages
 COPY apps/*/package.json ./apps/
 COPY packages/ ./packages/
@@ -28,7 +28,7 @@ RUN pnpm install --prod --ignore-scripts
 FROM base AS builder
 WORKDIR /app
 
-RUN npm install -g pnpm wrangler
+RUN npm install -g pnpm wrangler bun
 
 # Copy workspace configuration and source code
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
@@ -53,14 +53,14 @@ RUN cd apps/mail && pnpm run build
 FROM base AS runner
 WORKDIR /app
 
-RUN npm install -g wrangler
+RUN npm install -g wrangler bun
 
 RUN addgroup -S -g 1001 pnpm && \
     adduser -S -u 1001 nextjs -G pnpm
 
 # Set environment variables for build
 ENV NODE_ENV=production \
-    PORT=3000 \
+    PORT=10000 \
     HOSTNAME="0.0.0.0" \
     NEXT_TELEMETRY_DISABLED=1
 
@@ -75,7 +75,7 @@ COPY --from=builder --chown=nextjs:pnpm /app ./
 USER nextjs
 
 # Set server port and host
-EXPOSE 3000
+EXPOSE 10000
 
 # Start the server
 CMD ["/app/scripts/entrypoint.sh"]
