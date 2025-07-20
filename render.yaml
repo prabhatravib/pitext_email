@@ -3,9 +3,7 @@ services:
   - type: web
     name: pitext-email
     runtime: node
-    buildCommand: |
-      pnpm install --frozen-lockfile
-      cd apps/mail && pnpm run build:simple
+    buildCommand: pnpm install --frozen-lockfile
     startCommand: node all-in-one-server.js
     envVars:
       - key: NODE_ENV

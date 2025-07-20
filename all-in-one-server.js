@@ -309,7 +309,7 @@ if (fs.existsSync(buildPath)) {
     }
   });
 } else {
-  // Fallback if build doesn't exist yet
+  // Serve a simple HTML interface for the API
   app.get('*', (req, res) => {
     res.send(`
       <!DOCTYPE html>
@@ -317,14 +317,14 @@ if (fs.existsSync(buildPath)) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PiText Email - Building...</title>
+        <title>PiText Email - API Demo</title>
         <style>
           body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             margin: 0; 
             background: #0a0a0a;
             color: #fff;
@@ -335,7 +335,8 @@ if (fs.existsSync(buildPath)) {
             background: #1a1a1a; 
             border-radius: 12px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            max-width: 500px;
+            max-width: 600px;
+            width: 100%;
           }
           h1 { 
             color: #fff; 
@@ -345,49 +346,100 @@ if (fs.existsSync(buildPath)) {
             color: #888; 
             line-height: 1.6;
           }
-          .status { 
-            margin-top: 2rem; 
-            padding: 1.5rem; 
-            background: #2a2a2a; 
-            border-radius: 8px; 
-            font-family: 'Courier New', monospace; 
+          .api-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #2a2a2a;
+            border-radius: 8px;
+            text-align: left;
+          }
+          .api-endpoint {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #333;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+          }
+          .method {
+            color: #4a9eff;
+            font-weight: bold;
+          }
+          .url {
+            color: #fff;
+          }
+          .description {
+            color: #888;
+            margin-top: 0.5rem;
+          }
+          .status {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #2a2a2a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
             font-size: 0.9rem;
             text-align: left;
           }
-          .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #333;
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
+          .health-link {
+            color: #4a9eff;
+            text-decoration: none;
           }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
+          .health-link:hover {
+            text-decoration: underline;
           }
         </style>
       </head>
       <body>
         <div class="container">
-          <h1>🚀 PiText Email</h1>
-          <p><span class="spinner"></span>Application is building...</p>
-          <p>This usually takes 2-5 minutes on first deployment.</p>
-          <div class="status">
-            <strong>Status:</strong> Build in progress<br>
-            <strong>Server:</strong> Running on port ${PORT}<br>
-            <strong>Health:</strong> <a href="/health" style="color: #4a9eff">/health</a><br>
-            <strong>Mode:</strong> Demo with local data
+          <h1>🚀 PiText Email API</h1>
+          <p>Welcome to PiText Email! This is a demo API server with local data storage.</p>
+          
+          <div class="api-section">
+            <h3>📧 Available Endpoints</h3>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/threads</span></div>
+              <div class="description">Get all email threads</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/threads/:id</span></div>
+              <div class="description">Get a specific thread by ID</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">POST</span> <span class="url">/api/threads</span></div>
+              <div class="description">Create a new thread</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/messages</span></div>
+              <div class="description">Get all messages</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/search?q=query</span></div>
+              <div class="description">Search threads and messages</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/health</span></div>
+              <div class="description">Server health check</div>
+            </div>
           </div>
-          <p style="margin-top: 2rem; font-size: 0.9rem;">
-            Please refresh this page in a few moments.
+          
+          <div class="status">
+            <strong>Status:</strong> API Server Running<br>
+            <strong>Server:</strong> Running on port ${PORT}<br>
+            <strong>Health:</strong> <a href="/health" class="health-link">/health</a><br>
+            <strong>Mode:</strong> Demo with local JSON data<br>
+            <strong>Data:</strong> Stored in ${DATA_DIR}
+          </div>
+          
+          <p style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+            💡 <strong>Next Steps:</strong> Set up Gmail OAuth for email import functionality
           </p>
         </div>
-        <script>
-          // Auto-refresh every 30 seconds
-          setTimeout(() => location.reload(), 30000);
-        </script>
       </body>
       </html>
     `);
