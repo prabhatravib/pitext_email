@@ -10,29 +10,35 @@ import { createDb } from '../db';
 import { Hono } from 'hono';
 import { tool } from 'ai';
 import { z } from 'zod';
+import { cors } from 'hono/cors';
+import { auth } from '../lib/auth';
+import { createDriver } from '../lib/driver';
+import { type EProviders } from '../types';
+import { APIError } from 'better-auth/api';
+import { getContext } from 'hono/context-storage';
+import type { HonoContext } from '../ctx';
+import { redis } from '../lib/services';
+import { disableBrainFunction } from '../lib/brain';
+import { getSocialProviders } from '../lib/auth-providers';
+import { getBrowserTimezone, isValidTimezone } from '../lib/timezones';
+import { defaultUserSettings } from '../lib/schemas';
 
 export const aiRouter = new Hono();
 
-aiRouter.get('/', (c) => c.text('Twilio + ElevenLabs + AI Phone System Ready'));
+aiRouter.get('/', (c) => c.text('Google OAuth + AI Email System Ready'));
 
 aiRouter.post('/do/:action', async (c) => {
   if (env.DISABLE_CALLS) return c.json({ success: false, error: 'Not implemented' }, 400);
   if (env.VOICE_SECRET !== c.req.header('X-Voice-Secret'))
     return c.json({ success: false, error: 'Unauthorized' }, 401);
-  if (!c.req.header('X-Caller')) return c.json({ success: false, error: 'Unauthorized' }, 401);
-  const { db, conn } = createDb(env.HYPERDRIVE.connectionString);
-  const user = await db.query.user.findFirst({
-    where: (user, { eq, and }) =>
-      and(eq(user.phoneNumber, c.req.header('X-Caller')!), eq(user.phoneNumberVerified, true)),
-  });
-  if (!user) return c.json({ success: false, error: 'Unauthorized' }, 401);
-
-  const connection = await db.query.connection.findFirst({
-    where: (connection, { eq, or }) =>
-      or(eq(connection.id, user.defaultConnectionId!), eq(connection.userId, user.id)),
-  });
-  await conn.end();
-  if (!connection) return c.json({ success: false, error: 'Unauthorized' }, 401);
+  
+  // Removed phone number authentication - using session-based auth
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session?.user) return c.json({ success: false, error: 'Unauthorized' }, 401);
+  
+  // Note: Connection handling would need to be implemented differently
+  // since we're no longer using database for connections
+  console.log('Session-based authentication for user:', session.user.id);
 
   try {
     const action = c.req.param('action') as Tools;
@@ -101,11 +107,14 @@ aiRouter.post('/call', async (c) => {
   console.log('[DEBUG] Connecting to database');
   const { db, conn } = createDb(env.HYPERDRIVE.connectionString);
 
-  console.log('[DEBUG] Finding user by phone number:', c.req.header('X-Caller'));
-  const user = await db.query.user.findFirst({
-    where: (user, { eq, and }) =>
-      and(eq(user.phoneNumber, c.req.header('X-Caller')!), eq(user.phoneNumberVerified, true)),
-  });
+  // Removed phone number authentication - using session-based auth
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session?.user) {
+    console.log('[DEBUG] No valid session found');
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+  
+  console.log('[DEBUG] Session-based authentication for user:', session.user.id);
 
   if (!user) {
     console.log('[DEBUG] User not found or not verified');

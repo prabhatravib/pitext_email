@@ -50,7 +50,7 @@ export default function LoginZero() {
                   <FormLabel className="text-muted-foreground">Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="nizzy@0.email"
+                      placeholder="user@example.com"
                       {...field}
                       className="bg-black text-sm text-white placeholder:text-sm"
                     />

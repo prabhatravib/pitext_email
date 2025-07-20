@@ -59,7 +59,6 @@ const excludedUsernames = new Set([
   'autofix-ci[bot]',
 ]);
 const coreTeamMembers = [
-  'nizzyabi',
   'ahmetskilinc',
   'BlankParticle',
   'needlexo',
@@ -72,11 +71,6 @@ const specialRoles: Record<
   string,
   { role: string; position: number; x?: string; website?: string }
 > = {
-  nizzyabi: {
-    role: 'Founder & CEO',
-    position: 1,
-    x: 'nizzyabi',
-  },
   mrgsub: {
     role: 'Founder & CTO',
     position: 2,

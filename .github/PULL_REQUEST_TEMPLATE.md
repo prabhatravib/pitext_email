@@ -59,17 +59,39 @@ For changes involving data or authentication:
 - [ ] Input validation is implemented
 - [ ] Rate limiting is considered (if applicable)
 
-## Checklist
+## 📋 Checklist
 
-- [ ] I have read the [CONTRIBUTING](https://github.com/Mail-0/Zero/blob/staging/.github/CONTRIBUTING.md) document
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in complex areas
-- [ ] I have updated the documentation
+Please review and check off the following before submitting your PR:
+
+### 🧪 Testing
+- [ ] I have tested my changes locally
+- [ ] All existing tests pass
+- [ ] I have added tests for new functionality (if applicable)
+
+### 📚 Documentation
+- [ ] I have updated relevant documentation
+- [ ] Code is properly commented where necessary
+- [ ] README.md is updated (if needed)
+
+### 🔧 Code Quality
+- [ ] My code follows the project's coding standards
+- [ ] I have performed a self-review of my own code
+- [ ] I have made corresponding changes to the documentation
 - [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix/feature works
-- [ ] All tests pass locally
-- [ ] Any dependent changes are merged and published
+
+### 🚀 Deployment
+- [ ] Changes are compatible with current deployment setup
+- [ ] Environment variables are documented (if new ones added)
+
+### 🎯 Integration Areas (Check if your changes affect these areas)
+- [ ] Authentication & Authorization
+- [ ] Database Schema Changes
+- [ ] API Routes & Endpoints
+- [ ] User Interface Components
+- [ ] Email Integration (Gmail)
+- [ ] Security & Privacy
+- [ ] Performance Optimization
+- [ ] Third-party Services
 
 ## Additional Notes
 

@@ -3,20 +3,15 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev --show-interactive-dev-session=false --experimental-vectorize-bind-to-prod --env local",
-    "deploy": "wrangler deploy",
-    "start": "node server.js",
-    "start:render": "node server.js",
+    "start": "wrangler dev",
     "start:simple": "node simple-server.js",
-    "start:simple:with-build": "cd ../mail && pnpm run build && cd ../server && node simple-server.js",
-    "types": "wrangler types --env local",
-    "lint": "eslint .",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "eval": "evalite",
-    "eval:dev": "evalite watch"
+    "build": "esbuild --bundle --format=esm --outfile=dist/index.js --external:cloudflare:workers src/main.ts",
+    "dev": "wrangler dev --port 8787 --host 0.0.0.0 --compatibility-date 2024-09-04 --compatibility-flags nodejs_compat",
+    "deploy": "wrangler deploy --compatibility-date 2024-09-04 --compatibility-flags nodejs_compat",
+    "test:ai": "tsx evals/**/*.eval.ts",
+    "eval": "NODE_ENV=production tsx evals/**/*.eval.ts",
+    "eval:dev": "NODE_ENV=development tsx evals/**/*.eval.ts",
+    "eval:ci": "NODE_ENV=ci tsx evals/**/*.eval.ts"
   },
   "exports": {
     "./trpc": "./src/trpc/index.ts",
@@ -36,8 +31,7 @@
     "@googleapis/gmail": "12.0.0",
     "@googleapis/people": "3.0.9",
     "@hono/trpc-server": "^0.3.4",
-    "@microsoft/microsoft-graph-client": "^3.0.7",
-    "@microsoft/microsoft-graph-types": "^2.40.0",
+
     "@modelcontextprotocol/sdk": "1.15.1",
     "@react-email/components": "^0.0.41",
     "@react-email/render": "1.1.0",
@@ -54,7 +48,7 @@
     "cheerio": "1.1.0",
     "date-fns": "^4.1.0",
     "dedent": "^1.6.0",
-    "drizzle-orm": "^0.43.1",
+
     "effect": "3.16.12",
     "elevenlabs": "1.59.0",
     "email-addresses": "^5.0.0",
@@ -92,7 +86,7 @@
     "@zero/eslint-config": "workspace:*",
     "@zero/tsconfig": "workspace:*",
     "autoevals": "0.0.130",
-    "drizzle-kit": "0.20.13",
+
     "eslint": "^9.27.0",
     "evalite": "0.11.4",
     "jiti": "2.4.2",

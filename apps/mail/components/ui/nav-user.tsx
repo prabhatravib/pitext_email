@@ -446,6 +446,7 @@ export function NavUser() {
             </div>
 
             <div className="flex items-center justify-center gap-1">
+              {/* Removed phone number verification - Gmail OAuth only */}
               {/* {isSessionPending ? null : !session.user.phoneNumberVerified ? (
                 <SetupInboxDialog />
               ) : (

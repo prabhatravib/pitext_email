@@ -44,12 +44,7 @@ export const RecursiveFolder = ({
       }
 
       const labelToUse = label;
-
-      if (activeAccount.providerId === 'microsoft') {
-        navigate(`/mail/${id}`);
-      } else {
-        handleFilterByLabel(labelToUse);
-      }
+      handleFilterByLabel(labelToUse);
 
       if (isMobile) {
         setOpenMobile(false);
@@ -64,7 +59,7 @@ export const RecursiveFolder = ({
     <LabelSidebarContextMenu
       labelId={label.id}
       key={label.id}
-      hide={activeAccount?.providerId === 'microsoft' || hasChildren}
+      hide={hasChildren}
     >
       <Folder
         element={label.name}

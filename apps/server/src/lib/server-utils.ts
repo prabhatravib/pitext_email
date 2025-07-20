@@ -1,46 +1,34 @@
 import { getContext } from 'hono/context-storage';
-import { connection } from '../db/schema';
 import type { HonoContext } from '../ctx';
-import { env } from 'cloudflare:workers';
 import { createDriver } from './driver';
 
-export const getZeroDB = (userId: string) => {
-  const stub = env.ZERO_DB.get(env.ZERO_DB.idFromName(userId));
-  const rpcTarget = stub.setMetaData(userId);
-  return rpcTarget;
-};
+// Simple in-memory user connection structure
+export interface UserConnection {
+  id: string;
+  userId: string;
+  providerId: 'google';
+  email: string;
+  name?: string;
+  accessToken: string;
+  refreshToken: string;
+  scope: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export const getZeroAgent = async (connectionId: string) => {
-  const stub = env.ZERO_AGENT.get(env.ZERO_AGENT.idFromName(connectionId));
-  const rpcTarget = await stub.setMetaData(connectionId);
-  await rpcTarget.setupAuth(connectionId);
-  return rpcTarget;
-};
-
-export const getActiveConnection = async () => {
+export const getActiveConnection = async (): Promise<UserConnection> => {
   const c = getContext<HonoContext>();
   const { sessionUser } = c.var;
   if (!sessionUser) throw new Error('Session Not Found');
 
-  const db = getZeroDB(sessionUser.id);
-
-  const userData = await db.findUser();
-
-  if (userData?.defaultConnectionId) {
-    const activeConnection = await db.findUserConnection(userData.defaultConnectionId);
-    if (activeConnection) return activeConnection;
-  }
-
-  const firstConnection = await db.findFirstConnection();
-  if (!firstConnection) {
-    console.error(`No connections found for user ${sessionUser.id}`);
-    throw new Error('No connections found for user');
-  }
-
-  return firstConnection;
+  // Since we're not using persistent storage, we'll need to get connection info
+  // from the session or auth provider directly
+  // This will need to be implemented based on your auth setup
+  throw new Error('getActiveConnection needs to be implemented without database');
 };
 
-export const connectionToDriver = (activeConnection: typeof connection.$inferSelect) => {
+export const connectionToDriver = (activeConnection: UserConnection) => {
   if (!activeConnection.accessToken || !activeConnection.refreshToken) {
     throw new Error(`Invalid connection ${JSON.stringify(activeConnection?.id)}`);
   }

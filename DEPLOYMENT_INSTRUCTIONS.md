@@ -1,8 +1,8 @@
-# PiText Email - Gmail Import Deployment Guide
+# PiText Email - Gmail Integration Deployment Guide
 
-## 🎯 Goal: Get Gmail Import Working
+## 🎯 Goal: Get Gmail Integration Working
 
-This guide focuses on deploying PiText Email with working Gmail import functionality.
+This guide focuses on deploying PiText Email with working Gmail integration functionality.
 
 ## 📋 Prerequisites
 

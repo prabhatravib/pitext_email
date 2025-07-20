@@ -55,12 +55,11 @@ const link = {
   textDecoration: 'underline',
 };
 
+// Removed nizzy signature - using generic signature
 const signature = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '20px 0 0',
-  fontWeight: '500',
+  fontSize: '14px',
+  color: '#666',
+  marginTop: '20px',
 };
 
 interface EmailProps {
@@ -105,7 +104,7 @@ export const WelcomeEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Thanks for being one of the first to join this journey 🚀
             </Text>
-            <Text style={signature}>Nizzy</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -157,7 +156,7 @@ export const Mail0ProEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Let's level up your inbox,
             </Text>
-            <Text style={signature}>Nizzy</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -199,7 +198,7 @@ export const AutoLabelingEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Thanks for being here,
             </Text>
-            <Text style={signature}>Nizzy</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -244,7 +243,7 @@ export const AIWritingAssistantEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Talk soon,
             </Text>
-            <Text style={signature}>Adam</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -291,7 +290,7 @@ export const ShortcutsEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Let's make your inbox feel like second nature.
             </Text>
-            <Text style={signature}>Adam</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -336,7 +335,7 @@ export const CategoriesEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Talk soon,
             </Text>
-            <Text style={signature}>Adam</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -384,7 +383,7 @@ export const SuperSearchEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               See you in the future,
             </Text>
-            <Text style={signature}>Adam</Text>
+            <Text style={signature}>PiText Team</Text>
           </Section>
         </Container>
       </Body>
@@ -426,7 +425,7 @@ export const Mail0ProWelcomeEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Let's make this the smartest inbox you've ever used.
             </Text>
-            <Text style={signature}>Nizzy</Text>
+            <Text style={signature}>PiText Team</Text>
             <Text style={text}>
               P.S. If anything feels off or confusing, just reply to this email. We're here.
             </Text>
@@ -468,7 +467,7 @@ export const Mail0CancellationEmail = ({ name }: EmailProps) => {
             <Text style={text}>
               Thanks for giving Mail0 a shot,
             </Text>
-            <Text style={signature}>Nizzy</Text>
+            <Text style={signature}>PiText Team</Text>
             <Text style={text}>
               P.S. If you ever want to come back, your setup will be waiting for you ⚡️
             </Text>

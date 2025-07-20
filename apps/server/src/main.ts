@@ -1,92 +1,40 @@
-import {
-  createUpdatedMatrixFromNewEmail,
-  initializeStyleMatrixFromEmail,
-  type EmailMatrix,
-  type WritingStyleMatrix,
-} from './services/writing-style-service';
-import {
-  account,
-  connection,
-  note,
-  session,
-  user,
-  userHotkeys,
-  userSettings,
-  writingStyleMatrix,
-} from './db/schema';
-import { env, WorkerEntrypoint, DurableObject, RpcTarget } from 'cloudflare:workers';
+import { authProviders, getSocialProviders } from './lib/auth-providers';
+import { runMainWorkflow } from './pipelines.effect';
+import { cors } from 'hono/cors';
+import { handle } from 'hono/cloudflare-workers';
+import { Hono } from 'hono';
+import { contextStorage } from 'hono/context-storage';
+import { authMiddleware } from './lib/auth';
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import type { HonoContext } from './ctx';
+import { trpcServer } from '@hono/trpc-server';
+import { appRouter } from './trpc';
+import { env, WorkerEntrypoint } from 'cloudflare:workers';
 import { EProviders, type ISubscribeBatch, type IThreadBatch } from './types';
 import { oAuthDiscoveryMetadata } from 'better-auth/plugins';
-import { getZeroDB, verifyToken } from './lib/server-utils';
-import { eq, and, desc, asc, inArray } from 'drizzle-orm';
+import { verifyToken } from './lib/server-utils';
 import { EWorkflowType, runWorkflow } from './pipelines';
-import { contextStorage } from 'hono/context-storage';
 import { defaultUserSettings } from './lib/schemas';
 import { createLocalJWKSet, jwtVerify } from 'jose';
 import { routePartykitRequest } from 'partyserver';
-
 import { enableBrainFunction } from './lib/brain';
-import { trpcServer } from '@hono/trpc-server';
 import { agentsMiddleware } from 'hono-agents';
 import { ZeroMCP } from './routes/agent/mcp';
 import { publicRouter } from './routes/auth';
 import { autumnApi } from './routes/autumn';
 import { ZeroAgent } from './routes/agent';
-import type { HonoContext } from './ctx';
-import { createDb, type DB } from './db';
+
 import { createAuth } from './lib/auth';
 import { aiRouter } from './routes/ai';
 import { Autumn } from 'autumn-js';
-import { appRouter } from './trpc';
-import { cors } from 'hono/cors';
-import { Effect } from 'effect';
-import { Hono } from 'hono';
 
-export class DbRpcDO extends RpcTarget {
-  constructor(
-    private mainDo: ZeroDB,
-    private userId: string,
-  ) {
-    super();
-  }
+// Database classes removed - no persistent storage needed
 
-  async findUser(): Promise<typeof user.$inferSelect | undefined> {
-    return await this.mainDo.findUser(this.userId);
-  }
 
-  async findUserConnection(
-    connectionId: string,
-  ): Promise<typeof connection.$inferSelect | undefined> {
-    return await this.mainDo.findUserConnection(this.userId, connectionId);
-  }
 
-  async updateUser(data: Partial<typeof user.$inferInsert>) {
-    return await this.mainDo.updateUser(this.userId, data);
-  }
 
-  async deleteConnection(connectionId: string) {
-    return await this.mainDo.deleteConnection(connectionId, this.userId);
-  }
 
-  async findFirstConnection(): Promise<typeof connection.$inferSelect | undefined> {
-    return await this.mainDo.findFirstConnection(this.userId);
-  }
-
-  async findManyConnections(): Promise<(typeof connection.$inferSelect)[]> {
-    return await this.mainDo.findManyConnections(this.userId);
-  }
-
-  async findManyNotesByThreadId(threadId: string): Promise<(typeof note.$inferSelect)[]> {
-    return await this.mainDo.findManyNotesByThreadId(this.userId, threadId);
-  }
-
-  async createNote(payload: Omit<typeof note.$inferInsert, 'userId'>) {
-    return await this.mainDo.createNote(this.userId, payload as typeof note.$inferInsert);
-  }
-
-  async updateNote(noteId: string, payload: Partial<typeof note.$inferInsert>) {
-    return await this.mainDo.updateNote(this.userId, noteId, payload);
-  }
 
   async updateManyNotes(
     notes: { id: string; order: number; isPinned?: boolean | null }[],

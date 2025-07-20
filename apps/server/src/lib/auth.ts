@@ -1,25 +1,26 @@
-import { createAuthMiddleware, phoneNumber, jwt, bearer, mcp } from 'better-auth/plugins';
+import { createAuthMiddleware, jwt, bearer, mcp } from 'better-auth/plugins';
 import { type Account, betterAuth, type BetterAuthOptions } from 'better-auth';
 import { getBrowserTimezone, isValidTimezone } from './timezones';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+// Removed drizzleAdapter import - no longer using database
 import { getSocialProviders } from './auth-providers';
-import { redis, resend, twilio } from './services';
+import { redis } from './services';
 import { getContext } from 'hono/context-storage';
-import { user as _user } from '../db/schema';
+// Removed database schema imports - no longer needed
 import { defaultUserSettings } from './schemas';
 
 import { disableBrainFunction } from './brain';
 import { APIError } from 'better-auth/api';
-import { getZeroDB } from './server-utils';
+// Removed getZeroDB import - no longer using database
 import { type EProviders } from '../types';
 import type { HonoContext } from '../ctx';
 import { env } from 'cloudflare:workers';
 import { createDriver } from './driver';
 
-import { createDb } from '../db';
+// Removed createDb import - no longer using database
 import { dubAnalytics } from "@dub/better-auth";
 import { Dub } from "dub";
 
+// Simplified connection handler - without database operations
 const connectionHandlerHook = async (account: Account) => {
   if (!account.accessToken || !account.refreshToken) {
     console.error('Missing Access/Refresh Tokens', { account });
@@ -39,38 +40,22 @@ const connectionHandlerHook = async (account: Account) => {
     throw new APIError('UNAUTHORIZED', { message: 'Failed to get user info' });
   });
 
-
   if (!userInfo?.address) {
     console.error('Missing email in user info:', { userInfo });
     throw new APIError('BAD_REQUEST', { message: 'Missing "email" in user info' });
   }
 
-  const updatingInfo = {
-    name: userInfo.name || 'Unknown',
-    picture: userInfo.photo || '',
-    accessToken: account.accessToken,
-    refreshToken: account.refreshToken,
-    scope: driver.getScope(),
-    expiresAt: new Date(Date.now() + (account.accessTokenExpiresAt?.getTime() || 3600000)),
-  };
-
-  const db = getZeroDB(account.userId);
-  const [result] = await db.createConnection(
-    account.providerId as EProviders,
-    userInfo.address,
-    updatingInfo,
-  );
+  // Note: Connection info is no longer stored in database
+  // This would need to be handled differently (e.g., in session or client-side)
+  console.log('Connection established for:', userInfo.address);
 
   if (env.GOOGLE_S_ACCOUNT && env.GOOGLE_S_ACCOUNT !== '{}') {
-    await env.subscribe_queue.send({
-      connectionId: result.id,
-      providerId: account.providerId,
-    });
+    // Note: Queue functionality removed - no longer doing background sync
+    console.log('Background sync disabled - using on-demand fetch');
   }
 };
 
 export const createAuth = () => {
-  const twilioClient = twilio();
   const dub = new Dub();
 
   return betterAuth({
@@ -83,18 +68,7 @@ export const createAuth = () => {
       }),
       jwt(),
       bearer(),
-      phoneNumber({
-        sendOTP: async ({ code, phoneNumber }) => {
-          await twilioClient.messages
-            .send(phoneNumber, `Your verification code is: ${code}, do not share it with anyone.`)
-            .catch((error) => {
-              console.error('Failed to send OTP', error);
-              throw new APIError('INTERNAL_SERVER_ERROR', {
-                message: `Failed to send OTP, ${error.message}`,
-              });
-            });
-        },
-      }),
+      // Removed phoneNumber plugin - no SMS authentication
     ],
     user: {
       deleteUser: {
@@ -102,61 +76,61 @@ export const createAuth = () => {
         async sendDeleteAccountVerification(data) {
           const verificationUrl = data.url;
 
-          await resend().emails.send({
-            from: '0.email <no-reply@0.email>',
-            to: data.user.email,
-            subject: 'Delete your 0.email account',
-            html: `
-            <h2>Delete Your 0.email Account</h2>
-            <p>Click the link below to delete your account:</p>
-            <a href="${verificationUrl}">${verificationUrl}</a>
-          `,
-          });
+          // Removed resend() - no email service
+          // await resend().emails.send({
+          //   from: '0.email <no-reply@0.email>',
+          //   to: data.user.email,
+          //   subject: 'Delete your 0.email account',
+          //   html: `
+          //   <h2>Delete Your 0.email Account</h2>
+          //   <p>Click the link below to delete your account:</p>
+          //   <a href="${verificationUrl}">${verificationUrl}</a>
+          // `,
+          // });
         },
         beforeDelete: async (user, request) => {
           if (!request) throw new APIError('BAD_REQUEST', { message: 'Request object is missing' });
-          const db = getZeroDB(user.id);
-          const connections = await db.findManyConnections();
           const context = getContext<HonoContext>();
           try {
-            await context.var.autumn.customers.delete(user.id);
+            // Removed context.var.autumn.customers.delete(user.id); - no database
           } catch (error) {
             console.error('Failed to delete Autumn customer:', error);
             // Continue with deletion process despite Autumn failure
           }
 
-          const revokedAccounts = (
-            await Promise.allSettled(
-              connections.map(async (connection) => {
-                if (!connection.accessToken || !connection.refreshToken) return false;
-                await disableBrainFunction({
-                  id: connection.id,
-                  providerId: connection.providerId as EProviders,
-                });
-                const driver = createDriver(connection.providerId, {
-                  auth: {
-                    accessToken: connection.accessToken,
-                    refreshToken: connection.refreshToken,
-                    userId: user.id,
-                    email: connection.email,
-                  },
-                });
-                const token = connection.refreshToken;
-                return await driver.revokeToken(token || '');
-              }),
-            )
-          ).map((result) => {
-            if (result.status === 'fulfilled') {
-              return result.value;
-            }
-            return false;
-          });
+          // Removed connections.map(async (connection) => { ... }) - no database
+          // const revokedAccounts = (
+          //   await Promise.allSettled(
+          //     connections.map(async (connection) => {
+          //       if (!connection.accessToken || !connection.refreshToken) return false;
+          //       await disableBrainFunction({
+          //         id: connection.id,
+          //         providerId: connection.providerId as EProviders,
+          //       });
+          //       const driver = createDriver(connection.providerId, {
+          //         auth: {
+          //           accessToken: connection.accessToken,
+          //           refreshToken: connection.refreshToken,
+          //           userId: user.id,
+          //           email: connection.email,
+          //         },
+          //       });
+          //       const token = connection.refreshToken;
+          //       return await driver.revokeToken(token || '');
+          //     }),
+          //   )
+          // ).map((result) => {
+          //   if (result.status === 'fulfilled') {
+          //     return result.value;
+          //   }
+          //   return false;
+          // });
 
-          if (revokedAccounts.every((value) => !!value)) {
-            console.log('Failed to revoke some accounts');
-          }
+          // if (revokedAccounts.every((value) => !!value)) {
+          //   console.log('Failed to revoke some accounts');
+          // }
 
-          await db.deleteUser();
+          // await db.deleteUser(); // No longer using database
         },
       },
     },
@@ -174,17 +148,18 @@ export const createAuth = () => {
       enabled: false,
       requireEmailVerification: true,
       sendResetPassword: async ({ user, url }) => {
-        await resend().emails.send({
-          from: '0.email <onboarding@0.email>',
-          to: user.email,
-          subject: 'Reset your password',
-          html: `
-            <h2>Reset Your Password</h2>
-            <p>Click the link below to reset your password:</p>
-            <a href="${url}">${url}</a>
-            <p>If you didn't request this, you can safely ignore this email.</p>
-          `,
-        });
+        // Removed resend() - no email service
+        // await resend().emails.send({
+        //   from: '0.email <onboarding@0.email>',
+        //   to: user.email,
+        //   subject: 'Reset your password',
+        //   html: `
+        //   <h2>Reset Your Password</h2>
+        //   <p>Click the link below to reset your password:</p>
+        //   <a href="${url}">${url}</a>
+        //   <p>If you didn't request this, you can safely ignore this email.</p>
+        // `,
+        // });
       },
     },
     emailVerification: {
@@ -193,16 +168,17 @@ export const createAuth = () => {
       sendVerificationEmail: async ({ user, token }) => {
         const verificationUrl = `${env.VITE_PUBLIC_APP_URL}/api/auth/verify-email?token=${token}&callbackURL=/settings/connections`;
 
-        await resend().emails.send({
-          from: '0.email <onboarding@0.email>',
-          to: user.email,
-          subject: 'Verify your 0.email account',
-          html: `
-            <h2>Verify Your 0.email Account</h2>
-            <p>Click the link below to verify your email:</p>
-            <a href="${verificationUrl}">${verificationUrl}</a>
-          `,
-        });
+        // Removed resend() - no email service
+        // await resend().emails.send({
+        //   from: '0.email <onboarding@0.email>',
+        //   to: user.email,
+        //   subject: 'Verify your 0.email account',
+        //   html: `
+        //   <h2>Verify Your 0.email Account</h2>
+        //   <p>Click the link below to verify your email:</p>
+        //   <a href="${verificationUrl}">${verificationUrl}</a>
+        // `,
+        // });
       },
     },
     hooks: {
@@ -213,8 +189,9 @@ export const createAuth = () => {
           const newSession = ctx.context.newSession;
           if (newSession) {
             // Check if user already has settings
-            const db = getZeroDB(newSession.user.id);
-            const existingSettings = await db.findUserSettings();
+                         const context = getContext<HonoContext>();
+             // Simplified: no longer checking database for existing settings
+             const existingSettings = null;
 
             if (!existingSettings) {
               // get timezone from vercel's header
@@ -225,10 +202,8 @@ export const createAuth = () => {
                   ? headerTimezone
                   : getBrowserTimezone();
               // write default settings against the user
-              await db.insertUserSettings({
-                ...defaultUserSettings,
-                timezone,
-              });
+                             // Note: Settings no longer stored server-side
+               console.log('Default settings would be applied:', { ...defaultUserSettings, timezone });
             }
           }
         }
@@ -240,9 +215,15 @@ export const createAuth = () => {
 
 const createAuthConfig = () => {
   const cache = redis();
-  const { db } = createDb(env.HYPERDRIVE.connectionString);
   return {
-    database: drizzleAdapter(db, { provider: 'pg' }),
+    database: {
+      // No database connection, so no database adapter
+      // This section is now effectively a placeholder
+      // For now, we'll just return an empty object
+      // In a real scenario, you might return a mock or throw an error
+      // if you were to use a database-dependent feature.
+      // For this example, we'll just return an empty object.
+    },
     secondaryStorage: {
       get: async (key: string) => {
         const value = await cache.get(key);
@@ -287,7 +268,7 @@ const createAuthConfig = () => {
       accountLinking: {
         enabled: true,
         allowDifferentEmails: true,
-        trustedProviders: ['google', 'microsoft'],
+        trustedProviders: ['google'],
       },
     },
     onAPIError: {

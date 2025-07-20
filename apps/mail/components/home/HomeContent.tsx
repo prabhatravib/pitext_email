@@ -449,34 +449,15 @@ export default function HomeContent() {
                 </div>
                 <div className="flex flex-col items-start justify-start gap-1.5 self-stretch px-1.5">
                   <div className="inline-flex items-center justify-start gap-2.5 self-stretch rounded-md p-2.5">
-                    <img
-                      alt="Nizzy"
-                      height={250}
-                      width={250}
-                      className="h-6 w-6 rounded-full object-cover"
-                      src="/nizzy.jpg"
-                    />
-                    <div className="inline-flex h-7 flex-1 flex-col items-start justify-start gap-2">
-                      <div className="inline-flex items-start justify-start gap-2 self-stretch">
-                        <div className="flex flex-1 items-center justify-start gap-2.5">
-                          <div className="flex items-center justify-start gap-[3.04px]">
-                            <div className="text-base-gray-950 justify-start text-xs leading-3">
-                              Nizzy
-                            </div>
-                            <div className="justify-start text-center text-xs leading-3 text-[#8C8C8C]">
-                              [9]
-                            </div>
-                          </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex -space-x-2">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
+                          PT
                         </div>
-                        <div className="text-xs font-normal leading-3 text-[#8C8C8C]">Mar 29</div>
                       </div>
-                      <div className="inline-flex items-center justify-start gap-2 self-stretch">
-                        <div className="text-xs font-normal leading-3 text-[#8C8C8C]">
-                          New design review
-                        </div>
-                        <div className="flex items-start justify-start gap-[3.04px]">
-                          <div className="relative h-3.5 w-3.5 overflow-hidden" />
-                        </div>
+                      <div className="text-sm">
+                        <div className="font-medium">PiText Team</div>
+                        <div className="text-muted-foreground">Building the future of email</div>
                       </div>
                     </div>
                   </div>

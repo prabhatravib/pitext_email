@@ -1,17 +1,12 @@
 import type { MailManager, ManagerConfig } from './types';
-import { OutlookMailManager } from './microsoft';
 import { GoogleMailManager } from './google';
 
-const supportedProviders = {
-  google: GoogleMailManager,
-  microsoft: OutlookMailManager,
-};
-
 export const createDriver = (
-  provider: keyof typeof supportedProviders | (string & {}),
+  provider: string,
   config: ManagerConfig,
 ): MailManager => {
-  const Provider = supportedProviders[provider as keyof typeof supportedProviders];
-  if (!Provider) throw new Error('Provider not supported');
-  return new Provider(config);
+  if (provider === 'google') {
+    return new GoogleMailManager(config);
+  }
+  throw new Error(`Provider "${provider}" not supported. Only Google is supported.`);
 };

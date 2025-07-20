@@ -139,7 +139,7 @@
     "@types/sanitize-html": "2.13.0",
     "@zero/eslint-config": "workspace:*",
     "@zero/tsconfig": "workspace:*",
-    "drizzle-kit": "0.20.13",
+
     "eslint": "9.27.0",
     "jiti": "2.4.2",
     "postcss": "8.5.3",

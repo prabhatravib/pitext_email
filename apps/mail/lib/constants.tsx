@@ -1,4 +1,4 @@
-import { GmailColor, } from '../components/icons/icons';
+import { GmailColor } from '@/components/icons/icons';
 
 export const I18N_LOCALE_COOKIE_NAME = 'i18n:locale';
 export const SIDEBAR_COOKIE_NAME = 'sidebar:state';
@@ -10,7 +10,7 @@ export const SIDEBAR_WIDTH_ICON = '3rem';
 export const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 export const BASE_URL = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
 export const MAX_URL_LENGTH = 2000;
-export const CACHE_BURST_KEY = 'cache-burst:v0.0.5';
+export const CACHE_BURST_KEY = 'zero-cache-burst-v1';
 
 export const emailProviders = [
   {
@@ -18,11 +18,6 @@ export const emailProviders = [
     icon: GmailColor,
     providerId: 'google',
   },
-  //   {
-  //     name: 'Outlook',
-  //     icon: OutlookColor,
-  //     providerId: 'microsoft',
-  //   },
 ] as const;
 
 interface GmailColor {
@@ -47,4 +42,19 @@ export const GMAIL_COLORS: GmailColor[] = [
   { textColor: '#007B83', backgroundColor: '#B2EBF2' },
   { textColor: '#5B2C6F', backgroundColor: '#E1BEE7' },
   { textColor: '#BF360C', backgroundColor: '#FFAB91' },
+];
+
+export const defaultChatPrompts = [
+  {
+    title: 'Summarize',
+    prompt: 'Can you summarize this email?',
+  },
+  {
+    title: 'Action items',
+    prompt: 'What are the action items in this email?',
+  },
+  {
+    title: 'Draft reply',
+    prompt: 'Can you draft a reply to this email?',
+  },
 ];
