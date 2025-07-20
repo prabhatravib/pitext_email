@@ -16,8 +16,9 @@ services:
       cd apps/mail
       echo "📁 Changed to mail directory: $(pwd)"
       
-      # Run the build script
-      node build-simple.js
+      # Run the build script that we know works
+      echo "🔨 Running build script..."
+      pnpm run build
       
       # Verify build output
       echo "🔍 Verifying build output..."
@@ -28,6 +29,7 @@ services:
         
         if [ -f "build/client/index.html" ]; then
           echo "✅ index.html exists"
+          echo "📄 index.html size: $(wc -c < build/client/index.html) bytes"
         else
           echo "❌ index.html missing in build/client"
           echo "📄 Full directory tree:"
