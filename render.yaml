@@ -4,16 +4,39 @@ services:
     name: pitext-email
     runtime: node
     buildCommand: |
+      echo "🚀 Starting deployment build process..."
       pnpm install --frozen-lockfile
+      echo "✅ Dependencies installed"
+      
       cd apps/mail
-      echo "Building frontend..."
+      echo "📁 Changed to mail directory: $(pwd)"
+      echo "📄 Available files: $(ls -la)"
+      
+      echo "🔨 Building frontend..."
       pnpm run build:simple-fallback
-      echo "Build completed. Checking build output..."
-      ls -la build/client/
-      if [ ! -f "build/client/index.html" ]; then
-        echo "❌ Build failed - index.html not found"
+      
+      echo "🔍 Checking build output..."
+      if [ -d "build/client" ]; then
+        echo "✅ Build directory exists"
+        echo "📄 Files in build: $(ls -la build/client/)"
+        
+        if [ -f "build/client/index.html" ]; then
+          echo "✅ index.html exists"
+          echo "📄 index.html content preview:"
+          head -5 build/client/index.html
+        else
+          echo "❌ index.html missing"
+          echo "📄 Available files in build/client:"
+          ls -la build/client/
+          exit 1
+        fi
+      else
+        echo "❌ Build directory not found"
+        echo "📄 Current directory contents:"
+        ls -la
         exit 1
       fi
+      
       echo "✅ Build verification passed"
       cd ../..
     startCommand: pnpm run start:simple
@@ -22,6 +45,11 @@ services:
         value: production
       - key: PORT
         value: "10000"
+      # Build environment variables
+      - key: CI
+        value: "true"
+      - key: VITE_BUILD_MODE
+        value: "production"
       # Google OAuth (Optional - for Gmail import)
       - key: GOOGLE_CLIENT_ID
         sync: false

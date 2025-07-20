@@ -10,6 +10,9 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 async function buildSimple() {
   try {
     console.log('🚀 Starting simple client build...');
+    console.log('📁 Current directory:', __dirname);
+    console.log('🔧 Node version:', process.version);
+    console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
     
     // Create build directory
     const buildDir = resolve(__dirname, 'build/client');
@@ -41,7 +44,7 @@ async function buildSimple() {
     
     // Build assets with Vite
     console.log('🔨 Building with Vite...');
-    await build({
+    const result = await build({
       configFile: resolve(__dirname, 'vite.client.config.ts'),
       mode: 'production',
       build: {
@@ -54,6 +57,8 @@ async function buildSimple() {
         }
       }
     });
+    
+    console.log('✅ Vite build completed');
     
     // Verify build output
     console.log('🔍 Verifying build output...');
@@ -71,6 +76,15 @@ async function buildSimple() {
         } else {
           console.log(`❌ ${file} missing`);
         }
+      }
+      
+      // Check for assets directory
+      const assetsDir = resolve(buildDir, 'assets');
+      if (fs.existsSync(assetsDir)) {
+        const assetFiles = fs.readdirSync(assetsDir);
+        console.log('📄 Assets files:', assetFiles);
+      } else {
+        console.log('⚠️ Assets directory not found');
       }
     } else {
       console.log('❌ Build directory not found after build');
