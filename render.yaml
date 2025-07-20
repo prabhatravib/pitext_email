@@ -3,7 +3,7 @@ services:
   - type: web
     name: pitext-email
     runtime: node
-    buildCommand: pnpm install --frozen-lockfile && pnpm run build:frontend
+    buildCommand: pnpm install --frozen-lockfile && cd apps/mail && pnpm run build:simple-fallback && cd ../..
     startCommand: pnpm run start:simple
     envVars:
       - key: NODE_ENV

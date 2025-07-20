@@ -10,6 +10,7 @@
     "build:client": "vite build --mode client",
     "build:simple": "npx vite build --outDir build/client --mode client",
     "build:client-only": "node build-client-only.js",
+    "build:simple-fallback": "node build-simple.js",
     "start": "node server.js",
     "start:render": "node server.js",
     "types": "wrangler types",
