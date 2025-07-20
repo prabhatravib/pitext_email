@@ -1,32 +1,43 @@
-name: CI
+name: autofix.ci
 
 on:
-  push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  node:
+  autofix:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Update submodules
-        run: git submodule update --init --recursive
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install pnpm
-        run: npm install -g pnpm
-      - uses: actions/cache@v3
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-      - name: Install dependencies
-        run: pnpm install
-      - name: Lint mail
-        run: pnpm --filter pitext_mail lint
-      - name: Test mail
-        run: pnpm --filter pitext_mail test --if-present
-      - name: Build mail
-        run: pnpm --filter pitext_mail build 
+      - name: Checkout Code 🛎
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm 🌟
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node 📦
+        uses: actions/setup-node@v4
+
+      - name: Ensure npm registry is set 🔧
+        run: pnpm config set registry https://registry.npmjs.org/
+
+      - name: Verify catalog configuration 📋
+        run: |
+          echo "Verifying pnpm workspace configuration..."
+          cat pnpm-workspace.yaml
+          echo "Checking pnpm version..."
+          pnpm --version
+          echo "Checking pnpm config..."
+          pnpm config list
+
+      - name: Install dependencies 📦
+        run: |
+          pnpm store prune
+          pnpm config set registry https://registry.npmjs.org/
+          pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Lint JS
+        run: pnpm dlx oxlint@latest --deny-warnings

@@ -1,2 +1,13 @@
 packages:
-  - "pitext_mail/**" 
+  - apps/*
+  - packages/*
+  - scripts/*
+onlyBuiltDependencies:
+  - core-js
+  - core-js-pure
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - workerd
+patchedDependencies:
+  novel: patches/novel.patch

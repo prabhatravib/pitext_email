@@ -1,8 +1,0 @@
-{
-  "name": "Pitext Email Client",
-  "short_name": "PitextEmail",
-  "start_url": "/email/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "description": "Pitext Email Client"
-}
