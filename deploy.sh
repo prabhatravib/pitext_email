@@ -1,38 +1,46 @@
 #!/bin/bash
 
-# Deployment script for PiText Mail App
-# This script ensures the build process works correctly for Render deployment
-
+# Deployment script for PiText Email
 set -e
 
-echo "🚀 Starting PiText Mail App deployment..."
+echo "🚀 Starting deployment process..."
 
 # Check if we're in the right directory
-if [ ! -f "email_app.py" ]; then
-    echo "❌ Error: email_app.py not found. Please run this script from the pitext_mail directory."
+if [ ! -f "package.json" ]; then
+    echo "❌ Error: package.json not found. Please run this script from the project root."
     exit 1
 fi
 
+# Install dependencies
 echo "📦 Installing dependencies..."
-pnpm install
+pnpm install --frozen-lockfile
 
-echo "🔨 Building mail app..."
-cd apps/mail
-pnpm build
+# Build frontend
+echo "🔨 Building frontend..."
+pnpm run build:frontend
 
 # Check if build was successful
-if [ ! -d "build/client" ]; then
-    echo "❌ Build failed! build/client directory not found."
-    echo "Available files:"
-    ls -la
+if [ ! -f "apps/mail/build/client/index.html" ]; then
+    echo "❌ Error: Frontend build failed. index.html not found."
     exit 1
 fi
 
-echo "✅ Build completed successfully!"
-echo "📁 Build contents:"
-ls -la build/client/
+echo "✅ Frontend build completed successfully!"
 
-cd ../..
+# Build backend (if needed)
+echo "🔨 Building backend..."
+pnpm run build:backend
 
-echo "🎉 Deployment preparation completed!"
-echo "The mail app is now ready to be served by email_app.py" 
+echo "✅ Backend build completed successfully!"
+
+# Check if server files exist
+if [ ! -f "apps/server/simple-server.js" ]; then
+    echo "❌ Error: Backend server file not found."
+    exit 1
+fi
+
+echo "🎉 All builds completed successfully!"
+echo "📋 Next steps:"
+echo "   1. Commit your changes: git add . && git commit -m 'Deploy fixes'"
+echo "   2. Push to trigger Render deployment: git push"
+echo "   3. Monitor deployment at: https://dashboard.render.com" 

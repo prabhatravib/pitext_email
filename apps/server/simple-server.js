@@ -11,30 +11,47 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const DATA_DIR = path.join(__dirname, 'data');
 
+// Add logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
 // Ensure data directory exists
-await fs.mkdir(DATA_DIR, { recursive: true });
+try {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  console.log('Data directory created/verified:', DATA_DIR);
+} catch (error) {
+  console.error('Error creating data directory:', error);
+}
 
 // Initialize data files if they don't exist
 const initDataFile = async (filename, defaultData) => {
   const filepath = path.join(DATA_DIR, filename);
   try {
     await fs.access(filepath);
+    console.log(`Data file exists: ${filename}`);
   } catch {
     await fs.writeFile(filepath, JSON.stringify(defaultData, null, 2));
+    console.log(`Created data file: ${filename}`);
   }
 };
 
 // Initialize default data files
-await initDataFile('threads.json', []);
-await initDataFile('messages.json', []);
-await initDataFile('users.json', {});
-await initDataFile('folders.json', {
-  inbox: { id: 'inbox', name: 'Inbox', type: 'system' },
-  sent: { id: 'sent', name: 'Sent', type: 'system' },
-  drafts: { id: 'drafts', name: 'Drafts', type: 'system' },
-  trash: { id: 'trash', name: 'Trash', type: 'system' },
-  spam: { id: 'spam', name: 'Spam', type: 'system' }
-});
+try {
+  await initDataFile('threads.json', []);
+  await initDataFile('messages.json', []);
+  await initDataFile('users.json', {});
+  await initDataFile('folders.json', {
+    inbox: { id: 'inbox', name: 'Inbox', type: 'system' },
+    sent: { id: 'sent', name: 'Sent', type: 'system' },
+    drafts: { id: 'drafts', name: 'Drafts', type: 'system' },
+    trash: { id: 'trash', name: 'Trash', type: 'system' },
+    spam: { id: 'spam', name: 'Spam', type: 'system' }
+  });
+} catch (error) {
+  console.error('Error initializing data files:', error);
+}
 
 // Middleware
 app.use(cors({
@@ -46,13 +63,23 @@ app.use(express.json());
 // Helper functions
 const readData = async (filename) => {
   const filepath = path.join(DATA_DIR, filename);
-  const data = await fs.readFile(filepath, 'utf-8');
-  return JSON.parse(data);
+  try {
+    const data = await fs.readFile(filepath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(`Error reading ${filename}:`, error);
+    return [];
+  }
 };
 
 const writeData = async (filename, data) => {
   const filepath = path.join(DATA_DIR, filename);
-  await fs.writeFile(filepath, JSON.stringify(data, null, 2));
+  try {
+    await fs.writeFile(filepath, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error(`Error writing ${filename}:`, error);
+    throw error;
+  }
 };
 
 // Mock authentication endpoint
@@ -310,8 +337,15 @@ app.all('/api/*', (req, res) => {
   });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 app.listen(PORT, () => {
   console.log(`Simple email server is running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`Add sample data: POST http://localhost:${PORT}/api/sample-data`);
+  console.log(`CORS origin: ${process.env.VITE_PUBLIC_APP_URL || 'http://localhost:3000'}`);
 }); 

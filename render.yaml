@@ -1,7 +1,7 @@
 services:
   # Simple Backend Service
   - type: web
-    name: zero-email-backend-simple
+    name: pitext-email-backend
     runtime: node
     buildCommand: |
       pnpm install --frozen-lockfile
@@ -12,24 +12,24 @@ services:
       - key: PORT
         value: "10000"
       - key: VITE_PUBLIC_APP_URL
-        value: https://zero-email-frontend.onrender.com
+        value: https://pitext-email.onrender.com
 
   # Frontend Service
   - type: web
-    name: zero-email-frontend
+    name: pitext-email
     runtime: node
     buildCommand: |
       pnpm install --frozen-lockfile
       pnpm run build:frontend
-    startCommand: pnpm run start:frontend
+    startCommand: cd apps/mail && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: VITE_PUBLIC_BACKEND_URL
-        value: https://zero-email-backend-simple.onrender.com
+        value: https://pitext-email-backend.onrender.com
       - key: VITE_PUBLIC_APP_URL
-        value: https://zero-email-frontend.onrender.com
+        value: https://pitext-email.onrender.com
       - key: BETTER_AUTH_URL
-        value: https://zero-email-backend-simple.onrender.com
+        value: https://pitext-email-backend.onrender.com
       - key: PORT
         value: "3000" 
