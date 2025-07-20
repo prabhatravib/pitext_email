@@ -1,0 +1,59 @@
+# PiText Email - Environment Variables for Single Service Deployment
+# Copy these variables to your Render Dashboard Environment settings
+
+# ============================================
+# REQUIRED FOR BASIC DEPLOYMENT
+# ============================================
+
+NODE_ENV=production
+PORT=10000
+
+# ============================================
+# APPLICATION URLs (All pointing to same service)
+# ============================================
+
+# Your single Render service URL
+VITE_PUBLIC_APP_URL=https://pitext-email.onrender.com
+VITE_PUBLIC_BACKEND_URL=https://pitext-email.onrender.com
+BETTER_AUTH_URL=https://pitext-email.onrender.com
+
+# ============================================
+# AUTHENTICATION
+# ============================================
+
+# Generate a random secret key (use: openssl rand -base64 32)
+BETTER_AUTH_SECRET=your_random_secret_key_here
+
+# ============================================
+# GOOGLE OAUTH (Optional - For Gmail Import)
+# ============================================
+
+# Get these from Google Cloud Console:
+# https://console.cloud.google.com/apis/credentials
+# GOOGLE_CLIENT_ID=your_google_client_id_here
+# GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# ============================================
+# OPTIONAL CONFIGURATION
+# ============================================
+
+# Cookie domain (use your domain without https://)
+COOKIE_DOMAIN=.onrender.com
+
+# AI Services (optional)
+# OPENAI_API_KEY=your_openai_key
+# ANTHROPIC_API_KEY=your_anthropic_key
+
+# ============================================
+# INSTRUCTIONS
+# ============================================
+# 1. This is for a SINGLE SERVICE deployment (all-in-one)
+# 2. Add these variables in Render Dashboard:
+#    - Go to your service settings (pitext-email)
+#    - Navigate to "Environment" tab
+#    - Add each variable individually
+# 3. For Gmail OAuth setup (optional):
+#    - Enable Gmail API in Google Cloud Console
+#    - Add redirect URI: https://pitext-email.onrender.com/api/auth/callback/google
+#    - Add test users if in development mode
+# 4. The app will work in demo mode without Google OAuth 

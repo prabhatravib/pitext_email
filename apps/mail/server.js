@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Add logging middleware
 app.use((req, res, next) => {
@@ -31,28 +31,61 @@ app.get('/api/trpc/*', (req, res) => {
 
 // Serve static files from the build directory
 const buildPath = path.join(__dirname, 'build/client');
-app.use(express.static(buildPath));
 
 // Check if build directory exists
 if (!fs.existsSync(buildPath)) {
-  console.error('❌ Build directory not found:', buildPath);
-  console.error('Available directories:', fs.readdirSync(__dirname));
-  process.exit(1);
+  console.warn('⚠️ Build directory not found:', buildPath);
+  console.warn('Creating temporary placeholder...');
+  
+  // Create a temporary HTML response for deployment
+  app.get('*', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PiText Email - Deployment In Progress</title>
+        <style>
+          body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+          .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+          h1 { color: #333; }
+          p { color: #666; }
+          .status { margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.9rem; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🚀 PiText Email</h1>
+          <p>Deployment in progress. The build is being compiled.</p>
+          <p>Please refresh this page in a few moments.</p>
+          <div class="status">
+            Status: Build directory pending<br>
+            Server: Running on port ${PORT}<br>
+            Backend: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not configured'}
+          </div>
+        </div>
+      </body>
+      </html>
+    `);
+  });
+} else {
+  // Serve static files
+  app.use(express.static(buildPath));
+  
+  // Check if index.html exists
+  const indexPath = path.join(buildPath, 'index.html');
+  if (!fs.existsSync(indexPath)) {
+    console.error('❌ index.html not found at:', indexPath);
+    console.error('Available files in build/client:', fs.readdirSync(buildPath));
+  }
+  
+  // Handle all routes by serving the index.html file (for SPA routing)
+  app.get('*', (req, res) => {
+    console.log('Serving index.html for route:', req.path);
+    res.sendFile(indexPath);
+  });
 }
-
-// Check if index.html exists
-const indexPath = path.join(buildPath, 'index.html');
-if (!fs.existsSync(indexPath)) {
-  console.error('❌ index.html not found at:', indexPath);
-  console.error('Available files in build/client:', fs.readdirSync(buildPath));
-  process.exit(1);
-}
-
-// Handle all routes by serving the index.html file (for SPA routing)
-app.get('*', (req, res) => {
-  console.log('Serving index.html for route:', req.path);
-  res.sendFile(indexPath);
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

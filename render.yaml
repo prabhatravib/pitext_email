@@ -1,35 +1,29 @@
 services:
-  # Simple Backend Service
-  - type: web
-    name: pitext-email-backend
-    runtime: node
-    buildCommand: |
-      pnpm install --frozen-lockfile
-    startCommand: cd apps/server && pnpm run start:simple
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: "10000"
-      - key: VITE_PUBLIC_APP_URL
-        value: https://pitext-email.onrender.com
-
-  # Frontend Service
+  # Single All-in-One Service
   - type: web
     name: pitext-email
     runtime: node
     buildCommand: |
       pnpm install --frozen-lockfile
-      cd apps/mail && pnpm run build
-    startCommand: cd apps/mail && node server.js
+      cd apps/mail && pnpm run build:simple
+    startCommand: node all-in-one-server.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: VITE_PUBLIC_BACKEND_URL
-        value: https://pitext-email-backend.onrender.com
+      - key: PORT
+        value: "10000"
+      # Google OAuth (Optional - for Gmail import)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Auth Secret
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      # URLs (pointing to self)
       - key: VITE_PUBLIC_APP_URL
         value: https://pitext-email.onrender.com
+      - key: VITE_PUBLIC_BACKEND_URL
+        value: https://pitext-email.onrender.com
       - key: BETTER_AUTH_URL
-        value: https://pitext-email-backend.onrender.com
-      - key: PORT
-        value: "3000" 
+        value: https://pitext-email.onrender.com 
