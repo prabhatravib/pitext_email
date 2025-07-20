@@ -352,6 +352,16 @@ console.log('📄 Index path:', indexPath);
 console.log('✅ Build exists:', fsSync.existsSync(buildPath));
 console.log('✅ Index exists:', fsSync.existsSync(indexPath));
 
+// List contents of build directory if it exists
+if (fsSync.existsSync(buildPath)) {
+  try {
+    const files = fsSync.readdirSync(buildPath);
+    console.log('📄 Files in build directory:', files);
+  } catch (error) {
+    console.log('❌ Error reading build directory:', error.message);
+  }
+}
+
 if (fsSync.existsSync(buildPath) && fsSync.existsSync(indexPath)) {
   console.log('✅ Serving frontend from build directory');
   app.use(express.static(buildPath));
@@ -362,9 +372,34 @@ if (fsSync.existsSync(buildPath) && fsSync.existsSync(indexPath)) {
   });
 } else {
   console.log('⚠️  Frontend build not found, serving API demo page');
-  // Serve a simple HTML interface for the API
-  app.get('*', (req, res) => {
-    res.send(`
+  
+  // Try to serve a basic frontend if build exists but index.html is missing
+  if (fsSync.existsSync(buildPath)) {
+    console.log('📁 Build directory exists but index.html missing, trying to serve assets...');
+    app.use(express.static(buildPath));
+    
+    // Serve a basic HTML that loads the built assets
+    app.get('*', (req, res) => {
+      res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>PiText Email</title>
+          <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" src="/assets/index-BDGatm95.js"></script>
+        </body>
+        </html>
+      `);
+    });
+  } else {
+    // Serve a simple HTML interface for the API
+    app.get('*', (req, res) => {
+      res.send(`
       <!DOCTYPE html>
       <html lang="en">
       <head>

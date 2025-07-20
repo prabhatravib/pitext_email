@@ -3,7 +3,19 @@ services:
   - type: web
     name: pitext-email
     runtime: node
-    buildCommand: pnpm install --frozen-lockfile && cd apps/mail && pnpm run build:simple-fallback && cd ../..
+    buildCommand: |
+      pnpm install --frozen-lockfile
+      cd apps/mail
+      echo "Building frontend..."
+      pnpm run build:simple-fallback
+      echo "Build completed. Checking build output..."
+      ls -la build/client/
+      if [ ! -f "build/client/index.html" ]; then
+        echo "❌ Build failed - index.html not found"
+        exit 1
+      fi
+      echo "✅ Build verification passed"
+      cd ../..
     startCommand: pnpm run start:simple
     envVars:
       - key: NODE_ENV
