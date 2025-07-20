@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: PiText-Router
+    runtime: python
+    buildCommand: |
+      echo "=== Project structure ==="
+      ls -la
+      echo "=== Installing dependencies ==="
+      pip install -r requirements.txt
+      echo "=== Installing desktop dependencies ==="
+      cd pitext-desktop && pip install -r requirements.txt && cd ..
+      echo "=== Installing mobile dependencies ==="
+      cd pitext-mobile && pip install -r requirements.txt && cd ..
+      echo "=== Installing travel dependencies ==="
+      cd pitext_travel && pip install -r requirements.txt && cd ..
+      echo "=== Installing calendar integration dependencies ==="
+      cd calendar_integration && pip install -r requirements.txt && cd ..
+      echo "=== Installing router dependencies ==="
+      cd router-backend && pip install -r requirements.txt && cd ..
+      echo "=== Installing Node.js dependencies for email app with optimization ==="
+      cd pitext_mail && npm install -g pnpm && pnpm install --frozen-lockfile && cd ..
+      echo "=== Building email app ==="
+      cd pitext_mail && python build_email.py && cd ..
+      echo "=== Verifying email app build ==="
+      ls -la pitext_mail/apps/mail/build/client/ || echo "Build verification failed"
+      echo "=== Production pruning and cache cleanup ==="
+      cd pitext_mail && pnpm prune --prod && rm -rf apps/*/node_modules/.cache && rm -rf apps/*/.next/cache && cd ..
+      echo "=== Installing playwright ==="
+      playwright install chromium --with-deps
+      echo "=== Final structure check ==="
+      ls -la
+      ls -la pitext-desktop/
+      ls -la pitext-mobile/
+      ls -la pitext_travel/
+      ls -la calendar_integration/
+      ls -la router-backend/
+      ls -la pitext_mail/apps/mail/build/client/
+      echo "=== Size optimization summary ==="
+      du -sh pitext_mail/node_modules
+      du -sh pitext_mail/apps/*/node_modules 2>/dev/null || echo "No app node_modules found"
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: RENDER_MODE
+        value: html
+      - key: CI
+        value: "true"
+      - key: NODE_ENV
+        value: "production"
+      - key: VITE_DISABLE_SERVER
+        value: "true"

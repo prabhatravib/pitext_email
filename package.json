@@ -1,0 +1,9 @@
+{
+  "name": "pitext-root",
+  "private": true,
+  "scripts": {
+    "mail:dev": "pnpm --filter pitext_mail dev",
+    "mail:build": "pnpm --filter pitext_mail build",
+    "mail:start": "pnpm --filter pitext_mail start"
+  }
+} 
