@@ -19,9 +19,15 @@ importers:
       '@dub/better-auth':
         specifier: 0.0.3
         version: 0.0.3
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
       dub:
         specifier: 0.63.7
         version: 0.63.7(zod@4.0.5)
+      express:
+        specifier: ^4.21.2
+        version: 4.21.2
     devDependencies:
       '@types/node':
         specifier: 22.15.29

@@ -9,8 +9,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
+
+console.log('🚀 Starting PiText Email Server...');
+console.log('📁 Data directory:', DATA_DIR);
+console.log('🔧 Port:', PORT);
 
 // Middleware
 app.use(cors({
@@ -295,18 +299,14 @@ app.all('/api/*', (req, res) => {
 
 // Serve static files from the build directory
 const buildPath = path.join(__dirname, 'apps/mail/build/client');
+const indexPath = path.join(buildPath, 'index.html');
 
-if (fs.existsSync(buildPath)) {
+if (fs.existsSync(buildPath) && fs.existsSync(indexPath)) {
   app.use(express.static(buildPath));
   
   // Handle all routes by serving index.html (SPA routing)
   app.get('*', (req, res) => {
-    const indexPath = path.join(buildPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(404).send('Build not found. Please check deployment logs.');
-    }
+    res.sendFile(indexPath);
   });
 } else {
   // Serve a simple HTML interface for the API

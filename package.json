@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.13.0",
+  "type": "module",
   "scripts": {
     "go": "pnpm docker:db:up && pnpm run dev",
     "prepare": "husky",
@@ -43,8 +44,11 @@
     "verify:deployment": "node verify-deployment.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "@dub/analytics": "0.0.27",
+    "@dub/better-auth": "0.0.3",
+    "cors": "^2.8.5",
+    "dub": "0.63.7",
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@types/node": "22.15.29",
@@ -56,11 +60,6 @@
     "prettier-plugin-tailwindcss": "0.6.12",
     "tsx": "4.19.4",
     "turbo": "^2.5.4",
-          "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "@dub/analytics": "0.0.27",
-    "@dub/better-auth": "0.0.3",
-    "dub": "0.63.7"
+    "typescript": "^5.4.5"
   }
 }
