@@ -1,48 +1,43 @@
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-  useNavigate,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-} from 'react-router';
-import { ServerProviders } from '@/providers/server-providers';
+import { type LinksFunction, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/cloudflare';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { ClientProviders } from '@/providers/client-providers';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import { useEffect, type PropsWithChildren } from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import type { AppRouter } from '@zero/server/trpc';
+import { ServerProviders } from '@/providers/server-providers';
+import { createTRPCClient } from '@trpc/client';
+import { type AppRouter } from '@/server/trpc';
+import { getLocale } from '@/locales';
+import { siteConfig } from '@/config/site';
+import { DubAnalytics } from '@/components/ui/dub-analytics';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getLocale } from '@/paraglide/runtime';
-import { siteConfig } from '@/lib/site-config';
-import { signOut } from '@/lib/auth-client';
-import type { Route } from './+types/root';
-import { m } from '@/paraglide/messages';
-import { ArrowLeft } from 'lucide-react';
-import superjson from 'superjson';
-import './globals.css';
-import { Analytics as DubAnalytics } from '@dub/analytics/react';
+import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
+import { useEffect } from 'react';
+import { type PropsWithChildren } from 'react';
 
+import styles from './globals.css';
+
+export const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: styles },
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+  { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+  { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+  { rel: 'manifest', href: '/manifest.webmanifest' },
+];
 
 const getUrl = () => {
-  const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || window.location.origin;
-  return backendUrl + '/api/trpc';
+  if (typeof window !== 'undefined') return window.location.origin;
+  return process.env.VITE_PUBLIC_APP_URL || 'http://localhost:3000';
 };
 
 export const getServerTrpc = (req: Request) =>
   createTRPCClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        maxItems: 1,
-        url: getUrl(),
-        transformer: superjson,
-        headers: req.headers,
-      }),
-    ],
+    url: `${getUrl()}/api/trpc`,
+    headers: () => {
+      const headers = new Headers();
+      const cookie = req.headers.get('cookie');
+      if (cookie) headers.set('cookie', cookie);
+      return headers;
+    },
   });
 
 export const meta: MetaFunction = () => {
@@ -59,12 +54,8 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const trpc = getServerTrpc(request);
-  const defaultConnection = await trpc.connections.getDefault
-    .query()
-    .then((res) => (res?.id as string) ?? null)
-    .catch(() => null);
-  return { connectionId: defaultConnection };
+  // For Gmail-only version, hard-code the connection ID
+  return { connectionId: 'gmail' };
 }
 
 export function Layout({ children }: PropsWithChildren) {
@@ -148,17 +139,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             onClick={() => window.location.reload()}
             className="text-muted-foreground gap-2"
           >
-            Refresh
-          </Button>
-          <Button
-            variant="outline"
-            onClick={async () => {
-              await signOut();
-              window.location.href = '/login';
-            }}
-            className="text-muted-foreground gap-2"
-          >
-            Log Out and Refresh
+            Reload Page
           </Button>
         </div>
       </div>
@@ -167,35 +148,21 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 
 function NotFound() {
-  const navigate = useNavigate();
-
   return (
     <div className="dark:bg-background flex w-full items-center justify-center bg-white text-center">
       <div className="flex-col items-center justify-center md:flex dark:text-gray-100">
-        <div className="relative">
-          <h1 className="text-muted-foreground/20 select-none text-[150px] font-bold">404</h1>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <AlertCircle className="text-muted-foreground h-20 w-20" />
-          </div>
-        </div>
-
-        {/* Message */}
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold tracking-tight">
-            {m['pages.error.notFound.title']()}
-          </h2>
-          <p className="text-muted-foreground">{m['pages.error.notFound.description']()}</p>
+          <h2 className="text-2xl font-semibold tracking-tight">Page Not Found</h2>
+          <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
         </div>
 
-        {/* Buttons */}
-        <div className="mt-2 flex justify-center gap-2">
+        <div className="mt-2 flex gap-2">
           <Button
             variant="outline"
-            onClick={() => navigate(-1)}
+            onClick={() => window.location.href = '/'}
             className="text-muted-foreground gap-2"
           >
-            <ArrowLeft className="h-4 w-4" />
-            {m['pages.error.notFound.goBack']()}
+            Go Home
           </Button>
         </div>
       </div>

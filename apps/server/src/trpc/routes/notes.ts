@@ -1,18 +1,12 @@
-import { NotesManager } from '../../lib/notes-manager';
 import { privateProcedure, router } from '../trpc';
 import { z } from 'zod';
 
-const notesProcedure = privateProcedure.use(async ({ ctx, next }) => {
-  const notesManager = new NotesManager();
-  return next({ ctx: { ...ctx, notesManager } });
-});
-
 export const notesRouter = router({
-  list: notesProcedure.input(z.object({ threadId: z.string() })).query(async ({ ctx, input }) => {
-    const notes = await ctx.notesManager.getThreadNotes(ctx.sessionUser.id, input.threadId);
-    return { notes };
+  list: privateProcedure.input(z.object({ threadId: z.string() })).query(async ({ ctx, input }) => {
+    // For Gmail-only version, return empty notes
+    return { notes: [] };
   }),
-  create: notesProcedure
+  create: privateProcedure
     .input(
       z.object({
         threadId: z.string(),
@@ -22,17 +16,10 @@ export const notesRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { threadId, color, content, isPinned } = input;
-      const note = await ctx.notesManager.createNote(
-        ctx.sessionUser.id,
-        threadId,
-        content,
-        color,
-        isPinned,
-      );
-      return { note };
+      // For Gmail-only version, notes are not persisted
+      return { note: { id: 'temp', ...input } };
     }),
-  update: notesProcedure
+  update: privateProcedure
     .input(
       z.object({
         noteId: z.string(),
@@ -47,16 +34,16 @@ export const notesRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const note = await ctx.notesManager.updateNote(ctx.sessionUser.id, input.noteId, input.data);
-      return { note };
+      // For Gmail-only version, notes are not persisted
+      return { note: { id: input.noteId, ...input.data } };
     }),
-  delete: notesProcedure
+  delete: privateProcedure
     .input(z.object({ noteId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const success = await ctx.notesManager.deleteNote(ctx.sessionUser.id, input.noteId);
-      return { success };
+      // For Gmail-only version, notes are not persisted
+      return { success: true };
     }),
-  reorder: notesProcedure
+  reorder: privateProcedure
     .input(
       z.object({
         notes: z.array(
@@ -69,18 +56,7 @@ export const notesRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { notes } = input;
-      if (!notes || notes.length === 0) {
-        console.warn('Attempted to reorder an empty array of notes');
-        return { success: true };
-      }
-
-      console.log(
-        `Reordering ${notes.length} notes:`,
-        notes.map(({ id, order, isPinned }) => ({ id, order, isPinned })),
-      );
-
-      const result = await ctx.notesManager.reorderNotes(ctx.sessionUser.id, notes);
-      return { success: result };
+      // For Gmail-only version, notes are not persisted
+      return { success: true };
     }),
 });

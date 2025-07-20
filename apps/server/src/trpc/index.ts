@@ -8,7 +8,6 @@ import { getContext } from 'hono/context-storage';
 import { draftsRouter } from './routes/drafts';
 import { labelsRouter } from './routes/label';
 import { notesRouter } from './routes/notes';
-import { brainRouter } from './routes/brain';
 import { userRouter } from './routes/user';
 import { mailRouter } from './routes/mail';
 import { bimiRouter } from './routes/bimi';
@@ -19,7 +18,6 @@ import { router } from './trpc';
 export const appRouter = router({
   ai: aiRouter,
   bimi: bimiRouter,
-  brain: brainRouter,
   categories: categoriesRouter,
   connections: connectionsRouter,
   cookiePreferences: cookiePreferencesRouter,

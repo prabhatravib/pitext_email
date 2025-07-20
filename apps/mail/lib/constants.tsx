@@ -12,6 +12,7 @@ export const BASE_URL = import.meta.env.VITE_PUBLIC_APP_URL || window.location.o
 export const MAX_URL_LENGTH = 2000;
 export const CACHE_BURST_KEY = 'zero-cache-burst-v1';
 
+// Gmail-only provider configuration
 export const emailProviders = [
   {
     name: 'Gmail',

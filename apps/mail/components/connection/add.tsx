@@ -6,17 +6,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog';
-import { useBilling } from '@/hooks/use-billing';
-import { emailProviders } from '@/lib/constants';
 import { authClient } from '@/lib/auth-client';
-import { Plus, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { useLocation } from 'react-router';
 import { m } from '@/paraglide/messages';
 import { motion } from 'motion/react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { useMemo } from 'react';
-import { toast } from 'sonner';
 
 export const AddConnectionDialog = ({
   children,
@@ -27,28 +23,7 @@ export const AddConnectionDialog = ({
   className?: string;
   onOpenChange?: (open: boolean) => void;
 }) => {
-  const { connections, attach } = useBilling();
-
-  const canCreateConnection = useMemo(() => {
-    if (!connections?.remaining && !connections?.unlimited) return false;
-    return (connections?.unlimited && !connections?.remaining) || (connections?.remaining ?? 0) > 0;
-  }, [connections]);
   const pathname = useLocation().pathname;
-
-  const handleUpgrade = async () => {
-    if (attach) {
-      toast.promise(
-        attach({
-          productId: 'pro-example',
-          successUrl: `${window.location.origin}/mail/inbox?success=true`,
-        }),
-        {
-          success: 'Redirecting to payment...',
-          error: 'Failed to process upgrade. Please try again later.',
-        },
-      );
-    }
-  };
 
   return (
     <Dialog onOpenChange={onOpenChange}>
@@ -68,73 +43,51 @@ export const AddConnectionDialog = ({
         <DialogHeader>
           <DialogTitle>{m['pages.settings.connections.connectEmail']()}</DialogTitle>
           <DialogDescription>
-            {m['pages.settings.connections.connectEmailDescription']()}
+            Connect your Gmail account to get started
           </DialogDescription>
         </DialogHeader>
-        {!canCreateConnection && (
-          <div className="mt-2 flex justify-between gap-2 rounded-lg border border-red-800 bg-red-800/20 p-2">
-            <span className="text-sm">
-              You can only connect 1 email in the free tier.{' '}
-              <span
-                onClick={handleUpgrade}
-                className="hover:bg-subtleWhite hover:text-subtleBlack cursor-pointer underline"
-              >
-                Start 7 day free trial
-              </span>{' '}
-              to connect more.
-            </span>
-            <Button onClick={handleUpgrade} className="text-sm">
-              $20<span className="text-muted-foreground -ml-2 text-xs">/month</span>
-            </Button>
-          </div>
-        )}
         <motion.div
-          className="mt-4 grid grid-cols-2 gap-4"
+          className="mt-4 flex justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          {emailProviders.map((provider, index) => {
-            const Icon = provider.icon;
-            return (
-              <motion.div
-                key={provider.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.3 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <Button
-                  disabled={!canCreateConnection}
-                  variant="outline"
-                  className="h-24 w-full flex-col items-center justify-center gap-2"
-                  onClick={async () =>
-                    await authClient.linkSocial({
-                      provider: provider.providerId,
-                      callbackURL: `${window.location.origin}${pathname}`,
-                    })
-                  }
-                >
-                  <Icon className="!size-6" />
-                  <span className="text-xs">{provider.name}</span>
-                </Button>
-              </motion.div>
-            );
-          })}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: emailProviders.length * 0.1, duration: 0.3 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
             <Button
               variant="outline"
-              className="h-24 w-full flex-col items-center justify-center gap-2 border-dashed"
+              className="h-24 w-48 flex-col items-center justify-center gap-2"
+              onClick={async () =>
+                await authClient.linkSocial({
+                  provider: 'google',
+                  callbackURL: `${window.location.origin}${pathname}`,
+                })
+              }
             >
-              <Plus className="h-12 w-12" />
-              <span className="text-xs">{m['pages.settings.connections.moreComingSoon']()}</span>
+              <svg className="size-6" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+              <span className="text-xs">Gmail</span>
             </Button>
           </motion.div>
         </motion.div>

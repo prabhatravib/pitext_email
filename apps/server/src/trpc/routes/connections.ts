@@ -1,7 +1,5 @@
 import { createRateLimiterMiddleware, privateProcedure, publicProcedure, router } from '../trpc';
-import { getActiveConnection, getZeroDB } from '../../lib/server-utils';
 import { Ratelimit } from '@upstash/ratelimit';
-
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
@@ -14,59 +12,28 @@ export const connectionsRouter = router({
       }),
     )
     .query(async ({ ctx }) => {
-      const { sessionUser } = ctx;
-      const db = getZeroDB(sessionUser.id);
-      const connections = await db.findManyConnections();
-
-      const disconnectedIds = connections
-        .filter((c) => !c.accessToken || !c.refreshToken)
-        .map((c) => c.id);
-
+      // For Gmail-only version, return empty connections list
+      // The app will handle Gmail authentication directly
       return {
-        connections: connections.map((connection) => {
-          return {
-            id: connection.id,
-            email: connection.email,
-            name: connection.name,
-            picture: connection.picture,
-            createdAt: connection.createdAt,
-            providerId: connection.providerId,
-          };
-        }),
-        disconnectedIds,
+        connections: [],
+        disconnectedIds: [],
       };
     }),
   setDefault: privateProcedure
     .input(z.object({ connectionId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const { connectionId } = input;
-      const user = ctx.sessionUser;
-      const db = getZeroDB(user.id);
-      const foundConnection = await db.findUserConnection(connectionId);
-      if (!foundConnection) throw new TRPCError({ code: 'NOT_FOUND' });
-      await db.updateUser({ defaultConnectionId: connectionId });
+      // For Gmail-only version, this is a no-op
+      return { success: true };
     }),
   delete: privateProcedure
     .input(z.object({ connectionId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const { connectionId } = input;
-      const user = ctx.sessionUser;
-      const db = getZeroDB(user.id);
-      await db.deleteConnection(connectionId);
-
-      const activeConnection = await getActiveConnection();
-      if (connectionId === activeConnection.id) await db.updateUser({ defaultConnectionId: null });
+      // For Gmail-only version, this is a no-op
+      return { success: true };
     }),
   getDefault: publicProcedure.query(async ({ ctx }) => {
-    if (!ctx.sessionUser) return null;
-    const connection = await getActiveConnection();
-    return {
-      id: connection.id,
-      email: connection.email,
-      name: connection.name,
-      picture: connection.picture,
-      createdAt: connection.createdAt,
-      providerId: connection.providerId,
-    };
+    // For Gmail-only version, return null
+    // The app will handle Gmail authentication directly
+    return null;
   }),
 });

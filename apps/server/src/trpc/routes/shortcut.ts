@@ -1,5 +1,4 @@
 import { shortcutSchema } from '../../lib/shortcuts';
-import { getZeroDB } from '../../lib/server-utils';
 import { privateProcedure, router } from '../trpc';
 import { z } from 'zod';
 
@@ -11,9 +10,7 @@ export const shortcutRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { sessionUser } = ctx;
-      const { shortcuts } = input;
-      const db = getZeroDB(sessionUser.id);
-      await db.insertUserHotkeys(shortcuts as any);
+      // For Gmail-only version, shortcuts are not persisted
+      return { success: true };
     }),
 });
