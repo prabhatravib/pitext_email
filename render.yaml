@@ -20,8 +20,8 @@ services:
     runtime: node
     buildCommand: |
       pnpm install --frozen-lockfile
-      pnpm run build:frontend
-    startCommand: cd apps/mail && pnpm start
+      cd apps/mail && pnpm run build
+    startCommand: cd apps/mail && node server.js
     envVars:
       - key: NODE_ENV
         value: production

@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,27 +15,33 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from the build directory
-app.use(express.static(path.join(__dirname, 'build/client')));
-
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Frontend server is running' });
 });
 
+// Serve static files from the build directory
+const buildPath = path.join(__dirname, 'build/client');
+app.use(express.static(buildPath));
+
+// Check if build directory exists
+if (!fs.existsSync(buildPath)) {
+  console.error('❌ Build directory not found:', buildPath);
+  console.error('Available directories:', fs.readdirSync(__dirname));
+  process.exit(1);
+}
+
+// Check if index.html exists
+const indexPath = path.join(buildPath, 'index.html');
+if (!fs.existsSync(indexPath)) {
+  console.error('❌ index.html not found at:', indexPath);
+  console.error('Available files in build/client:', fs.readdirSync(buildPath));
+  process.exit(1);
+}
+
 // Handle all routes by serving the index.html file (for SPA routing)
 app.get('*', (req, res) => {
-  const indexPath = path.join(__dirname, 'build/client/index.html');
-  
-  // Check if index.html exists
-  if (!require('fs').existsSync(indexPath)) {
-    console.error('index.html not found at:', indexPath);
-    return res.status(404).json({ 
-      error: 'Application not built properly',
-      message: 'Please check the build process'
-    });
-  }
-  
+  console.log('Serving index.html for route:', req.path);
   res.sendFile(indexPath);
 });
 
@@ -45,6 +52,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Frontend server is running on port ${PORT}`);
-  console.log(`Serving static files from: ${path.join(__dirname, 'build/client')}`);
+  console.log(`🚀 Frontend server is running on port ${PORT}`);
+  console.log(`📁 Serving static files from: ${buildPath}`);
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
 }); 
