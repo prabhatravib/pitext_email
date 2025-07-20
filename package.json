@@ -39,7 +39,8 @@
     "eval:dev": "dotenv -- pnpm --filter=@zero/server run eval:dev",
     "eval:ci": "dotenv -- pnpm --filter=@zero/server run eval:ci",
     "setup:gmail": "node setup-gmail-import.js",
-    "verify:build": "node verify-build.js"
+    "verify:build": "node verify-build.js",
+    "verify:deployment": "node verify-deployment.js"
   },
   "devDependencies": {
     "@types/node": "22.15.29",

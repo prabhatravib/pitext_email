@@ -20,6 +20,15 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Frontend server is running' });
 });
 
+// API proxy for development (if backend is not available)
+app.get('/api/trpc/*', (req, res) => {
+  console.log('TRPC request intercepted:', req.path);
+  res.status(503).json({ 
+    error: 'Backend not available',
+    message: 'Please ensure the backend service is running'
+  });
+});
+
 // Serve static files from the build directory
 const buildPath = path.join(__dirname, 'build/client');
 app.use(express.static(buildPath));
@@ -55,4 +64,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Frontend server is running on port ${PORT}`);
   console.log(`📁 Serving static files from: ${buildPath}`);
   console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔗 Backend URL: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not set'}`);
 }); 
