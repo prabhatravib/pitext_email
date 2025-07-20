@@ -5,41 +5,53 @@ services:
     runtime: node
     buildCommand: |
       echo "🚀 Starting deployment build process..."
+      echo "📁 Current directory: $(pwd)"
+      
+      # Install dependencies at root level
       pnpm install --frozen-lockfile
       echo "✅ Dependencies installed"
       
+      # Build the frontend
+      echo "🔨 Building frontend..."
       cd apps/mail
       echo "📁 Changed to mail directory: $(pwd)"
-      echo "📄 Available files: $(ls -la)"
       
-      echo "🔨 Building frontend..."
-      pnpm run build:simple-fallback
+      # Run the build script
+      node build-simple.js
       
-      echo "🔍 Checking build output..."
+      # Verify build output
+      echo "🔍 Verifying build output..."
       if [ -d "build/client" ]; then
-        echo "✅ Build directory exists"
-        echo "📄 Files in build: $(ls -la build/client/)"
+        echo "✅ Build directory exists at apps/mail/build/client"
+        echo "📄 Files in build:"
+        ls -la build/client/
         
         if [ -f "build/client/index.html" ]; then
           echo "✅ index.html exists"
-          echo "📄 index.html content preview:"
-          head -5 build/client/index.html
         else
-          echo "❌ index.html missing"
-          echo "📄 Available files in build/client:"
-          ls -la build/client/
+          echo "❌ index.html missing in build/client"
+          echo "📄 Full directory tree:"
+          find . -type f -name "index.html" | head -20
           exit 1
         fi
       else
-        echo "❌ Build directory not found"
+        echo "❌ Build directory not found at apps/mail/build/client"
         echo "📄 Current directory contents:"
         ls -la
+        echo "📄 Looking for build directories:"
+        find . -type d -name "build" | head -20
         exit 1
       fi
       
-      echo "✅ Build verification passed"
+      echo "✅ Frontend build completed successfully"
+      
+      # Return to root directory
       cd ../..
-    startCommand: pnpm run start:simple
+      echo "📁 Back to root directory: $(pwd)"
+    startCommand: |
+      echo "🚀 Starting server..."
+      echo "📁 Current directory: $(pwd)"
+      cd apps/server && node simple-server.js
     envVars:
       - key: NODE_ENV
         value: production
