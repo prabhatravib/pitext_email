@@ -8,6 +8,7 @@
     "start": "node server.js",
     "start:render": "node server.js",
     "start:simple": "node simple-server.js",
+    "start:simple:with-build": "cd ../mail && pnpm run build && cd ../server && node simple-server.js",
     "types": "wrangler types --env local",
     "lint": "eslint .",
     "db:generate": "drizzle-kit generate",

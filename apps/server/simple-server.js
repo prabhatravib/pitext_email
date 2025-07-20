@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -336,6 +337,192 @@ app.all('/api/*', (req, res) => {
     message: 'This endpoint is not available in the simple server'
   });
 });
+
+// ==========================================
+// FRONTEND SERVING
+// ==========================================
+
+// Serve static files from the build directory
+const buildPath = path.join(__dirname, '../mail/build/client');
+const indexPath = path.join(buildPath, 'index.html');
+
+console.log('🔍 Checking for frontend build...');
+console.log('📁 Build path:', buildPath);
+console.log('📄 Index path:', indexPath);
+console.log('✅ Build exists:', fsSync.existsSync(buildPath));
+console.log('✅ Index exists:', fsSync.existsSync(indexPath));
+
+if (fsSync.existsSync(buildPath) && fsSync.existsSync(indexPath)) {
+  console.log('✅ Serving frontend from build directory');
+  app.use(express.static(buildPath));
+  
+  // Handle all routes by serving index.html (SPA routing)
+  app.get('*', (req, res) => {
+    res.sendFile(indexPath);
+  });
+} else {
+  console.log('⚠️  Frontend build not found, serving API demo page');
+  // Serve a simple HTML interface for the API
+  app.get('*', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PiText Email - API Demo</title>
+        <style>
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            background: #0a0a0a;
+            color: #fff;
+          }
+          .container { 
+            text-align: center; 
+            padding: 3rem; 
+            background: #1a1a1a; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+          }
+          h1 { 
+            color: #fff; 
+            margin-bottom: 1rem;
+          }
+          p { 
+            color: #888; 
+            line-height: 1.6;
+          }
+          .warning {
+            background: #ff6b35;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: bold;
+          }
+          .api-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #2a2a2a;
+            border-radius: 8px;
+            text-align: left;
+          }
+          .api-endpoint {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #333;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+          }
+          .method {
+            color: #4a9eff;
+            font-weight: bold;
+          }
+          .url {
+            color: #fff;
+          }
+          .description {
+            color: #888;
+            margin-top: 0.5rem;
+          }
+          .status {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #2a2a2a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            text-align: left;
+          }
+          .health-link {
+            color: #4a9eff;
+            text-decoration: none;
+          }
+          .health-link:hover {
+            text-decoration: underline;
+          }
+          .button {
+            display: inline-block;
+            background: #4a9eff;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 0.5rem;
+            font-weight: bold;
+          }
+          .button:hover {
+            background: #3a8eef;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🚀 PiText Email API</h1>
+          <p>Welcome to PiText Email! This is a demo API server with local data storage.</p>
+          
+          <div class="warning">
+            ⚠️ Frontend build not found. This is an API-only deployment.
+          </div>
+          
+          <div class="api-section">
+            <h3>📧 Available Endpoints</h3>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/threads</span></div>
+              <div class="description">Get all email threads</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/threads/:id</span></div>
+              <div class="description">Get a specific thread by ID</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">POST</span> <span class="url">/api/emails</span></div>
+              <div class="description">Create a new email</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/api/search?q=query</span></div>
+              <div class="description">Search threads and messages</div>
+            </div>
+            
+            <div class="api-endpoint">
+              <div><span class="method">GET</span> <span class="url">/health</span></div>
+              <div class="description">Server health check</div>
+            </div>
+          </div>
+          
+          <div class="status">
+            <strong>Status:</strong> API Server Running<br>
+            <strong>Server:</strong> Running on port ${PORT}<br>
+            <strong>Health:</strong> <a href="/health" class="health-link">/health</a><br>
+            <strong>Mode:</strong> Demo with local JSON data<br>
+            <strong>Data:</strong> Stored in ${DATA_DIR}
+          </div>
+          
+          <div style="margin-top: 2rem;">
+            <a href="/health" class="button">Check Health</a>
+            <a href="/api/threads" class="button">View Threads</a>
+          </div>
+          
+          <p style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+            💡 <strong>Next Steps:</strong> Build the frontend or set up Gmail OAuth for email import functionality
+          </p>
+        </div>
+      </body>
+      </html>
+    `);
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {

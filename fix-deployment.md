@@ -24,6 +24,8 @@ git push origin main
 3. For the `pitext-email` service:
    - Click on it
    - Go to "Settings" → "Build & Deploy"
+   - Set the **Build Command** to: `cd apps/mail && pnpm run build && cd ../server`
+   - Set the **Start Command** to: `pnpm run start:simple`
    - Click "Clear build cache & deploy"
 
 ### 3. Set Environment Variables
@@ -37,6 +39,7 @@ VITE_PUBLIC_APP_URL=https://pitext-email.onrender.com
 VITE_PUBLIC_BACKEND_URL=https://pitext-email.onrender.com
 BETTER_AUTH_URL=https://pitext-email.onrender.com
 BETTER_AUTH_SECRET=<generate-random-32-char-string>
+CORS_ORIGIN=https://pitext-email.onrender.com
 ```
 
 To generate a random secret:
