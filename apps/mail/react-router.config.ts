@@ -2,12 +2,12 @@ import type { Config } from '@react-router/dev/config';
 
 export default {
   ssr: false,
-  buildDirectory: 'build',
+  buildDirectory: 'build/client',
   appDirectory: 'app',
   routeDiscovery: {
     mode: 'initial',
   },
-  prerender: ['/manifest.webmanifest'],
+  prerender: false,
   future: {
     unstable_viteEnvironmentApi: true,
   },
