@@ -557,6 +557,7 @@ if (fsSync.existsSync(buildPath) && fsSync.existsSync(indexPath)) {
       </html>
     `);
   });
+  }
 }
 
 // Error handling middleware
