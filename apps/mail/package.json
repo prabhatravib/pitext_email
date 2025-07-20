@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "build": "vite build --outDir build/client",
+    "prebuild": "npx @inlang/paraglide-js compile --project project.inlang",
+    "build": "vite build --outDir build/client --mode client",
     "build:client": "vite build --mode client",
-    "build:simple": "vite build --outDir build/client",
+    "build:simple": "npx vite build --outDir build/client --mode client",
     "start": "node server.js",
     "start:render": "node server.js",
     "types": "wrangler types",
