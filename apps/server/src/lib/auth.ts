@@ -254,6 +254,8 @@ const createAuthConfig = () => {
       'https://staging.0.email',
       'https://0.email',
       'http://localhost:3000',
+      'https://pitext-email.onrender.com',
+      'https://pitext-email-backend.onrender.com',
     ],
     session: {
       cookieCache: {

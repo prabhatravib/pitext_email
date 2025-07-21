@@ -160,7 +160,7 @@ export class ZeroAgent extends AIChatAgent<typeof env> {
   public async setupAuth(connectionId: string) {
     if (connectionId === 'general') return;
     if (!this.driver) {
-      const { db, conn } = createDb(env.HYPERDRIVE.connectionString);
+      const { db, conn } = createDb(env.HYPERDRIVE?.connectionString);
       const _connection = await db.query.connection.findFirst({
         where: eq(connection.id, connectionId),
       });

@@ -40,6 +40,12 @@ BETTER_AUTH_SECRET=your_random_secret_key_here
 # Cookie domain (use your domain without https://)
 COOKIE_DOMAIN=.onrender.com
 
+# Autumn configuration (for billing features)
+AUTUMN_SECRET_KEY=your_autumn_secret_key_here
+
+# Database configuration (optional - for persistent storage)
+# HYPERDRIVE_CONNECTION_STRING=your_hyperdrive_connection_string
+
 # AI Services (optional)
 # OPENAI_API_KEY=your_openai_key
 # ANTHROPIC_API_KEY=your_anthropic_key

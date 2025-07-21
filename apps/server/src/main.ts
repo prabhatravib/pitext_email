@@ -32,7 +32,7 @@ import { Autumn } from 'autumn-js';
 // Database classes removed - no persistent storage needed
 
 class ZeroDB extends DurableObject<Env> {
-  db: DB = createDb(env.HYPERDRIVE.connectionString).db;
+  db: DB = createDb(env.HYPERDRIVE?.connectionString).db;
 
   async setMetaData(userId: string) {
     return new DbRpcDO(this, userId);
@@ -397,7 +397,7 @@ export default class extends WorkerEntrypoint<typeof env> {
     .route('/ai', aiRouter)
     .route('/autumn', autumnApi)
     .route('/public', publicRouter)
-    .on(['GET', 'POST', 'OPTIONS'], '/auth/*', (c) => {
+    .on(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], '/auth/*', (c) => {
       return c.var.auth.handler(c.req.raw);
     })
     .use(
@@ -437,16 +437,28 @@ export default class extends WorkerEntrypoint<typeof env> {
           } catch {
             return null;
           }
-          const cookieDomain = env.COOKIE_DOMAIN;
-          if (!cookieDomain) return null;
-          if (hostname === cookieDomain || hostname.endsWith('.' + cookieDomain)) {
+          
+          // Allow the main app domain
+          if (hostname === 'pitext-email.onrender.com') {
             return origin;
           }
+          
+          // Allow localhost for development
+          if (hostname === 'localhost') {
+            return origin;
+          }
+          
+          // Allow subdomains of onrender.com
+          if (hostname.endsWith('.onrender.com')) {
+            return origin;
+          }
+          
           return null;
         },
         credentials: true,
-        allowHeaders: ['Content-Type', 'Authorization'],
+        allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
         exposeHeaders: ['X-Zero-Redirect'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       }),
     )
     .get('.well-known/oauth-authorization-server', async (c) => {
