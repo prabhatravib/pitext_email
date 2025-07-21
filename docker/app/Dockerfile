@@ -41,20 +41,19 @@ ENV VITE_BUILD_MODE=production
 # Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
 
-# Build the application with strict error checking
+# Build the application with React Router
 RUN cd apps/mail && \
-    echo "🔍 Starting build process..." && \
+    echo "🔍 Starting React Router build process..." && \
     echo "🔍 Current directory: $(pwd)" && \
     echo "🔍 Files in directory: $(ls -la)" && \
     echo "🔍 Node version: $(node --version)" && \
     echo "🔍 PNPM version: $(pnpm --version)" && \
     echo "🔍 Checking required files..." && \
-    echo "  - index.html: $(test -f index.html && echo 'exists' || echo 'MISSING')" && \
-    echo "  - vite.client.config.ts: $(test -f vite.client.config.ts && echo 'exists' || echo 'MISSING')" && \
-    echo "  - build-client-only.js: $(test -f build-client-only.js && echo 'exists' || echo 'MISSING')" && \
+    echo "  - react-router.config.ts: $(test -f react-router.config.ts && echo 'exists' || echo 'MISSING')" && \
+    echo "  - app directory: $(test -d app && echo 'exists' || echo 'MISSING')" && \
     echo "🔍 Running prebuild script..." && \
     pnpm run prebuild || echo "⚠️ Prebuild script failed, continuing..." && \
-    echo "🔍 Running build command..." && \
+    echo "🔍 Running React Router build..." && \
     pnpm run build && \
     echo "🔍 Build completed, verifying output..." && \
     echo "🔍 Build directory exists: $(test -d build && echo 'yes' || echo 'NO - BUILD FAILED')" && \
@@ -68,7 +67,41 @@ RUN cd apps/mail && \
     ls -la build/client/index.html 2>/dev/null || (echo "❌ INDEX.HTML NOT FOUND - BUILD FAILED" && exit 1) && \
     echo "🔍 Verifying index.html content:" && \
     head -5 build/client/index.html && \
-    echo "✅ Build process completed successfully"
+    echo "🔍 Verifying index.html is not empty:" && \
+    test -s build/client/index.html && echo "✅ index.html is not empty" || (echo "❌ INDEX.HTML IS EMPTY - BUILD FAILED" && exit 1) && \
+    echo "✅ React Router build process completed successfully"
+
+# Create a fallback index.html if the build fails
+RUN cd apps/mail && \
+    if [ ! -f build/client/index.html ] || [ ! -s build/client/index.html ]; then \
+        echo "⚠️ Creating fallback index.html due to build failure" && \
+        mkdir -p build/client && \
+        cat > build/client/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiText Email - Build Error</title>
+    <style>
+        body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+        .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 600px; }
+        h1 { color: #d32f2f; }
+        p { color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ Build Error</h1>
+        <p>The React Router build failed. Please check the build logs.</p>
+        <p>This is a fallback page created during the Docker build process.</p>
+    </div>
+</body>
+</html>
+EOF
+        echo "✅ Fallback index.html created" && \
+        ls -la build/client/index.html; \
+    fi
 
 # ========================================
 # Runner Stage: Production Environment
@@ -105,6 +138,7 @@ RUN echo "🔍 Verifying copied build files..." && \
     echo "🔍 Fallback index.html exists: $(test -f apps/mail/fallback-index.html && echo 'yes' || echo 'NO - FALLBACK NOT COPIED')" && \
     test -d apps/mail/build/client || (echo "❌ CLIENT DIRECTORY MISSING - DEPLOYMENT FAILED" && exit 1) && \
     test -f apps/mail/build/client/index.html || (echo "❌ INDEX.HTML MISSING - DEPLOYMENT FAILED" && exit 1) && \
+    test -s apps/mail/build/client/index.html || (echo "❌ INDEX.HTML IS EMPTY - DEPLOYMENT FAILED" && exit 1) && \
     echo "🔍 Verifying index.html content:" && \
     head -5 apps/mail/build/client/index.html && \
     echo "✅ All build files verified successfully"
