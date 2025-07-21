@@ -8,6 +8,11 @@ export default defineConfig({
   base: '/',
   plugins: [
     react(),
+    reactRouter({
+      ssr: false,
+      prerender: false,
+    }),
+
     tsconfigPaths(),
   ],
   server: {
