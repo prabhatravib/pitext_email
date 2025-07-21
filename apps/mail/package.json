@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "react-router dev",
     "prebuild": "npx @inlang/paraglide-js compile --project project.inlang",
-    "build": "node build-client-only.js",
+    "build": "npx @react-router/dev build",
     "build:client-only": "vite build --mode client",
     "build:client": "vite build --mode client",
     "start": "node server.js",
