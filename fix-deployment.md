@@ -17,29 +17,31 @@ git commit -m "Fix deployment for single service with built-in backend"
 git push origin main
 ```
 
-### 2. Deploy to Render
+### 2. Deploy to Cloudflare Workers
 
-1. Go to your [Render Dashboard](https://dashboard.render.com)
-2. If you have multiple services, DELETE the backend service (keep only `pitext-email`)
-3. For the `pitext-email` service:
-   - Click on it
-   - Go to "Settings" → "Build & Deploy"
-   - Set the **Build Command** to: `cd apps/mail && pnpm run build && cd ../server`
-   - Set the **Start Command** to: `pnpm run start:simple`
-   - Click "Clear build cache & deploy"
+1. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Create a new Workers project
+3. Configure your environment variables in the Workers settings
+4. Deploy using: `pnpm run deploy:backend`
 
-### 3. Set Environment Variables
+### 3. Deploy Frontend
 
-While it's building, add these environment variables to your `pitext-email` service:
+Deploy the frontend to Vercel, Netlify, or any static hosting:
+
+1. Build the frontend: `pnpm run build:frontend`
+2. Deploy the `apps/mail/build/client` directory
+3. Configure environment variables for the frontend
+
+### 4. Set Environment Variables
+
+For the Cloudflare Workers backend, add these environment variables:
 
 ```env
 NODE_ENV=production
-PORT=10000
-VITE_PUBLIC_APP_URL=https://pitext-email.onrender.com
-VITE_PUBLIC_BACKEND_URL=https://pitext-email.onrender.com
-BETTER_AUTH_URL=https://pitext-email.onrender.com
+BETTER_AUTH_URL=https://your-frontend-domain.com
 BETTER_AUTH_SECRET=<generate-random-32-char-string>
-CORS_ORIGIN=https://pitext-email.onrender.com
+GOOGLE_CLIENT_ID=<your-google-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 ```
 
 To generate a random secret:
@@ -47,24 +49,24 @@ To generate a random secret:
 openssl rand -base64 32
 ```
 
-### 4. Verify Deployment
+### 5. Verify Deployment
 
-After deployment (takes 5-10 minutes):
+After deployment:
 
-1. Check health endpoint: https://pitext-email.onrender.com/health
+1. Check health endpoint: https://your-worker-domain.workers.dev/health
    - Should return: `{"status":"ok","message":"PiText Email is running"}`
 
-2. Visit your app: https://pitext-email.onrender.com
+2. Visit your app: https://your-frontend-domain.com
    - You should see the email client interface
-   - A welcome email will be in the inbox
+   - Connect your Gmail account to start using
 
 ## 📧 How It Works
 
 This deployment uses:
-- **Single Service**: Everything runs from one Render service
-- **Built-in Backend**: Simple JSON file storage for demo emails
-- **No Database Required**: Data stored in local JSON files
-- **Demo Mode**: Works immediately without Gmail setup
+- **Cloudflare Workers**: Backend API with Gmail integration
+- **Static Frontend**: Deployed to any static hosting
+- **Gmail OAuth**: Real email access via Google APIs
+- **Production Ready**: Full email client functionality
 
 ## 🔧 Adding Gmail Import (Optional)
 

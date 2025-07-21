@@ -17,8 +17,8 @@ async function testBuild() {
     console.log('📁 Changed to directory:', process.cwd());
     
     // Run the build
-    console.log('🔨 Running build:simple-fallback...');
-    execSync('pnpm run build:simple-fallback', { stdio: 'inherit' });
+    console.log('🔨 Running build...');
+    execSync('pnpm run build', { stdio: 'inherit' });
     
     // Check build output
     const buildPath = path.join(mailAppPath, 'build/client');

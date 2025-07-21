@@ -1,19 +1,21 @@
-# Quick Start Guide - Mail-0/Zero Simple Version
+# Quick Start Guide - PiText Email
 
-This is the quickest way to get Mail-0/Zero running with a simple JSON-based backend.
+This is the quickest way to get PiText Email running with Gmail integration.
 
-## 🚀 Deploy to Render in 2 Minutes
+## 🚀 Deploy to Cloudflare Workers
 
 1. **Fork this repo** to your GitHub account
 
-2. **Deploy on Render**:
-   - Go to https://dashboard.render.com
-   - Click "New +" → "Blueprint"
-   - Connect your GitHub and select your fork
-   - Click "Apply" - Render will create both services automatically
+2. **Set up Cloudflare Workers**:
+   - Go to https://dash.cloudflare.com
+   - Create a new Workers project
+   - Configure your environment variables
+   - Deploy using `pnpm run deploy:backend`
 
-3. **Done!** Your email app will be live at:
-   - `https://zero-email-frontend.onrender.com`
+3. **Deploy Frontend**:
+   - Use Vercel, Netlify, or any static hosting
+   - Build with `pnpm run build:frontend`
+   - Deploy the `apps/mail/build/client` directory
 
 ## 💻 Run Locally
 
@@ -25,44 +27,42 @@ cd pitext_email
 # Install dependencies
 pnpm install
 
-# Terminal 1: Start the backend
-pnpm start:simple
+# Terminal 1: Start the backend (Cloudflare Workers)
+pnpm start:backend
 
 # Terminal 2: Start the frontend
 pnpm dev
-
-# Terminal 3: Add sample data (optional)
-pnpm setup:simple
 ```
 
 Visit http://localhost:3000 to see your email app!
 
 ## 📧 What Can It Do?
 
+- ✅ Connect to Gmail via OAuth
 - ✅ View emails in a beautiful interface
 - ✅ Mark emails as read/unread
 - ✅ Star important emails
 - ✅ Search through emails
-- ✅ Compose new emails (stored locally)
-- ✅ Organize with folders
+- ✅ Compose new emails
+- ✅ AI-powered email composition
+- ✅ Organize with labels and folders
 
-## ⚠️ Limitations
+## ⚠️ Requirements
 
-This is a demo version that:
-- Stores data in JSON files (resets on free Render tier)
-- Doesn't connect to real email providers
-- Doesn't send actual emails
-- Single user only
+This version requires:
+- Gmail account for email access
+- Cloudflare Workers for backend hosting
+- Proper OAuth configuration
 
 ## 🔧 Next Steps
 
-Want the full Mail-0/Zero experience?
-- Check out the original: https://github.com/Mail-0/Zero
-- Deploy to Cloudflare Workers for full features
-- Add real email provider integration
+Want to customize further?
+- Check the [deployment instructions](DEPLOYMENT_INSTRUCTIONS.md)
+- Configure additional email providers
+- Add custom AI features
 
 ## 🆘 Need Help?
 
 - Create an issue in your fork
 - Check the [deployment instructions](DEPLOYMENT_INSTRUCTIONS.md)
-- Visit the original Mail-0/Zero repo 
+- Visit the original PiText Email repo 

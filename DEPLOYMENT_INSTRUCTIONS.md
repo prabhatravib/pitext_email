@@ -131,7 +131,7 @@ pnpm run build:backend
 
 # Test servers locally
 pnpm run start:frontend
-pnpm run start:simple
+pnpm run start:backend
 ```
 
 ## 📞 Support

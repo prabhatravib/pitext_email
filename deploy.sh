@@ -34,7 +34,7 @@ pnpm run build:backend
 echo "✅ Backend build completed successfully!"
 
 # Check if server files exist
-if [ ! -f "apps/server/simple-server.js" ]; then
+if [ ! -f "apps/server/src/main.ts" ]; then
     echo "❌ Error: Backend server file not found."
     exit 1
 fi
