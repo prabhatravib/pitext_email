@@ -13,6 +13,18 @@ if (!fs.existsSync(src)) {
   process.exit(1);
 }
 
+// Check if the destination already exists (built by Vite)
+if (fs.existsSync(dest)) {
+  console.log('Build output already exists, checking if it has the required root div...');
+  const existingHtml = fs.readFileSync(dest, 'utf8');
+  
+  // If the built HTML already has the root div, don't overwrite it
+  if (existingHtml.includes('id="root"')) {
+    console.log('Built HTML already contains <div id="root"></div>, preserving Vite build output.');
+    process.exit(0);
+  }
+}
+
 let html = fs.readFileSync(src, 'utf8');
 if (!html.includes('id="root"')) {
   console.error('index.html does not contain <div id="root"></div>!');

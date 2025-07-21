@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,8 +17,41 @@ app.use(cors({
   credentials: true
 }));
 
-// Serve static files from the built frontend
-app.use(express.static(path.join(__dirname, '../mail/build/client')));
+// Serve static files from the built frontend with proper MIME types
+app.use(express.static(path.join(__dirname, '../mail/build/client'), {
+  setHeaders: (res, filePath) => {
+    // Set proper MIME types for JavaScript files
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.mjs')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
+
+// Handle the specific case where the script tag points to /app/entry.client.tsx
+app.get('/app/entry.client.tsx', (req, res) => {
+  // Find the actual entry.client.js file in the assets directory
+  const buildPath = path.join(__dirname, '../mail/build/client/client');
+  const assetsDir = path.join(buildPath, 'assets');
+  if (fs.existsSync(assetsDir)) {
+    const files = fs.readdirSync(assetsDir);
+    const entryClientFile = files.find(file => file.startsWith('entry.client-') && file.endsWith('.js'));
+    
+    if (entryClientFile) {
+      console.log(`📄 Serving entry.client.js as /app/entry.client.tsx: ${entryClientFile}`);
+      const filePath = path.join(assetsDir, entryClientFile);
+      res.setHeader('Content-Type', 'application/javascript');
+      res.sendFile(filePath);
+      return;
+    }
+  }
+  
+  // If not found, return 404
+  res.status(404).send('Entry client file not found');
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -70,7 +104,7 @@ app.get('/api/*', (req, res) => {
 
 // Catch-all handler for SPA routing - serve index.html for any non-API route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../mail/build/client/index.html'));
+  res.sendFile(path.join(__dirname, '../mail/build/client/client/index.html'));
 });
 
 app.listen(PORT, () => {

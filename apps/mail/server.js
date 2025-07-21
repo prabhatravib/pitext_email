@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
 // CORS configuration
 app.use(cors({
@@ -327,13 +327,44 @@ if (!buildPath) {
   console.log('✅ Build directory found, serving static files');
   console.log('📁 Files in build directory:', fs.readdirSync(buildPath));
 
-  // Serve static files with explicit options
+  // Serve static files with explicit options - this MUST come before the catch-all route
   app.use(express.static(buildPath, {
     index: false, // Don't serve index.html automatically
     dotfiles: 'ignore',
     etag: true,
-    lastModified: true
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Set proper MIME types for JavaScript files
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (path.endsWith('.mjs')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      }
+    }
   }));
+
+  // Handle the specific case where the script tag points to /app/entry.client.tsx
+  app.get('/app/entry.client.tsx', (req, res) => {
+    // Find the actual entry.client.js file in the assets directory
+    const assetsDir = path.join(buildPath, 'assets');
+    if (fs.existsSync(assetsDir)) {
+      const files = fs.readdirSync(assetsDir);
+      const entryClientFile = files.find(file => file.startsWith('entry.client-') && file.endsWith('.js'));
+      
+      if (entryClientFile) {
+        console.log(`📄 Serving entry.client.js as /app/entry.client.tsx: ${entryClientFile}`);
+        const filePath = path.join(assetsDir, entryClientFile);
+        res.setHeader('Content-Type', 'application/javascript');
+        res.sendFile(filePath);
+        return;
+      }
+    }
+    
+    // If not found, return 404
+    res.status(404).send('Entry client file not found');
+  });
 
   // Check if index.html exists
   console.log('🔍 Index path:', indexPath);
@@ -344,7 +375,7 @@ if (!buildPath) {
     console.error('Available files in build/client:', fs.readdirSync(buildPath));
   }
 
-  // Handle all routes by serving the index.html file (for SPA routing)
+  // Handle all routes by serving the index.html file (for SPA routing) - this MUST come AFTER static file serving
   app.get('*', (req, res) => {
     console.log('📄 Serving index.html for route:', req.path);
 
