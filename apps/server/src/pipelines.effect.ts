@@ -411,7 +411,7 @@ export const runThreadWorkflow = (
 
     if (providerId === EProviders.google) {
       yield* Console.log('[THREAD_WORKFLOW] Processing Google provider workflow');
-      const { db, conn } = createDb(env.HYPERDRIVE.connectionString);
+      const { db, conn } = createDb(env.HYPERDRIVE?.connectionString);
 
       const foundConnection = yield* Effect.tryPromise({
         try: async () => {
