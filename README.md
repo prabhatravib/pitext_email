@@ -7,7 +7,7 @@
 
 # PiText Email - Gmail-Only Email Client
 
-A modern, AI-powered email client focused exclusively on Gmail integration.
+A modern, AI-powered email client focused exclusively on Gmail integration.There is no back end at all by design So this is a fork of the zero email repo. here the source of this email repo is only supposed to be Gmail.
 
 ## Features
 
