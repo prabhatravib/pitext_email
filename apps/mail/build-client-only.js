@@ -43,19 +43,29 @@ async function buildClientOnly() {
       console.log('Created build directory:', buildDir);
     }
     
-    await build({
+    // Build with explicit configuration
+    const result = await build({
       configFile: viteConfigPath,
       mode: 'production',
+      root: __dirname,
       build: {
         outDir: 'build/client',
         emptyOutDir: true,
         rollupOptions: {
           input: {
             main: indexHtmlPath
+          },
+          output: {
+            manualChunks: undefined,
+            entryFileNames: 'assets/[name]-[hash].js',
+            chunkFileNames: 'assets/[name]-[hash].js',
+            assetFileNames: 'assets/[name]-[hash].[ext]'
           }
         }
       }
     });
+    
+    console.log('Build result:', result);
     
     // Verify the build output
     const buildPath = resolve(__dirname, 'build/client');
@@ -78,6 +88,11 @@ async function buildClientOnly() {
       }
       throw new Error('index.html was not generated in build output');
     }
+    
+    // Read and verify index.html content
+    const indexContent = fs.readFileSync(indexPath, 'utf8');
+    console.log('index.html content length:', indexContent.length);
+    console.log('index.html starts with DOCTYPE:', indexContent.startsWith('<!DOCTYPE'));
     
     if (fs.existsSync(buildPath)) {
       const buildFiles = fs.readdirSync(buildPath);

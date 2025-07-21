@@ -52,6 +52,8 @@ RUN cd apps/mail && \
     echo "  - index.html: $(test -f index.html && echo 'exists' || echo 'MISSING')" && \
     echo "  - vite.client.config.ts: $(test -f vite.client.config.ts && echo 'exists' || echo 'MISSING')" && \
     echo "  - build-client-only.js: $(test -f build-client-only.js && echo 'exists' || echo 'MISSING')" && \
+    echo "🔍 Running prebuild script..." && \
+    pnpm run prebuild || echo "⚠️ Prebuild script failed, continuing..." && \
     echo "🔍 Running build command..." && \
     pnpm run build && \
     echo "🔍 Build completed, verifying output..." && \
@@ -64,6 +66,8 @@ RUN cd apps/mail && \
     ls -la build/client/ 2>/dev/null || (echo "❌ CLIENT DIRECTORY NOT FOUND - BUILD FAILED" && exit 1) && \
     echo "🔍 Verifying index.html exists:" && \
     ls -la build/client/index.html 2>/dev/null || (echo "❌ INDEX.HTML NOT FOUND - BUILD FAILED" && exit 1) && \
+    echo "🔍 Verifying index.html content:" && \
+    head -5 build/client/index.html && \
     echo "✅ Build process completed successfully"
 
 # ========================================
@@ -98,8 +102,11 @@ RUN echo "🔍 Verifying copied build files..." && \
     echo "🔍 Client directory exists: $(test -d apps/mail/build/client && echo 'yes' || echo 'NO - CLIENT NOT COPIED')" && \
     echo "🔍 index.html exists: $(test -f apps/mail/build/client/index.html && echo 'yes' || echo 'NO - INDEX.HTML NOT COPIED')" && \
     echo "🔍 Server.js exists: $(test -f apps/mail/server.js && echo 'yes' || echo 'NO - SERVER.JS NOT COPIED')" && \
+    echo "🔍 Fallback index.html exists: $(test -f apps/mail/fallback-index.html && echo 'yes' || echo 'NO - FALLBACK NOT COPIED')" && \
     test -d apps/mail/build/client || (echo "❌ CLIENT DIRECTORY MISSING - DEPLOYMENT FAILED" && exit 1) && \
     test -f apps/mail/build/client/index.html || (echo "❌ INDEX.HTML MISSING - DEPLOYMENT FAILED" && exit 1) && \
+    echo "🔍 Verifying index.html content:" && \
+    head -5 apps/mail/build/client/index.html && \
     echo "✅ All build files verified successfully"
 
 # Switch to non-root user

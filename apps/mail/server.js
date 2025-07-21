@@ -36,11 +36,14 @@ const possibleBuildPaths = [
   path.join(__dirname, '../../build/client'),
   '/opt/render/project/src/apps/mail/build/client',
   path.join(process.cwd(), 'apps/mail/build/client'),
-  path.join(process.cwd(), 'build/client')
+  path.join(process.cwd(), 'build/client'),
+  '/app/apps/mail/build/client', // Docker container path
+  '/app/build/client' // Alternative Docker path
 ];
 
 let buildPath = null;
 let indexPath = null;
+let fallbackPath = path.join(__dirname, 'fallback-index.html');
 
 // Find the correct build path
 for (const testPath of possibleBuildPaths) {
@@ -54,57 +57,62 @@ for (const testPath of possibleBuildPaths) {
   }
 }
 
-// If no build directory found, show detailed error
+// If no build directory found, serve fallback
 if (!buildPath) {
   console.error('❌ CRITICAL ERROR: No build directory found');
   console.error('Expected paths:', possibleBuildPaths);
   console.error('Current directory:', __dirname);
   console.error('Working directory:', process.cwd());
   
-  // Show detailed error page for all routes
+  // Serve fallback for all routes
   app.get('*', (req, res) => {
-    console.log('📝 Serving error page for route:', req.path);
-    res.setHeader('Content-Type', 'text/html');
-    res.status(500).send(`
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PiText Email - BUILD FAILED</title>
-        <style>
-          body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
-          .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; }
-          h1 { color: #d32f2f; }
-          p { color: #666; }
-          .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; text-align: left; }
-          .details { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem; text-align: left; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>❌ BUILD FAILED</h1>
-          <p>The application failed to build properly. No build files were found.</p>
-          <div class="error">
-            <strong>Error:</strong> Build directory not found<br>
-            <strong>Server:</strong> Running on port ${PORT}<br>
-            <strong>Current Directory:</strong> ${__dirname}<br>
-            <strong>Working Directory:</strong> ${process.cwd()}
+    console.log('📝 Serving fallback page for route:', req.path);
+    
+    if (fs.existsSync(fallbackPath)) {
+      res.sendFile(fallbackPath);
+    } else {
+      res.setHeader('Content-Type', 'text/html');
+      res.status(500).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>PiText Email - BUILD FAILED</title>
+          <style>
+            body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+            .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; }
+            h1 { color: #d32f2f; }
+            p { color: #666; }
+            .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; text-align: left; }
+            .details { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>❌ BUILD FAILED</h1>
+            <p>The application failed to build properly. No build files were found.</p>
+            <div class="error">
+              <strong>Error:</strong> Build directory not found<br>
+              <strong>Server:</strong> Running on port ${PORT}<br>
+              <strong>Current Directory:</strong> ${__dirname}<br>
+              <strong>Working Directory:</strong> ${process.cwd()}
+            </div>
+            <div class="details">
+              <strong>Expected build paths:</strong><br>
+              ${possibleBuildPaths.map(p => `• ${p}`).join('<br>')}
+            </div>
+            <div class="details">
+              <strong>Environment:</strong><br>
+              • NODE_ENV: ${process.env.NODE_ENV}<br>
+              • PORT: ${process.env.PORT}<br>
+              • Backend URL: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not configured'}
+            </div>
           </div>
-          <div class="details">
-            <strong>Expected build paths:</strong><br>
-            ${possibleBuildPaths.map(p => `• ${p}`).join('<br>')}
-          </div>
-          <div class="details">
-            <strong>Environment:</strong><br>
-            • NODE_ENV: ${process.env.NODE_ENV}<br>
-            • PORT: ${process.env.PORT}<br>
-            • Backend URL: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not configured'}
-          </div>
-        </div>
-      </body>
-      </html>
-    `);
+        </body>
+        </html>
+      `);
+    }
   });
 } else {
   console.log('✅ Build directory found, serving static files');
@@ -133,41 +141,45 @@ if (!buildPath) {
 
     // Check if the file exists before sending
     if (!fs.existsSync(indexPath)) {
-      console.error('❌ index.html not found, sending detailed error');
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>PiText Email - MISSING INDEX.HTML</title>
-          <style>
-            body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
-            .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; }
-            h1 { color: #d32f2f; }
-            p { color: #666; }
-            .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; text-align: left; }
-            .details { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem; text-align: left; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>❌ MISSING INDEX.HTML</h1>
-            <p>The build directory exists but index.html is missing.</p>
-            <div class="error">
-              <strong>Error:</strong> index.html not found at ${indexPath}<br>
-              <strong>Build Path:</strong> ${buildPath}<br>
-              <strong>Server:</strong> Running on port ${PORT}
+      console.error('❌ index.html not found, serving fallback');
+      if (fs.existsSync(fallbackPath)) {
+        return res.sendFile(fallbackPath);
+      } else {
+        res.setHeader('Content-Type', 'text/html');
+        return res.status(404).send(`
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>PiText Email - MISSING INDEX.HTML</title>
+            <style>
+              body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+              .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; }
+              h1 { color: #d32f2f; }
+              p { color: #666; }
+              .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; text-align: left; }
+              .details { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem; text-align: left; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>❌ MISSING INDEX.HTML</h1>
+              <p>The build directory exists but index.html is missing.</p>
+              <div class="error">
+                <strong>Error:</strong> index.html not found at ${indexPath}<br>
+                <strong>Build Path:</strong> ${buildPath}<br>
+                <strong>Server:</strong> Running on port ${PORT}
+              </div>
+              <div class="details">
+                <strong>Available files in build directory:</strong><br>
+                ${fs.existsSync(buildPath) ? fs.readdirSync(buildPath).map(f => `• ${f}`).join('<br>') : 'No files found'}
+              </div>
             </div>
-            <div class="details">
-              <strong>Available files in build directory:</strong><br>
-              ${fs.existsSync(buildPath) ? fs.readdirSync(buildPath).map(f => `• ${f}`).join('<br>') : 'No files found'}
-            </div>
-          </div>
-        </body>
-        </html>
-      `);
+          </body>
+          </html>
+        `);
+      }
     }
 
     res.sendFile(indexPath, (err) => {

@@ -26,6 +26,10 @@ ls -la apps/mail/build/client/index.html || (echo "❌ BUILD ERROR: index.html n
 echo "🔍 Checking server.js..."
 ls -la apps/mail/server.js || (echo "❌ CRITICAL ERROR: server.js not found" && exit 1)
 
+# Check if fallback file exists
+echo "🔍 Checking fallback-index.html..."
+ls -la apps/mail/fallback-index.html || echo "⚠️ Fallback file not found, but continuing..."
+
 # Set environment variables for production
 export NODE_ENV=production
 export PORT=10000
