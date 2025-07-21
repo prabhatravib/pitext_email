@@ -3,6 +3,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import babel from 'vite-plugin-babel';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 const ReactCompilerConfig = {
   /* ... */
@@ -11,6 +12,7 @@ const ReactCompilerConfig = {
 export default defineConfig({
   base: '/',
   plugins: [
+    react(),
     reactRouter({
       ssr: false,
       prerender: false,
@@ -18,7 +20,10 @@ export default defineConfig({
     babel({
       filter: /\.[jt]sx?$/,
       babelConfig: {
-        presets: ['@babel/preset-typescript'],
+        presets: [
+          ['@babel/preset-react', { runtime: 'automatic' }],
+          '@babel/preset-typescript'
+        ],
         plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
       },
     }),
