@@ -50,7 +50,7 @@ function LoginClientContent({ providers, isProd }: LoginClientProps) {
     if (provider.isCustom && provider.customRedirectPath) {
       navigate(provider.customRedirectPath);
     } else {
-      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
+      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
       toast.promise(
         signIn.social({
           provider: provider.id as any,
