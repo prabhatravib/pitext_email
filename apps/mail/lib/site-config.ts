@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: 'PiText Email',
-  description: 'A modern, AI-powered email client focused on Gmail integration',
+  description: 'A modern, AI-powered email client  with Gmail integration',
   url: 'https://pitext.email',
   ogImage: 'https://pitext.email/og.jpg',
   links: {
-    twitter: 'https://twitter.com/pitext_email',
+    twitter: '',
     github: 'https://github.com/your-username/pitext_email',
   },
   creator: '@pitext_email',
