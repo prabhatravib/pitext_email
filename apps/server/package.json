@@ -3,14 +3,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
-    "build": "wrangler deploy --dry-run",
-    "dev": "wrangler dev --port 8787 --host 0.0.0.0 --compatibility-date 2024-09-04 --compatibility-flags nodejs_compat",
-    "deploy": "wrangler deploy --compatibility-date 2024-09-04 --compatibility-flags nodejs_compat",
-    "test:ai": "tsx evals/**/*.eval.ts",
-    "eval": "NODE_ENV=production tsx evals/**/*.eval.ts",
-    "eval:dev": "NODE_ENV=development tsx evals/**/*.eval.ts",
-    "eval:ci": "NODE_ENV=ci tsx evals/**/*.eval.ts"
+    "start": "node server.js",
+    "start:simple": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step needed for Gmail server'",
+    "deploy": "echo 'Deploy using Render or your preferred platform'"
   },
   "exports": {
     "./trpc": "./src/trpc/index.ts",
