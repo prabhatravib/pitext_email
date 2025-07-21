@@ -1,5 +1,10 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -10,6 +15,9 @@ app.use(cors({
   origin: process.env.VITE_PUBLIC_APP_URL || 'http://localhost:3000',
   credentials: true
 }));
+
+// Serve static files from the built frontend
+app.use(express.static(path.join(__dirname, '../mail/build/client')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -60,8 +68,14 @@ app.get('/api/*', (req, res) => {
   });
 });
 
+// Catch-all handler for SPA routing - serve index.html for any non-API route
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../mail/build/client/index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Gmail server is running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`📧 Gmail API ready at: http://localhost:${PORT}/api/gmail`);
+  console.log(`🌐 Frontend served from: ${path.join(__dirname, '../mail/build/client')}`);
 }); 

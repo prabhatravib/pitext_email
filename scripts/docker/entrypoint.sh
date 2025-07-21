@@ -20,7 +20,7 @@ export NODE_ENV=production
 export PORT=10000
 export HOSTNAME="0.0.0.0"
 
-echo "🚀 Starting server on port $PORT..."
+echo "🚀 Starting mail server on port $PORT..."
 
-# Start the server directly
+# Start the mail server (which serves the frontend)
 exec node /app/apps/mail/server.js
