@@ -6,9 +6,27 @@ import { hydrateRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 
 startTransition(() => {
-  const rootElement = document.getElementById('root');
+  let rootElement = document.getElementById('root');
+  
+  // If root element doesn't exist, create it
   if (!rootElement) {
-    throw new Error('Root element not found');
+    console.warn('Root element not found, creating it dynamically');
+    rootElement = document.createElement('div');
+    rootElement.id = 'root';
+    
+    // If there's no body, create it too
+    if (!document.body) {
+      const body = document.createElement('body');
+      body.className = 'antialiased';
+      document.documentElement.appendChild(body);
+    }
+    
+    document.body.appendChild(rootElement);
+  }
+
+  // Ensure the root element is properly positioned
+  if (!rootElement.parentElement) {
+    document.body.appendChild(rootElement);
   }
 
   hydrateRoot(

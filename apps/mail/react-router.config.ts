@@ -12,4 +12,8 @@ export default {
     unstable_viteEnvironmentApi: true,
   },
   serverModuleFormat: 'esm',
+  // Add custom HTML template to ensure root element is present
+  html: {
+    template: 'index.html',
+  },
 } satisfies Config;
