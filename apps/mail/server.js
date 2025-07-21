@@ -366,6 +366,32 @@ if (!buildPath) {
     res.status(404).send('Entry client file not found');
   });
 
+  // Handle asset requests that might be missing
+  app.get('/assets/*', (req, res) => {
+    const assetPath = req.path.replace('/assets/', '');
+    const fullPath = path.join(buildPath, 'assets', assetPath);
+    
+    if (fs.existsSync(fullPath)) {
+      console.log(`📄 Serving asset: ${req.path}`);
+      res.sendFile(fullPath);
+    } else {
+      console.log(`❌ Asset not found: ${req.path}`);
+      res.status(404).send('Asset not found');
+    }
+  });
+
+  // Handle favicon.svg
+  app.get('/favicon.svg', (req, res) => {
+    const faviconPath = path.join(buildPath, 'favicon.svg');
+    if (fs.existsSync(faviconPath)) {
+      console.log(`📄 Serving favicon.svg`);
+      res.sendFile(faviconPath);
+    } else {
+      console.log(`❌ favicon.svg not found`);
+      res.status(404).send('Favicon not found');
+    }
+  });
+
   // Check if index.html exists
   console.log('🔍 Index path:', indexPath);
   console.log('🔍 Index file exists:', fs.existsSync(indexPath));
