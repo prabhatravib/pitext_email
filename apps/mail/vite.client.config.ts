@@ -1,11 +1,11 @@
-import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
   base: '/',
   plugins: [
-    tsconfigPaths(),
+    // Removed vite-tsconfig-paths plugin due to Vite 6 compatibility issues
   ],
   server: {
     port: 3000,
@@ -31,6 +31,9 @@ export default defineConfig({
   resolve: {
     alias: {
       tslib: 'tslib/tslib.es6.js',
+      // Add manual path mappings to replace vite-tsconfig-paths functionality
+      '@': resolve(__dirname, './'),
+      '~/': resolve(__dirname, './'),
     },
   },
 }); 

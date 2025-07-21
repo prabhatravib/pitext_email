@@ -1,8 +1,8 @@
 import { reactRouter } from '@react-router/dev/vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import babel from 'vite-plugin-babel';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 const ReactCompilerConfig = {
   /* ... */
@@ -22,7 +22,7 @@ export default defineConfig({
         plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
       },
     }),
-    tsconfigPaths(),
+    // Removed vite-tsconfig-paths plugin due to Vite 6 compatibility issues
   ],
   server: {
     port: 3000,
@@ -40,6 +40,9 @@ export default defineConfig({
   resolve: {
     alias: {
       tslib: 'tslib/tslib.es6.js',
+      // Add manual path mappings to replace vite-tsconfig-paths functionality
+      '@': resolve(__dirname, './'),
+      '~/': resolve(__dirname, './'),
     },
   },
 });
