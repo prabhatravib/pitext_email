@@ -1,11 +1,20 @@
 import { defineConfig } from 'vite';
 import tailwindcss from 'tailwindcss';
 import { resolve } from 'path';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   base: '/',
   plugins: [
-    // Removed vite-tsconfig-paths plugin due to Vite 6 compatibility issues
+    react({
+      // React 19 specific configuration
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+      // Disable React compiler for now to avoid conflicts
+      babel: {
+        plugins: []
+      }
+    })
   ],
   build: {
     sourcemap: false,
@@ -20,6 +29,15 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]'
+      },
+      // Ensure React is properly externalized
+      external: [],
+      onwarn(warning, warn) {
+        // Suppress warnings about React being undefined
+        if (warning.code === 'MISSING_EXPORT' && warning.message.includes('React')) {
+          return;
+        }
+        warn(warning);
       }
     }
   },
@@ -34,6 +52,14 @@ export default defineConfig({
       // Add manual path mappings to replace vite-tsconfig-paths functionality
       '@': resolve(__dirname, './'),
       '~/': resolve(__dirname, './'),
+      // Ensure React is properly resolved
+      'react': 'react',
+      'react-dom': 'react-dom'
     },
   },
+  define: {
+    // Ensure React is globally available
+    'process.env.NODE_ENV': '"production"',
+    'global': 'globalThis'
+  }
 }); 

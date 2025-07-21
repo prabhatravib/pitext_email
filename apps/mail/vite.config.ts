@@ -3,26 +3,25 @@ import babel from 'vite-plugin-babel';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-
-const ReactCompilerConfig = {
-  /* ... */
-};
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   base: '/',
   plugins: [
+    react({
+      // React 19 specific configuration
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+      // Disable React compiler for now to avoid conflicts
+      babel: {
+        plugins: []
+      }
+    }),
     reactRouter({
       ssr: false,
       prerender: false,
     }),
-    babel({
-      filter: /\.[jt]sx?$/,
-      babelConfig: {
-        presets: ['@babel/preset-typescript'],
-        plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
-      },
-    }),
-    // Removed vite-tsconfig-paths plugin due to Vite 6 compatibility issues
+    // Remove babel plugin that was causing React compiler issues
   ],
   server: {
     port: 3000,
@@ -43,6 +42,14 @@ export default defineConfig({
       // Add manual path mappings to replace vite-tsconfig-paths functionality
       '@': resolve(__dirname, './'),
       '~/': resolve(__dirname, './'),
+      // Ensure React is properly resolved
+      'react': 'react',
+      'react-dom': 'react-dom'
     },
   },
+  define: {
+    // Ensure React is globally available
+    'process.env.NODE_ENV': '"development"',
+    'global': 'globalThis'
+  }
 });

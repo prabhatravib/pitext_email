@@ -78,29 +78,7 @@ RUN cd apps/mail && \
     if [ ! -f build/client/index.html ] || [ ! -s build/client/index.html ]; then \
         echo "⚠️ Creating fallback index.html due to build failure" && \
         mkdir -p build/client && \
-        cat > build/client/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PiText Email - Build Error</title>
-    <style>
-        body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
-        .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 600px; }
-        h1 { color: #d32f2f; }
-        p { color: #666; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>⚠️ Build Error</h1>
-        <p>The React Router build failed. Please check the build logs.</p>
-        <p>This is a fallback page created during the Docker build process.</p>
-    </div>
-</body>
-</html>
-EOF
+        cp fallback-index.html build/client/index.html && \
         echo "✅ Fallback index.html created" && \
         ls -la build/client/index.html; \
     fi

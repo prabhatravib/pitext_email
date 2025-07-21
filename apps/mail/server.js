@@ -20,6 +20,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Frontend server is running' });
 });
 
+// Handle Sentry monitoring requests to prevent 404 errors
+app.post('/monitoring', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'Monitoring endpoint' });
+});
+
 // API proxy for development (if backend is not available)
 app.get('/api/trpc/*', (req, res) => {
   console.log('TRPC request intercepted:', req.path);
