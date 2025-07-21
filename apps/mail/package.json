@@ -58,7 +58,6 @@
     "agents": "0.0.93",
     "ai": "^4.3.9",
     "autumn-js": "^0.0.48",
-    "babel-plugin-react-compiler": "19.1.0-rc.2",
     "better-auth": "^1.2.9",
     "canvas-confetti": "1.9.3",
     "class-variance-authority": "0.7.1",
@@ -135,6 +134,7 @@
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "@types/sanitize-html": "2.13.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "@zero/eslint-config": "workspace:*",
     "@zero/tsconfig": "workspace:*",
 
