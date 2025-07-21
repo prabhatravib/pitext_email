@@ -104,6 +104,12 @@ app.get('/api/*', (req, res) => {
 
 // Catch-all handler for SPA routing - serve index.html for any non-API route
 app.get('*', (req, res) => {
+  // Don't serve HTML for JavaScript, CSS, or other asset files
+  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/)) {
+    console.log(`❌ Blocked HTML serving for asset: ${req.path}`);
+    return res.status(404).send('Asset not found');
+  }
+  
   res.sendFile(path.join(__dirname, '../mail/build/client/client/index.html'));
 });
 

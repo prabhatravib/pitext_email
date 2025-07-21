@@ -375,9 +375,15 @@ if (!buildPath) {
     console.error('Available files in build/client:', fs.readdirSync(buildPath));
   }
 
-  // Handle all routes by serving the index.html file (for SPA routing) - this MUST come AFTER static file serving
+  // Handle SPA routes by serving the index.html file - this MUST come AFTER static file serving
   app.get('*', (req, res) => {
     console.log('📄 Serving index.html for route:', req.path);
+
+    // Don't serve HTML for JavaScript, CSS, or other asset files
+    if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/)) {
+      console.log(`❌ Blocked HTML serving for asset: ${req.path}`);
+      return res.status(404).send('Asset not found');
+    }
 
     // Check if the file exists before sending
     if (!fs.existsSync(indexPath)) {
