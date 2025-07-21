@@ -1,0 +1,2 @@
+export const getLocale = () => 'en';
+export const setLocale = () => {};

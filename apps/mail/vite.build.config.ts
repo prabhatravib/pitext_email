@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { reactRouter } from '@react-router/dev/vite';
 import tailwindcss from 'tailwindcss';
 import { resolve } from 'path';
 import react from '@vitejs/plugin-react';
@@ -14,6 +15,10 @@ export default defineConfig({
       babel: {
         plugins: []
       }
+    }),
+    reactRouter({
+      ssr: false,
+      prerender: false,
     })
   ],
   build: {

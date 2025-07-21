@@ -17,4 +17,8 @@ export default {
   build: {
     ssr: false,
   },
+  // Ensure client-side routing works properly
+  clientEntry: 'app/entry.client.tsx',
+  // Disable server-side features
+  serverEntry: undefined,
 } satisfies Config;
