@@ -289,6 +289,11 @@ export function ThreadDisplay() {
 
   const printThread = () => {
     try {
+      // Only run in browser environment
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return;
+      }
+
       // Create a hidden iframe for printing
       const printFrame = document.createElement('iframe');
       printFrame.style.position = 'absolute';
@@ -303,7 +308,7 @@ export function ThreadDisplay() {
       // Generate clean, simple HTML content for printing
       const printContent = `
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
         <head>
           <meta charset="utf-8">
           <title>Print Thread - ${emailData?.latest?.subject || 'No Subject'}</title>

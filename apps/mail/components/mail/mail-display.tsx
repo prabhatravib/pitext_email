@@ -791,6 +791,11 @@ const MailDisplay = ({ emailData, index, totalEmails, demo, threadAttachments }:
   // email printing
   const printMail = () => {
     try {
+      // Only run in browser environment
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return;
+      }
+
       // Create a hidden iframe for printing
       const printFrame = document.createElement('iframe');
       printFrame.style.position = 'absolute';
@@ -805,7 +810,7 @@ const MailDisplay = ({ emailData, index, totalEmails, demo, threadAttachments }:
       // Generate clean, simple HTML content for printing
       const printContent = `
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
         <head>
           <meta charset="utf-8">
           <title>Print Email - ${emailData.subject || 'No Subject'}</title>

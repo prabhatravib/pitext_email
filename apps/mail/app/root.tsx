@@ -21,7 +21,7 @@ export function Layout({ children }: PropsWithChildren) {
         <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
         <link rel="manifest" href="/manifest.json" />
-        <title>{siteConfig.title}</title>
+        <title>{siteConfig.name}</title>
         <meta name="description" content={siteConfig.description} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -65,28 +65,44 @@ export function ErrorBoundary() {
     }
   };
 
-  return (
-    <html lang={getLocale()} suppressHydrationWarning>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <link rel="manifest" href="/manifest.json" />
-        <title>{siteConfig.title}</title>
-      </head>
-      <body className="antialiased">
-        <div className="flex h-screen w-full items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <h1 className="text-2xl font-bold">Something went wrong</h1>
-            <p className="text-muted-foreground">An error occurred while loading this page.</p>
-            <Button onClick={handleReload}>
-              Reload Page
-            </Button>
+  // Only render HTML structure if we're in an error state
+  if (typeof window !== 'undefined') {
+    return (
+      <html lang={getLocale()} suppressHydrationWarning>
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
+          <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+          <link rel="manifest" href="/manifest.json" />
+          <title>{siteConfig.name}</title>
+        </head>
+        <body className="antialiased">
+          <div className="flex h-screen w-full items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <h1 className="text-2xl font-bold">Something went wrong</h1>
+              <p className="text-muted-foreground">An error occurred while loading this page.</p>
+              <Button onClick={handleReload}>
+                Reload Page
+              </Button>
+            </div>
           </div>
-        </div>
-      </body>
-    </html>
+        </body>
+      </html>
+    );
+  }
+
+  // Return a simple div during SSR to avoid hydration issues
+  return (
+    <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <h1 className="text-2xl font-bold">Something went wrong</h1>
+        <p className="text-muted-foreground">An error occurred while loading this page.</p>
+        <Button onClick={handleReload}>
+          Reload Page
+        </Button>
+      </div>
+    </div>
   );
 }
 
