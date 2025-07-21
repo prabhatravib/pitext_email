@@ -1,3 +1,4 @@
+import { reactRouter } from '@react-router/dev/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
