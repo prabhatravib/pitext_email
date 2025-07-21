@@ -32,6 +32,10 @@ app.get('/api/trpc/*', (req, res) => {
 // Serve static files from the build directory
 const buildPath = path.join(__dirname, 'build/client');
 
+console.log('🔍 Build path:', buildPath);
+console.log('🔍 Current directory:', __dirname);
+console.log('🔍 Build directory exists:', fs.existsSync(buildPath));
+
 // Check if build directory exists
 if (!fs.existsSync(buildPath)) {
   console.warn('⚠️ Build directory not found:', buildPath);
@@ -39,6 +43,7 @@ if (!fs.existsSync(buildPath)) {
   
   // Create a temporary HTML response for deployment
   app.get('*', (req, res) => {
+    console.log('📝 Serving placeholder for route:', req.path);
     res.send(`
       <!DOCTYPE html>
       <html lang="en">
@@ -70,11 +75,22 @@ if (!fs.existsSync(buildPath)) {
     `);
   });
 } else {
-  // Serve static files
-  app.use(express.static(buildPath));
+  console.log('✅ Build directory found, serving static files');
+  console.log('📁 Files in build directory:', fs.readdirSync(buildPath));
+  
+  // Serve static files with explicit options
+  app.use(express.static(buildPath, {
+    index: false, // Don't serve index.html automatically
+    dotfiles: 'ignore',
+    etag: true,
+    lastModified: true
+  }));
   
   // Check if index.html exists
   const indexPath = path.join(buildPath, 'index.html');
+  console.log('🔍 Index path:', indexPath);
+  console.log('🔍 Index file exists:', fs.existsSync(indexPath));
+  
   if (!fs.existsSync(indexPath)) {
     console.error('❌ index.html not found at:', indexPath);
     console.error('Available files in build/client:', fs.readdirSync(buildPath));
@@ -82,8 +98,20 @@ if (!fs.existsSync(buildPath)) {
   
   // Handle all routes by serving the index.html file (for SPA routing)
   app.get('*', (req, res) => {
-    console.log('Serving index.html for route:', req.path);
-    res.sendFile(indexPath);
+    console.log('📄 Serving index.html for route:', req.path);
+    
+    // Check if the file exists before sending
+    if (!fs.existsSync(indexPath)) {
+      console.error('❌ index.html not found, sending 404');
+      return res.status(404).send('Cannot GET /');
+    }
+    
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('❌ Error sending index.html:', err);
+        res.status(500).send('Internal server error');
+      }
+    });
   });
 }
 
