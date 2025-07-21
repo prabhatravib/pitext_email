@@ -20,13 +20,13 @@ async function buildClientOnly() {
     
     // Check if required files exist
     const indexHtmlPath = resolve(process.cwd(), 'index.html');
-    const viteConfigPath = resolve(process.cwd(), 'vite.config.ts');
+    const viteBuildConfigPath = resolve(process.cwd(), 'vite.build.config.ts');
     
     console.log('Checking required files...');
     console.log('index.html path:', indexHtmlPath);
-    console.log('vite.config.ts path:', viteConfigPath);
+    console.log('vite.build.config.ts path:', viteBuildConfigPath);
     console.log('index.html exists:', fs.existsSync(indexHtmlPath));
-    console.log('vite.config.ts exists:', fs.existsSync(viteConfigPath));
+    console.log('vite.build.config.ts exists:', fs.existsSync(viteBuildConfigPath));
     
     if (!fs.existsSync(indexHtmlPath)) {
       console.error('❌ index.html not found at:', indexHtmlPath);
@@ -40,8 +40,8 @@ async function buildClientOnly() {
       throw new Error('index.html not found');
     }
     
-    if (!fs.existsSync(viteConfigPath)) {
-      throw new Error('vite.config.ts not found');
+    if (!fs.existsSync(viteBuildConfigPath)) {
+      throw new Error('vite.build.config.ts not found');
     }
     
     console.log('Starting Vite build...');
@@ -53,26 +53,11 @@ async function buildClientOnly() {
       console.log('Created build directory:', buildDir);
     }
     
-    // Build with explicit configuration
+    // Build with dedicated configuration file
     const result = await build({
-      configFile: viteConfigPath,
+      configFile: viteBuildConfigPath,
       mode: 'production',
-      root: process.cwd(),
-      build: {
-        outDir: 'build/client',
-        emptyOutDir: true,
-        rollupOptions: {
-          input: {
-            main: indexHtmlPath
-          },
-          output: {
-            manualChunks: undefined,
-            entryFileNames: 'assets/[name]-[hash].js',
-            chunkFileNames: 'assets/[name]-[hash].js',
-            assetFileNames: 'assets/[name]-[hash].[ext]'
-          }
-        }
-      }
+      root: process.cwd()
     });
     
     console.log('Build result:', result);
