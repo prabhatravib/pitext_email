@@ -20,13 +20,13 @@ async function buildClientOnly() {
     
     // Check if required files exist
     const indexHtmlPath = resolve(process.cwd(), 'index.html');
-    const viteConfigPath = resolve(process.cwd(), 'vite.client.config.ts');
+    const viteConfigPath = resolve(process.cwd(), 'vite.config.ts');
     
     console.log('Checking required files...');
     console.log('index.html path:', indexHtmlPath);
-    console.log('vite.client.config.ts path:', viteConfigPath);
+    console.log('vite.config.ts path:', viteConfigPath);
     console.log('index.html exists:', fs.existsSync(indexHtmlPath));
-    console.log('vite.client.config.ts exists:', fs.existsSync(viteConfigPath));
+    console.log('vite.config.ts exists:', fs.existsSync(viteConfigPath));
     
     if (!fs.existsSync(indexHtmlPath)) {
       console.error('❌ index.html not found at:', indexHtmlPath);
@@ -41,7 +41,7 @@ async function buildClientOnly() {
     }
     
     if (!fs.existsSync(viteConfigPath)) {
-      throw new Error('vite.client.config.ts not found');
+      throw new Error('vite.config.ts not found');
     }
     
     console.log('Starting Vite build...');
