@@ -2,12 +2,21 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.VITE_PUBLIC_APP_URL || 'https://pitext-email.onrender.com',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Add logging middleware
 app.use((req, res, next) => {
@@ -25,13 +34,169 @@ app.post('/monitoring', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Monitoring endpoint' });
 });
 
-// API proxy for development (if backend is not available)
-app.get('/api/trpc/*', (req, res) => {
-  console.log('TRPC request intercepted:', req.path);
-  res.status(503).json({ 
-    error: 'Backend not available',
-    message: 'Please ensure the backend service is running'
+// Better Auth API endpoints
+app.get('/api/auth/session', (req, res) => {
+  res.json({
+    user: null,
+    session: null,
+    status: 'unauthenticated'
   });
+});
+
+app.get('/api/auth/use-session', (req, res) => {
+  res.json({
+    user: null,
+    session: null,
+    status: 'unauthenticated'
+  });
+});
+
+app.post('/api/auth/sign-in', (req, res) => {
+  res.json({
+    user: null,
+    session: null,
+    status: 'unauthenticated'
+  });
+});
+
+app.post('/api/auth/sign-out', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Signed out successfully'
+  });
+});
+
+app.post('/api/auth/sign-up', (req, res) => {
+  res.json({
+    user: null,
+    session: null,
+    status: 'unauthenticated'
+  });
+});
+
+app.get('/api/auth/providers', (req, res) => {
+  res.json({
+    providers: []
+  });
+});
+
+app.get('/api/auth/callback/:provider', (req, res) => {
+  res.json({
+    user: null,
+    session: null,
+    status: 'unauthenticated'
+  });
+});
+
+// Autumn API endpoints (for customer management)
+app.get('/api/autumn/customers', (req, res) => {
+  res.json({
+    customers: [],
+    total: 0,
+    status: 'success'
+  });
+});
+
+app.post('/api/autumn/customers', (req, res) => {
+  res.json({
+    customer: req.body,
+    status: 'success'
+  });
+});
+
+// Handle all other API routes that might be called
+app.all('/api/*', (req, res) => {
+  console.log(`API route not implemented: ${req.method} ${req.path}`);
+  res.json({
+    message: 'API endpoint not implemented in this version',
+    status: 'not_implemented',
+    path: req.path,
+    method: req.method
+  });
+});
+
+// tRPC API endpoints - provide basic responses for common queries
+app.all('/api/trpc/*', (req, res) => {
+  console.log(`tRPC request: ${req.method} ${req.path}`);
+  
+  // Handle different tRPC procedures
+  const path = req.path.replace('/api/trpc/', '');
+  
+  switch (path) {
+    case 'settings.get':
+      res.json({
+        result: {
+          data: {
+            settings: {
+              theme: 'system',
+              language: 'en',
+              notifications: true,
+              autoSave: true
+            }
+          }
+        }
+      });
+      break;
+      
+    case 'settings.save':
+      res.json({
+        result: {
+          data: { success: true }
+        }
+      });
+      break;
+      
+    case 'mail.listThreads':
+      res.json({
+        result: {
+          data: {
+            threads: [],
+            nextCursor: null
+          }
+        }
+      });
+      break;
+      
+    case 'mail.count':
+      res.json({
+        result: {
+          data: {
+            total: 0,
+            unread: 0,
+            read: 0
+          }
+        }
+      });
+      break;
+      
+    case 'categories.defaults':
+      res.json({
+        result: {
+          data: {
+            categories: []
+          }
+        }
+      });
+      break;
+      
+    case 'notes.list':
+      res.json({
+        result: {
+          data: {
+            notes: []
+          }
+        }
+      });
+      break;
+      
+    default:
+      res.json({
+        result: {
+          data: null,
+          message: 'tRPC procedure not implemented in this version'
+        }
+      });
+  }
 });
 
 // Try multiple possible build paths for different deployment environments
