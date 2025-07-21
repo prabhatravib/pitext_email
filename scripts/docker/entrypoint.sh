@@ -3,17 +3,28 @@ set -x
 
 # Debug: Check if build files exist
 echo "🔍 Checking build files in container..."
-ls -la /app/apps/mail/
+echo "🔍 Current working directory: $(pwd)"
+echo "🔍 Files in current directory:"
+ls -la
+
+echo "🔍 Checking apps directory..."
+ls -la apps/ || (echo "❌ CRITICAL ERROR: Apps directory not found" && exit 1)
+
+echo "🔍 Checking mail app..."
+ls -la apps/mail/ || (echo "❌ CRITICAL ERROR: Mail app not found" && exit 1)
+
 echo "🔍 Checking build directory..."
-ls -la /app/apps/mail/build/ || echo "❌ Build directory not found"
+ls -la apps/mail/build/ || (echo "❌ BUILD ERROR: Build directory not found" && exit 1)
+
 echo "🔍 Checking client directory..."
-ls -la /app/apps/mail/build/client/ || echo "❌ Client directory not found"
+ls -la apps/mail/build/client/ || (echo "❌ BUILD ERROR: Client directory not found" && exit 1)
+
 echo "🔍 Checking index.html..."
-ls -la /app/apps/mail/build/client/index.html || echo "❌ index.html not found"
+ls -la apps/mail/build/client/index.html || (echo "❌ BUILD ERROR: index.html not found" && exit 1)
 
 # Check if the server file exists
 echo "🔍 Checking server.js..."
-ls -la /app/apps/mail/server.js || echo "❌ server.js not found"
+ls -la apps/mail/server.js || (echo "❌ CRITICAL ERROR: server.js not found" && exit 1)
 
 # Set environment variables for production
 export NODE_ENV=production

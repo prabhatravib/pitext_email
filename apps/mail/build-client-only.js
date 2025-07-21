@@ -36,6 +36,13 @@ async function buildClientOnly() {
     
     console.log('Starting Vite build...');
     
+    // Ensure build directory exists
+    const buildDir = resolve(__dirname, 'build/client');
+    if (!fs.existsSync(buildDir)) {
+      fs.mkdirSync(buildDir, { recursive: true });
+      console.log('Created build directory:', buildDir);
+    }
+    
     await build({
       configFile: viteConfigPath,
       mode: 'production',
@@ -63,6 +70,12 @@ async function buildClientOnly() {
     }
     
     if (!fs.existsSync(indexPath)) {
+      console.error('❌ index.html was not generated in build output');
+      console.error('Available files in build directory:');
+      if (fs.existsSync(buildPath)) {
+        const buildFiles = fs.readdirSync(buildPath);
+        console.error(buildFiles);
+      }
       throw new Error('index.html was not generated in build output');
     }
     

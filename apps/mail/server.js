@@ -29,48 +29,77 @@ app.get('/api/trpc/*', (req, res) => {
   });
 });
 
-// Serve static files from the build directory
-const buildPath = path.join(__dirname, 'build/client');
+// Try multiple possible build paths for different deployment environments
+const possibleBuildPaths = [
+  path.join(__dirname, 'build/client'),
+  path.join(__dirname, '../build/client'),
+  path.join(__dirname, '../../build/client'),
+  '/opt/render/project/src/apps/mail/build/client',
+  path.join(process.cwd(), 'apps/mail/build/client'),
+  path.join(process.cwd(), 'build/client')
+];
 
-console.log('🔍 Build path:', buildPath);
-console.log('🔍 Current directory:', __dirname);
-console.log('🔍 Build directory exists:', fs.existsSync(buildPath));
+let buildPath = null;
+let indexPath = null;
 
-// Check if build directory exists
-if (!fs.existsSync(buildPath)) {
-  console.warn('⚠️ Build directory not found:', buildPath);
-  console.warn('Creating temporary placeholder...');
+// Find the correct build path
+for (const testPath of possibleBuildPaths) {
+  console.log(`🔍 Testing build path: ${testPath}`);
+  if (fs.existsSync(testPath)) {
+    buildPath = testPath;
+    indexPath = path.join(buildPath, 'index.html');
+    console.log(`✅ Found build directory: ${buildPath}`);
+    console.log(`✅ Index file exists: ${fs.existsSync(indexPath)}`);
+    break;
+  }
+}
+
+// If no build directory found, show detailed error
+if (!buildPath) {
+  console.error('❌ CRITICAL ERROR: No build directory found');
+  console.error('Expected paths:', possibleBuildPaths);
+  console.error('Current directory:', __dirname);
+  console.error('Working directory:', process.cwd());
   
-  // Create a temporary HTML response for deployment
+  // Show detailed error page for all routes
   app.get('*', (req, res) => {
-    console.log('📝 Serving placeholder for route:', req.path);
+    console.log('📝 Serving error page for route:', req.path);
     res.setHeader('Content-Type', 'text/html');
-    res.send(`
+    res.status(500).send(`
       <!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PiText Email - Deployment In Progress</title>
+        <title>PiText Email - BUILD FAILED</title>
         <style>
           body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
-          .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-          h1 { color: #333; }
+          .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; }
+          h1 { color: #d32f2f; }
           p { color: #666; }
-          .status { margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.9rem; }
-          .refresh-btn { margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+          .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; text-align: left; }
+          .details { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem; text-align: left; }
         </style>
       </head>
       <body>
         <div class="container">
-          <h1>🚀 PiText Email</h1>
-          <p>Deployment in progress. The build is being compiled.</p>
-          <p>Please refresh this page in a few moments.</p>
-          <button class="refresh-btn" onclick="location.reload()">Refresh Page</button>
-          <div class="status">
-            Status: Build directory pending<br>
-            Server: Running on port ${PORT}<br>
-            Backend: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not configured'}
+          <h1>❌ BUILD FAILED</h1>
+          <p>The application failed to build properly. No build files were found.</p>
+          <div class="error">
+            <strong>Error:</strong> Build directory not found<br>
+            <strong>Server:</strong> Running on port ${PORT}<br>
+            <strong>Current Directory:</strong> ${__dirname}<br>
+            <strong>Working Directory:</strong> ${process.cwd()}
+          </div>
+          <div class="details">
+            <strong>Expected build paths:</strong><br>
+            ${possibleBuildPaths.map(p => `• ${p}`).join('<br>')}
+          </div>
+          <div class="details">
+            <strong>Environment:</strong><br>
+            • NODE_ENV: ${process.env.NODE_ENV}<br>
+            • PORT: ${process.env.PORT}<br>
+            • Backend URL: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not configured'}
           </div>
         </div>
       </body>
@@ -80,7 +109,7 @@ if (!fs.existsSync(buildPath)) {
 } else {
   console.log('✅ Build directory found, serving static files');
   console.log('📁 Files in build directory:', fs.readdirSync(buildPath));
-  
+
   // Serve static files with explicit options
   app.use(express.static(buildPath, {
     index: false, // Don't serve index.html automatically
@@ -88,24 +117,23 @@ if (!fs.existsSync(buildPath)) {
     etag: true,
     lastModified: true
   }));
-  
+
   // Check if index.html exists
-  const indexPath = path.join(buildPath, 'index.html');
   console.log('🔍 Index path:', indexPath);
   console.log('🔍 Index file exists:', fs.existsSync(indexPath));
-  
+
   if (!fs.existsSync(indexPath)) {
     console.error('❌ index.html not found at:', indexPath);
     console.error('Available files in build/client:', fs.readdirSync(buildPath));
   }
-  
+
   // Handle all routes by serving the index.html file (for SPA routing)
   app.get('*', (req, res) => {
     console.log('📄 Serving index.html for route:', req.path);
-    
+
     // Check if the file exists before sending
     if (!fs.existsSync(indexPath)) {
-      console.error('❌ index.html not found, sending 404');
+      console.error('❌ index.html not found, sending detailed error');
       res.setHeader('Content-Type', 'text/html');
       return res.status(404).send(`
         <!DOCTYPE html>
@@ -113,30 +141,35 @@ if (!fs.existsSync(buildPath)) {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>PiText Email - Build Error</title>
+          <title>PiText Email - MISSING INDEX.HTML</title>
           <style>
             body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
-            .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            h1 { color: #333; }
+            .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; }
+            h1 { color: #d32f2f; }
             p { color: #666; }
-            .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; }
+            .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; text-align: left; }
+            .details { margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem; text-align: left; }
           </style>
         </head>
         <body>
           <div class="container">
-            <h1>❌ PiText Email</h1>
-            <p>Build files are missing. The application failed to build properly.</p>
+            <h1>❌ MISSING INDEX.HTML</h1>
+            <p>The build directory exists but index.html is missing.</p>
             <div class="error">
-              Error: index.html not found in build directory<br>
-              Server: Running on port ${PORT}<br>
-              Build Path: ${buildPath}
+              <strong>Error:</strong> index.html not found at ${indexPath}<br>
+              <strong>Build Path:</strong> ${buildPath}<br>
+              <strong>Server:</strong> Running on port ${PORT}
+            </div>
+            <div class="details">
+              <strong>Available files in build directory:</strong><br>
+              ${fs.existsSync(buildPath) ? fs.readdirSync(buildPath).map(f => `• ${f}`).join('<br>') : 'No files found'}
             </div>
           </div>
         </body>
         </html>
       `);
     }
-    
+
     res.sendFile(indexPath, (err) => {
       if (err) {
         console.error('❌ Error sending index.html:', err);
@@ -154,7 +187,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Frontend server is running on port ${PORT}`);
-  console.log(`📁 Serving static files from: ${buildPath}`);
+  console.log(`📁 Serving static files from: ${buildPath || 'NO BUILD DIRECTORY FOUND'}`);
   console.log(`🌐 Health check: http://localhost:${PORT}/health`);
   console.log(`🔗 Backend URL: ${process.env.VITE_PUBLIC_BACKEND_URL || 'Not set'}`);
 }); 

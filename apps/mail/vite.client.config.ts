@@ -19,6 +19,11 @@ export default defineConfig({
     sourcemap: false,
     outDir: 'build/client',
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   resolve: {
     alias: {

@@ -41,19 +41,30 @@ ENV VITE_BUILD_MODE=production
 # Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
 
-# Build the application with better error handling
+# Build the application with strict error checking
 RUN cd apps/mail && \
     echo "🔍 Starting build process..." && \
     echo "🔍 Current directory: $(pwd)" && \
     echo "🔍 Files in directory: $(ls -la)" && \
-    echo "🔍 Checking if build script exists: $(test -f package.json && echo 'yes' || echo 'no')" && \
     echo "🔍 Node version: $(node --version)" && \
-    echo "🔍 NPM version: $(npm --version)" && \
     echo "🔍 PNPM version: $(pnpm --version)" && \
+    echo "🔍 Checking required files..." && \
+    echo "  - index.html: $(test -f index.html && echo 'exists' || echo 'MISSING')" && \
+    echo "  - vite.client.config.ts: $(test -f vite.client.config.ts && echo 'exists' || echo 'MISSING')" && \
+    echo "  - build-client-only.js: $(test -f build-client-only.js && echo 'exists' || echo 'MISSING')" && \
+    echo "🔍 Running build command..." && \
     pnpm run build && \
-    echo "🔍 Build completed, checking output..." && \
-    ls -la build/client/ || echo "❌ Build directory not found" && \
-    echo "✅ Build process completed"
+    echo "🔍 Build completed, verifying output..." && \
+    echo "🔍 Build directory exists: $(test -d build && echo 'yes' || echo 'NO - BUILD FAILED')" && \
+    echo "🔍 Client directory exists: $(test -d build/client && echo 'yes' || echo 'NO - BUILD FAILED')" && \
+    echo "🔍 index.html exists: $(test -f build/client/index.html && echo 'yes' || echo 'NO - BUILD FAILED')" && \
+    echo "🔍 Build directory contents:" && \
+    ls -la build/ 2>/dev/null || (echo "❌ BUILD DIRECTORY NOT FOUND - BUILD FAILED" && exit 1) && \
+    echo "🔍 Client directory contents:" && \
+    ls -la build/client/ 2>/dev/null || (echo "❌ CLIENT DIRECTORY NOT FOUND - BUILD FAILED" && exit 1) && \
+    echo "🔍 Verifying index.html exists:" && \
+    ls -la build/client/index.html 2>/dev/null || (echo "❌ INDEX.HTML NOT FOUND - BUILD FAILED" && exit 1) && \
+    echo "✅ Build process completed successfully"
 
 # ========================================
 # Runner Stage: Production Environment
@@ -72,12 +83,24 @@ ENV NODE_ENV=production \
     HOSTNAME="0.0.0.0" \
     NEXT_TELEMETRY_DISABLED=1
 
-# Copy entrypoint and run it
+# Copy entrypoint and verification scripts
 COPY scripts/docker/ /app/scripts
 RUN chmod -R +x /app/scripts/*
 
 # Copy the entire built application
 COPY --from=builder --chown=nextjs:pnpm /app ./
+
+# Verify the build files are copied correctly - FAIL FAST if missing
+RUN echo "🔍 Verifying copied build files..." && \
+    echo "🔍 Apps directory exists: $(test -d apps && echo 'yes' || echo 'NO - CRITICAL ERROR')" && \
+    echo "🔍 Mail app exists: $(test -d apps/mail && echo 'yes' || echo 'NO - CRITICAL ERROR')" && \
+    echo "🔍 Build directory exists: $(test -d apps/mail/build && echo 'yes' || echo 'NO - BUILD NOT COPIED')" && \
+    echo "🔍 Client directory exists: $(test -d apps/mail/build/client && echo 'yes' || echo 'NO - CLIENT NOT COPIED')" && \
+    echo "🔍 index.html exists: $(test -f apps/mail/build/client/index.html && echo 'yes' || echo 'NO - INDEX.HTML NOT COPIED')" && \
+    echo "🔍 Server.js exists: $(test -f apps/mail/server.js && echo 'yes' || echo 'NO - SERVER.JS NOT COPIED')" && \
+    test -d apps/mail/build/client || (echo "❌ CLIENT DIRECTORY MISSING - DEPLOYMENT FAILED" && exit 1) && \
+    test -f apps/mail/build/client/index.html || (echo "❌ INDEX.HTML MISSING - DEPLOYMENT FAILED" && exit 1) && \
+    echo "✅ All build files verified successfully"
 
 # Switch to non-root user
 USER nextjs
