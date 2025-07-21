@@ -1,7 +1,7 @@
 import { createAuthClient } from 'better-auth/client';
 import { type Account } from 'better-auth';
 
-const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || window.location.origin;
+const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
 export const authClient = createAuthClient<Account>({
   baseURL: backendUrl,
@@ -14,4 +14,4 @@ export const authClient = createAuthClient<Account>({
 });
 
 export const { signIn, signUp, signOut, useSession, getSession, $fetch } = authClient;
-export type Session = Awaited<ReturnType<Auth['api']['getSession']>>;
+export type Session = Awaited<ReturnType<typeof authClient.api.getSession>>;

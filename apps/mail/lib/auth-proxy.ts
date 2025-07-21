@@ -1,6 +1,6 @@
 import { createAuthClient } from 'better-auth/client';
 
-const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || window.location.origin;
+const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
 const authClient = createAuthClient({
   baseURL: backendUrl,
