@@ -341,42 +341,6 @@ class GoogleSubscriptionFactory extends BaseSubscriptionFactory {
       return false;
     }
   }
-
-  /**
-   * Renew Gmail watch for a connection
-   * This method is called by the cron job to renew watch subscriptions
-   */
-  public async renewWatch(connectionData: any): Promise<void> {
-    try {
-      console.log(`[RENEW_WATCH] Renewing Gmail watch for connection: ${connectionData.id}`);
-      
-      const pubSubName = `notifications__${connectionData.id}`;
-      const pushEndpoint = getNotificationsUrl(EProviders.google);
-      
-      console.log(`[RENEW_WATCH] Using PubSub name: ${pubSubName}`);
-      console.log(`[RENEW_WATCH] Using push endpoint: ${pushEndpoint}`);
-
-      // Setup PubSub topic if it doesn't exist
-      await this.setupPubSubTopic(pubSubName);
-      
-      // Create or update PubSub subscription
-      await this.createPubSubSubscription(pubSubName, pushEndpoint);
-      
-      // Setup Gmail watch (this will renew the watch)
-      await this.setupGmailWatch(connectionData, pubSubName);
-      
-      // Update the subscription age
-      await env.gmail_sub_age.put(
-        `${connectionData.id}__${EProviders.google}`,
-        new Date().toISOString(),
-      );
-      
-      console.log(`[RENEW_WATCH] Successfully renewed watch for connection: ${connectionData.id}`);
-    } catch (error) {
-      console.error(`[RENEW_WATCH] Failed to renew watch for connection ${connectionData.id}:`, error);
-      throw error;
-    }
-  }
 }
 
 // Export class for registry use

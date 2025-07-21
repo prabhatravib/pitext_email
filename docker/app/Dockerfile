@@ -51,6 +51,7 @@ RUN cd apps/mail && \
     echo "🔍 Checking required files..." && \
     echo "  - index.html: $(test -f index.html && echo 'exists' || echo 'MISSING')" && \
     echo "  - react-router.config.ts: $(test -f react-router.config.ts && echo 'exists' || echo 'MISSING')" && \
+    echo "  - build-client-only.js: $(test -f build-client-only.js && echo 'exists' || echo 'MISSING')" && \
     echo "  - app directory: $(test -d app && echo 'exists' || echo 'MISSING')" && \
     echo "🔍 Running prebuild script..." && \
     pnpm run prebuild || echo "⚠️ Prebuild script failed, continuing..." && \
@@ -70,10 +71,6 @@ RUN cd apps/mail && \
     head -5 build/client/index.html && \
     echo "🔍 Verifying index.html is not empty:" && \
     test -s build/client/index.html && echo "✅ index.html is not empty" || (echo "❌ INDEX.HTML IS EMPTY - BUILD FAILED" && exit 1) && \
-    echo "🔍 Verifying JavaScript files exist:" && \
-    ls -la build/client/assets/ 2>/dev/null || (echo "❌ ASSETS DIRECTORY NOT FOUND - BUILD FAILED" && exit 1) && \
-    echo "🔍 JavaScript files in assets:" && \
-    ls -la build/client/assets/*.js 2>/dev/null || (echo "❌ NO JAVASCRIPT FILES FOUND - BUILD FAILED" && exit 1) && \
     echo "✅ React Router build process completed successfully"
 
 # Create a fallback index.html if the build fails

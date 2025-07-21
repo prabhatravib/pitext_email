@@ -40,10 +40,8 @@ export const makeQueryClient = (connectionId: string | null) =>
           signOut({
             fetchOptions: {
               onSuccess: () => {
-                if (typeof window !== 'undefined' && window.location.href.includes('/login')) return;
-                if (typeof window !== 'undefined') {
-                  window.location.href = '/login?error=required_scopes_missing';
-                }
+                if (window.location.href.includes('/login')) return;
+                window.location.href = '/login?error=required_scopes_missing';
               },
             },
           });
@@ -103,9 +101,7 @@ export const trpcClient = createTRPCClient<AppRouter>({
           if (typeof window !== 'undefined') {
             const currentPath = new URL(window.location.href).pathname;
             const redirectPath = res.headers.get('X-Zero-Redirect');
-            if (!!redirectPath && redirectPath !== currentPath) {
-              window.location.href = redirectPath;
-            }
+            if (!!redirectPath && redirectPath !== currentPath) window.location.href = redirectPath;
           }
           return res;
         }),

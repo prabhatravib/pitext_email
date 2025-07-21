@@ -248,7 +248,7 @@ async function createDraftFromMailto(mailtoData: {
 
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const session = await authProxy.api.getSession({ headers: request.headers });
-  const appUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  const appUrl = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
   if (!session) return Response.redirect(`${appUrl}/login`);
 
   const url = new URL(request.url);

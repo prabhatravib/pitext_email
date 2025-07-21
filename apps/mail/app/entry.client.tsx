@@ -5,14 +5,9 @@ import { HydratedRouter } from 'react-router/dom';
 import { hydrateRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error('Root element not found');
-}
-
 startTransition(() => {
   hydrateRoot(
-    rootElement,
+    document,
     <StrictMode>
       <HydratedRouter />
     </StrictMode>,

@@ -35,23 +35,7 @@ export NODE_ENV=production
 export PORT=10000
 export HOSTNAME="0.0.0.0"
 
-# Determine service type based on environment variable or service name
-SERVICE_TYPE=${SERVICE_TYPE:-"web"}
+echo "🚀 Starting mail server on port $PORT..."
 
-echo "🚀 Starting service type: $SERVICE_TYPE"
-
-case $SERVICE_TYPE in
-  "worker")
-    echo "🚀 Starting worker service..."
-    cd /app/apps/server && exec node server.js
-    ;;
-  "cron")
-    echo "🚀 Starting cron service..."
-    cd /app/apps/server && exec node jobs/renew-watch.js
-    ;;
-  "web"|*)
-    echo "🚀 Starting web server on port $PORT..."
-    # Start the mail server (which serves the frontend)
-    exec node /app/apps/mail/server.js
-    ;;
-esac
+# Start the mail server (which serves the frontend)
+exec node /app/apps/mail/server.js

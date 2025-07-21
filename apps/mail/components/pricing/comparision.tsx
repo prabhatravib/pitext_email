@@ -11,7 +11,7 @@ export default function Comparision() {
 
   const handleUpgrade = async () => {
     if (!session) {
-      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
       toast.promise(
         signIn.social({
           provider: 'google',
@@ -29,7 +29,7 @@ export default function Comparision() {
       toast.promise(
         attach({
           productId: 'pro-example',
-          successUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/mail/inbox?success=true`,
+          successUrl: `${window.location.origin}/mail/inbox?success=true`,
         }),
         {
           success: 'Redirecting to payment...',
@@ -157,7 +157,7 @@ export default function Comparision() {
                     toast.promise(
                       signIn.social({
                         provider: 'google',
-                        callbackURL: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/mail`,
+                        callbackURL: `${window.location.origin}/mail`,
                       }),
                       {
                         error: 'Login redirect failed',

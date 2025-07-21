@@ -8,12 +8,6 @@ import { useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
-interface EnvVarInfo {
-  name: string;
-  description: string;
-  required: boolean;
-}
-
 interface EnvVarStatus {
   name: string;
   set: boolean;
@@ -56,7 +50,7 @@ function LoginClientContent({ providers, isProd }: LoginClientProps) {
     if (provider.isCustom && provider.customRedirectPath) {
       navigate(provider.customRedirectPath);
     } else {
-      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
       toast.promise(
         signIn.social({
           provider: provider.id as any,

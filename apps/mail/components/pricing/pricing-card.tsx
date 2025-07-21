@@ -89,7 +89,7 @@ export default function PricingCard() {
 
   const handleUpgrade = async () => {
     if (!session) {
-      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+      const callbackUrl = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
       handleGoogleSignIn(`${callbackUrl}/pricing`);
       return;
     }
@@ -98,7 +98,7 @@ export default function PricingCard() {
       toast.promise(
         attach({
           productId: isAnnual ? 'pro_annual' : 'pro-example',
-          successUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/mail/inbox?success=true`,
+          successUrl: `${window.location.origin}/mail/inbox?success=true`,
         }),
         {
           success: 'Redirecting to payment...',
@@ -163,7 +163,7 @@ export default function PricingCard() {
               if (session) {
                 navigate('/mail/inbox');
               } else {
-                handleGoogleSignIn(`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/mail`, {
+                handleGoogleSignIn(`${window.location.origin}/mail`, {
                   loading: undefined,
                   success: undefined,
                 });

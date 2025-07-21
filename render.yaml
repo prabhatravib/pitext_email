@@ -40,8 +40,6 @@ services:
         value: "gpt-4.1"
       - key: LLM_PROXY_URL
         sync: false
-      - key: SERVICE_TYPE
-        value: "web"
 
   # ───────── Background worker (Gmail sync, etc.) ─────────
   - type: worker
@@ -49,6 +47,7 @@ services:
     env: docker
     plan: standard
     dockerfilePath: ./docker/app/Dockerfile
+    startCommand: cd apps/server && node server.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -62,8 +61,6 @@ services:
         value: "gpt-4.1"
       - key: LLM_PROXY_URL
         sync: false
-      - key: SERVICE_TYPE
-        value: "worker"
 
   # ───────── Cron job for Gmail watch renewal ─────────
   - type: cron
@@ -71,6 +68,7 @@ services:
     env: docker
     schedule: "0 */6 * * *"
     dockerfilePath: ./docker/app/Dockerfile
+    startCommand: cd apps/server && node jobs/renew-watch.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -79,6 +77,4 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: BETTER_AUTH_SECRET
-        sync: false
-      - key: SERVICE_TYPE
-        value: "cron" 
+        sync: false 

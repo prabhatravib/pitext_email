@@ -5,7 +5,6 @@ import { siteConfig } from '@/lib/site-config';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type PropsWithChildren } from 'react';
-import { Scripts } from 'react-router';
 
 const getUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin;
@@ -21,7 +20,7 @@ export function Layout({ children }: PropsWithChildren) {
         <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
         <link rel="manifest" href="/manifest.json" />
-        <title>{siteConfig.name}</title>
+        <title>{siteConfig.title}</title>
         <meta name="description" content={siteConfig.description} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -36,7 +35,6 @@ export function Layout({ children }: PropsWithChildren) {
         <ServerProviders connectionId="gmail">
           <ClientProviders>{children}</ClientProviders>
         </ServerProviders>
-        <Scripts />
       </body>
     </html>
   );
@@ -73,7 +71,7 @@ export function ErrorBoundary() {
         <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
         <link rel="manifest" href="/manifest.json" />
-        <title>{siteConfig.name}</title>
+        <title>{siteConfig.title}</title>
       </head>
       <body className="antialiased">
         <div className="flex h-screen w-full items-center justify-center">
