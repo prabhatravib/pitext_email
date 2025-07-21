@@ -18,7 +18,7 @@ export default defineConfig({
       }
     }),
     reactRouter({
-      ssr: false,
+      ssr: true,
       prerender: false,
       // Ensure the HTML template is used
       html: {
