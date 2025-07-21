@@ -46,6 +46,27 @@ let indexPath = null;
 let fallbackPath = path.join(__dirname, 'fallback-index.html');
 
 // Find the correct build path
+console.log('🔍 Starting build path detection...');
+console.log('🔍 Current directory:', __dirname);
+console.log('🔍 Working directory:', process.cwd());
+console.log('🔍 Environment:', process.env.NODE_ENV);
+
+// List all files in current directory for debugging
+try {
+  const currentDirFiles = fs.readdirSync(__dirname);
+  console.log('📁 Files in current directory:', currentDirFiles.slice(0, 20));
+} catch (e) {
+  console.log('❌ Could not read current directory:', e.message);
+}
+
+// List all files in working directory for debugging
+try {
+  const workingDirFiles = fs.readdirSync(process.cwd());
+  console.log('📁 Files in working directory:', workingDirFiles.slice(0, 20));
+} catch (e) {
+  console.log('❌ Could not read working directory:', e.message);
+}
+
 for (const testPath of possibleBuildPaths) {
   console.log(`🔍 Testing build path: ${testPath}`);
   if (fs.existsSync(testPath)) {
@@ -53,7 +74,17 @@ for (const testPath of possibleBuildPaths) {
     indexPath = path.join(buildPath, 'index.html');
     console.log(`✅ Found build directory: ${buildPath}`);
     console.log(`✅ Index file exists: ${fs.existsSync(indexPath)}`);
+    
+    // List contents of build directory
+    try {
+      const buildFiles = fs.readdirSync(buildPath);
+      console.log(`📁 Build directory contents:`, buildFiles.slice(0, 10));
+    } catch (e) {
+      console.log(`❌ Could not read build directory:`, e.message);
+    }
     break;
+  } else {
+    console.log(`❌ Path not found: ${testPath}`);
   }
 }
 

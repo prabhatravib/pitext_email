@@ -49,7 +49,9 @@ RUN cd apps/mail && \
     echo "🔍 Node version: $(node --version)" && \
     echo "🔍 PNPM version: $(pnpm --version)" && \
     echo "🔍 Checking required files..." && \
+    echo "  - index.html: $(test -f index.html && echo 'exists' || echo 'MISSING')" && \
     echo "  - react-router.config.ts: $(test -f react-router.config.ts && echo 'exists' || echo 'MISSING')" && \
+    echo "  - build-client-only.js: $(test -f build-client-only.js && echo 'exists' || echo 'MISSING')" && \
     echo "  - app directory: $(test -d app && echo 'exists' || echo 'MISSING')" && \
     echo "🔍 Running prebuild script..." && \
     pnpm run prebuild || echo "⚠️ Prebuild script failed, continuing..." && \

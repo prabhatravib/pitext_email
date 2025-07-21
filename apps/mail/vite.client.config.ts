@@ -20,7 +20,6 @@ export default defineConfig({
     outDir: 'build/client',
     emptyOutDir: true,
     rollupOptions: {
-      input: 'index.html',
       output: {
         manualChunks: undefined,
         entryFileNames: 'assets/[name]-[hash].js',

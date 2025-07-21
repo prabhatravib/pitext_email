@@ -13,4 +13,8 @@ export default {
   },
   serverModuleFormat: 'esm',
   serverMinify: false,
+  // Disable SSR build completely
+  build: {
+    ssr: false,
+  },
 } satisfies Config;

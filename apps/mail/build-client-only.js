@@ -9,7 +9,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 async function buildClientOnly() {
   try {
-    console.log('Building client-side only...');
+    console.log('Building client-side only with Vite...');
     console.log('Current directory:', process.cwd());
     console.log('Script directory:', __dirname);
     
@@ -19,14 +19,24 @@ async function buildClientOnly() {
     process.env.CI = 'true';
     
     // Check if required files exist
-    const indexHtmlPath = resolve(__dirname, 'index.html');
-    const viteConfigPath = resolve(__dirname, 'vite.client.config.ts');
+    const indexHtmlPath = resolve(process.cwd(), 'index.html');
+    const viteConfigPath = resolve(process.cwd(), 'vite.client.config.ts');
     
     console.log('Checking required files...');
+    console.log('index.html path:', indexHtmlPath);
+    console.log('vite.client.config.ts path:', viteConfigPath);
     console.log('index.html exists:', fs.existsSync(indexHtmlPath));
     console.log('vite.client.config.ts exists:', fs.existsSync(viteConfigPath));
     
     if (!fs.existsSync(indexHtmlPath)) {
+      console.error('❌ index.html not found at:', indexHtmlPath);
+      console.error('Available files in current directory:');
+      try {
+        const files = fs.readdirSync(process.cwd());
+        console.error(files.slice(0, 20));
+      } catch (e) {
+        console.error('Could not read directory:', e.message);
+      }
       throw new Error('index.html not found');
     }
     
@@ -37,7 +47,7 @@ async function buildClientOnly() {
     console.log('Starting Vite build...');
     
     // Ensure build directory exists
-    const buildDir = resolve(__dirname, 'build/client');
+    const buildDir = resolve(process.cwd(), 'build/client');
     if (!fs.existsSync(buildDir)) {
       fs.mkdirSync(buildDir, { recursive: true });
       console.log('Created build directory:', buildDir);
@@ -47,7 +57,7 @@ async function buildClientOnly() {
     const result = await build({
       configFile: viteConfigPath,
       mode: 'production',
-      root: __dirname,
+      root: process.cwd(),
       build: {
         outDir: 'build/client',
         emptyOutDir: true,
@@ -68,7 +78,7 @@ async function buildClientOnly() {
     console.log('Build result:', result);
     
     // Verify the build output
-    const buildPath = resolve(__dirname, 'build/client');
+    const buildPath = resolve(process.cwd(), 'build/client');
     const indexPath = resolve(buildPath, 'index.html');
     
     console.log('Verifying build output...');
@@ -99,7 +109,7 @@ async function buildClientOnly() {
       console.log('Build files:', buildFiles.slice(0, 10));
     }
     
-    console.log('✅ Client-only build completed successfully!');
+    console.log('✅ Vite build completed successfully!');
   } catch (error) {
     console.error('❌ Build failed:', error);
     console.error('Error details:', error.message);
