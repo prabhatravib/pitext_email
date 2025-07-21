@@ -15,7 +15,10 @@ const getUrl = () => {
 export function Layout({ children }: PropsWithChildren) {
   return (
     <ServerProviders connectionId="gmail">
-      <ClientProviders>{children}</ClientProviders>
+      <ClientProviders>
+        {children}
+        <Scripts />
+      </ClientProviders>
     </ServerProviders>
   );
 }
