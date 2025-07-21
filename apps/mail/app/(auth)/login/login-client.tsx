@@ -1,8 +1,8 @@
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from 'react-router';
 import { signIn } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Google } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
@@ -36,7 +36,7 @@ const getProviderIcon = (providerId: string, className?: string): ReactNode => {
 
   switch (providerId) {
     case 'google':
-      return <Google className={defaultClass} />;
+      return <Mail className={defaultClass} />;
     default:
       return null;
   }

@@ -11,4 +11,6 @@ export default {
   future: {
     unstable_viteEnvironmentApi: true,
   },
+  serverModuleFormat: 'esm',
+  serverMinify: false,
 } satisfies Config;

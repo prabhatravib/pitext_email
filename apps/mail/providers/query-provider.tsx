@@ -82,7 +82,7 @@ const getQueryClient = (connectionId: string | null) => {
 };
 
 const getUrl = () => {
-  const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || window.location.origin;
+  const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
   return backendUrl + '/api/trpc';
 };
 
@@ -98,9 +98,11 @@ export const trpcClient = createTRPCClient<AppRouter>({
       maxItems: 1,
       fetch: (url, options) =>
         fetch(url, { ...options, credentials: 'include' }).then((res) => {
-          const currentPath = new URL(window.location.href).pathname;
-          const redirectPath = res.headers.get('X-Zero-Redirect');
-          if (!!redirectPath && redirectPath !== currentPath) window.location.href = redirectPath;
+          if (typeof window !== 'undefined') {
+            const currentPath = new URL(window.location.href).pathname;
+            const redirectPath = res.headers.get('X-Zero-Redirect');
+            if (!!redirectPath && redirectPath !== currentPath) window.location.href = redirectPath;
+          }
           return res;
         }),
     }),
