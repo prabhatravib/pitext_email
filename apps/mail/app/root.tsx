@@ -8,7 +8,7 @@ import { type PropsWithChildren } from 'react';
 
 const getUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin;
-  return process.env.VITE_PUBLIC_APP_URL || 'http://localhost:3000';
+  return import.meta.env.VITE_PUBLIC_APP_URL || 'http://localhost:3000';
 };
 
 export function Layout({ children }: PropsWithChildren) {
