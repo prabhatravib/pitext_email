@@ -105,7 +105,7 @@ aiRouter.post('/call', async (c) => {
   }
 
   console.log('[DEBUG] Connecting to database');
-  const { db, conn } = createDb(env.HYPERDRIVE.connectionString);
+      const { db, conn } = createDb(env.HYPERDRIVE?.connectionString);
 
   // Removed phone number authentication - using session-based auth
   const session = await auth.api.getSession({ headers: c.req.raw.headers });

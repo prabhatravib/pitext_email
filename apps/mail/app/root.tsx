@@ -51,11 +51,7 @@ export function HydrateFallback() {
 }
 
 export default function App() {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <div id="root"></div>
-    </div>
-  );
+  return null;
 }
 
 export function ErrorBoundary() {
