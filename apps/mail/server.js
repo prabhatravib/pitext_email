@@ -36,13 +36,21 @@ app.get('/api/trpc/*', (req, res) => {
 
 // Try multiple possible build paths for different deployment environments
 const possibleBuildPaths = [
+  path.join(__dirname, 'build/client/client'),
   path.join(__dirname, 'build/client'),
+  path.join(__dirname, '../build/client/client'),
   path.join(__dirname, '../build/client'),
+  path.join(__dirname, '../../build/client/client'),
   path.join(__dirname, '../../build/client'),
+  '/opt/render/project/src/apps/mail/build/client/client',
   '/opt/render/project/src/apps/mail/build/client',
+  path.join(process.cwd(), 'apps/mail/build/client/client'),
   path.join(process.cwd(), 'apps/mail/build/client'),
+  path.join(process.cwd(), 'build/client/client'),
   path.join(process.cwd(), 'build/client'),
+  '/app/apps/mail/build/client/client', // Docker container path
   '/app/apps/mail/build/client', // Docker container path
+  '/app/build/client/client', // Alternative Docker path
   '/app/build/client' // Alternative Docker path
 ];
 
