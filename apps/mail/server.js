@@ -44,6 +44,7 @@ if (!fs.existsSync(buildPath)) {
   // Create a temporary HTML response for deployment
   app.get('*', (req, res) => {
     console.log('📝 Serving placeholder for route:', req.path);
+    res.setHeader('Content-Type', 'text/html');
     res.send(`
       <!DOCTYPE html>
       <html lang="en">
@@ -57,6 +58,7 @@ if (!fs.existsSync(buildPath)) {
           h1 { color: #333; }
           p { color: #666; }
           .status { margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.9rem; }
+          .refresh-btn { margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
         </style>
       </head>
       <body>
@@ -64,6 +66,7 @@ if (!fs.existsSync(buildPath)) {
           <h1>🚀 PiText Email</h1>
           <p>Deployment in progress. The build is being compiled.</p>
           <p>Please refresh this page in a few moments.</p>
+          <button class="refresh-btn" onclick="location.reload()">Refresh Page</button>
           <div class="status">
             Status: Build directory pending<br>
             Server: Running on port ${PORT}<br>
@@ -103,7 +106,35 @@ if (!fs.existsSync(buildPath)) {
     // Check if the file exists before sending
     if (!fs.existsSync(indexPath)) {
       console.error('❌ index.html not found, sending 404');
-      return res.status(404).send('Cannot GET /');
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(404).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>PiText Email - Build Error</title>
+          <style>
+            body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+            .container { text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #333; }
+            p { color: #666; }
+            .error { margin-top: 2rem; padding: 1rem; background: #ffe6e6; border-radius: 4px; font-family: monospace; font-size: 0.9rem; color: #d32f2f; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>❌ PiText Email</h1>
+            <p>Build files are missing. The application failed to build properly.</p>
+            <div class="error">
+              Error: index.html not found in build directory<br>
+              Server: Running on port ${PORT}<br>
+              Build Path: ${buildPath}
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
     }
     
     res.sendFile(indexPath, (err) => {
