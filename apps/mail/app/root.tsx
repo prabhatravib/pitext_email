@@ -4,7 +4,7 @@ import { getLocale } from '@/paraglide/runtime';
 import { siteConfig } from '@/lib/site-config';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Scripts, Outlet } from 'react-router';
+import { Outlet } from 'react-router';
 import { type PropsWithChildren } from 'react';
 
 const getUrl = () => {
@@ -17,7 +17,6 @@ export function Layout({ children }: PropsWithChildren) {
     <ServerProviders connectionId="gmail">
       <BaseProviders>
         {children}
-        <Scripts />
       </BaseProviders>
     </ServerProviders>
   );
