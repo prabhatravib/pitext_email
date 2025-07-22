@@ -3,9 +3,18 @@ import '../instrument';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 
 // Import the root component
 import Root from './root';
+
+// Create the router for client-side rendering with data router support
+const router = createBrowserRouter([
+  {
+    path: '*',
+    element: <Root />,
+  },
+]);
 
 startTransition(() => {
   let rootElement = document.getElementById('root');
@@ -31,12 +40,11 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // In React Router v7 with @react-router/dev, the router is automatically created
-  // We just need to render the Root component
+  // Render with RouterProvider for proper data router support
   hydrateRoot(
     rootElement,
     <StrictMode>
-      <Root />
+      <RouterProvider router={router} />
     </StrictMode>,
     {
       onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
