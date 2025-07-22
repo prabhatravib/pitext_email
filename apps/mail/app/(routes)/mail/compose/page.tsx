@@ -16,16 +16,13 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
     const session = await authProxy.api.getSession({ headers: request.headers });
     if (!session) return redirect('/login');
   } catch (error) {
-    // Handle client-side auth gracefully
-    console.warn('Auth check failed in loader:', error);
-    return redirect('/login');
+    // In client-only mode, we'll handle auth in the component
+    console.warn('Auth check failed in loader, will handle in component:', error);
   }
 
   const url = new URL(request.url);
   if (url.searchParams.get('to')?.startsWith('mailto:')) {
-    return redirect(
-      `/mail/compose/handle-mailto?mailto=${encodeURIComponent(url.searchParams.get('to') ?? '')}`,
-    );
+    return redirect(`/mail/compose/handle-mailto?mailto=${encodeURIComponent(url.searchParams.get('to') ?? '')}`);
   }
 
   return Object.fromEntries(url.searchParams.entries()) as {

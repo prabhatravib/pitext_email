@@ -31,23 +31,13 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // In React Router v7 with @react-router/dev, the router is automatically created
-  // We just need to render the Root component - dev tools will handle HydratedRouter
+  // Let dev tools handle router creation - NO manual RouterProvider
   hydrateRoot(
     rootElement,
     <StrictMode>
       <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
         <Root />
       </Sentry.ErrorBoundary>
-    </StrictMode>,
-    {
-      onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
-        console.warn('Uncaught error', error, errorInfo.componentStack);
-      }),
-      // Callback called when React catches an error in an ErrorBoundary.
-      onCaughtError: Sentry.reactErrorHandler(),
-      // Callback called when React automatically recovers from errors.
-      onRecoverableError: Sentry.reactErrorHandler(),
-    },
+    </StrictMode>
   );
 });

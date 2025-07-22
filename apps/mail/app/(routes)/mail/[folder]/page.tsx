@@ -16,8 +16,8 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     const session = await authProxy.api.getSession({ headers: request.headers });
     if (!session) return redirect('/login');
   } catch (error) {
-    // Handle client-side auth gracefully
-    console.warn('Auth check failed in loader:', error);
+    // In client-only mode, we'll handle auth in the component
+    console.warn('Auth check failed in loader, will handle in component:', error);
   }
 
   return {

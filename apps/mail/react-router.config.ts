@@ -12,8 +12,4 @@ export default {
     unstable_viteEnvironmentApi: true,
   },
   serverModuleFormat: 'esm',
-  // Enable client-only rendering with data router support
-  clientOnly: true,
-  // Ensure proper data router functionality
-  dataRouter: true,
 } satisfies Config;

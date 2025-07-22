@@ -12,8 +12,8 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
       return redirect('/login');
     }
   } catch (error) {
-    // Handle client-side auth gracefully
-    console.warn('Auth check failed in loader:', error);
+    // In client-only mode, we'll handle auth in the component
+    console.warn('Auth check failed in loader, will handle in component:', error);
   }
 
   return null;
