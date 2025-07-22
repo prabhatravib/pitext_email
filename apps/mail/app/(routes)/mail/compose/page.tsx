@@ -7,17 +7,22 @@ import {
 } from '@/components/ui/dialog';
 import { CreateEmail } from '@/components/create/create-email';
 import { authProxy } from '@/lib/auth-proxy';
+import { redirect } from 'react-router';
 import { useSearchParams } from 'react-router';
 import type { Route } from './+types/page';
 
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  const session = await authProxy.api.getSession({ headers: request.headers });
-  if (!session) return Response.redirect(`${import.meta.env.VITE_PUBLIC_APP_URL}/login`);
+  try {
+    const session = await authProxy.api.getSession({ headers: request.headers });
+    if (!session) return redirect('/login');
+  } catch (error) {
+    // In client-only mode, we'll handle auth in the component
+    console.warn('Auth check failed in loader, will handle in component:', error);
+  }
+
   const url = new URL(request.url);
   if (url.searchParams.get('to')?.startsWith('mailto:')) {
-    return Response.redirect(
-      `${import.meta.env.VITE_PUBLIC_APP_URL}/mail/compose/handle-mailto?mailto=${encodeURIComponent(url.searchParams.get('to') ?? '')}`,
-    );
+    return redirect(`/mail/compose/handle-mailto?mailto=${encodeURIComponent(url.searchParams.get('to') ?? '')}`);
   }
 
   return Object.fromEntries(url.searchParams.entries()) as {
