@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "npx @inlang/paraglide-js compile --project project.inlang",
-    "build": "vite build && node scripts/ensure-root-template.js && node scripts/fix-asset-references.js && node verify-build.js",
+    "build": "node build-with-fallback.js",
     "build:client-only": "vite build --mode client",
     "build:client": "vite build --mode client",
     "start": "node server.js",

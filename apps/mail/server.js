@@ -378,10 +378,10 @@ if (!buildPath) {
       const files = fs.readdirSync(assetsDir);
       console.log(`📁 Available files in assets directory:`, files);
       
-      // Try to find the entry client file with different patterns
-      const entryClientFile = files.find(file => 
-        (file.startsWith('entry.client-') || file.startsWith('main-')) && file.endsWith('.js')
-      );
+          // Try to find the entry client file with different patterns
+    const entryClientFile = files.find(file => 
+      (file.startsWith('entry.client-') || file.startsWith('main-') || file.includes('fallback')) && file.endsWith('.js')
+    );
       
       if (entryClientFile) {
         console.log(`📄 Serving entry.client.js as /app/entry.client.tsx: ${entryClientFile}`);
@@ -407,6 +407,38 @@ if (!buildPath) {
     } else {
       console.log(`❌ Assets directory does not exist: ${assetsDir}`);
       console.log(`📁 Build directory contents:`, fs.existsSync(buildPath) ? fs.readdirSync(buildPath) : 'Build directory does not exist');
+      
+      // Check if there are any JavaScript files in the build directory itself
+      if (fs.existsSync(buildPath)) {
+        const buildFiles = fs.readdirSync(buildPath);
+        const jsFiles = buildFiles.filter(file => file.endsWith('.js'));
+        console.log(`📁 JavaScript files in build directory:`, jsFiles);
+        
+        if (jsFiles.length > 0) {
+          const fallbackFile = jsFiles[0];
+          console.log(`📄 Serving JavaScript file from build directory as /app/entry.client.tsx: ${fallbackFile}`);
+          const filePath = path.join(buildPath, fallbackFile);
+          res.setHeader('Content-Type', 'application/javascript');
+          res.sendFile(filePath);
+          return;
+        }
+      }
+      
+      // If no JavaScript files found, serve a minimal fallback
+      console.log(`📄 Serving fallback JavaScript content for /app/entry.client.tsx`);
+      res.setHeader('Content-Type', 'application/javascript');
+      res.send(`
+        // Fallback entry client - build assets not found
+        console.error('Build assets not found. Please check the build process.');
+        console.log('This is a fallback response for /app/entry.client.tsx');
+        
+        // Try to load the application anyway
+        import('./app/entry.client.tsx').catch(err => {
+          console.error('Failed to load entry client:', err);
+          document.body.innerHTML = '<div style="padding: 20px; text-align: center;"><h1>Build Error</h1><p>The application failed to build properly. Please check the deployment logs.</p></div>';
+        });
+      `);
+      return;
     }
     
     // If still not found, return 404
