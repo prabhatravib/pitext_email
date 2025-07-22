@@ -1,7 +1,7 @@
 import '../instrument';
 
 import { startTransition, StrictMode } from 'react';
-import { hydrateRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
@@ -40,9 +40,9 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // Simple v6 approach - no dev tools conflicts
-  hydrateRoot(
-    rootElement,
+  // Use createRoot for client-side only rendering
+  const root = createRoot(rootElement);
+  root.render(
     <StrictMode>
       <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
         <RouterProvider router={router} />
