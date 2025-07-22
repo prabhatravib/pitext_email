@@ -1,10 +1,16 @@
+import { redirect } from 'react-router';
 import { authProxy } from '@/lib/auth-proxy';
 import type { Route } from './+types/page';
 
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  const session = await authProxy.api.getSession({ headers: request.headers });
-  const appUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-  if (!session) return Response.redirect(`${appUrl}/login`);
+  try {
+    const session = await authProxy.api.getSession({ headers: request.headers });
+    if (!session) return redirect('/login');
+  } catch (error) {
+    // Handle client-side auth gracefully
+    console.warn('Auth check failed in loader:', error);
+    return redirect('/login');
+  }
 
   const url = new URL(request.url);
   const params = Object.fromEntries(url.searchParams.entries()) as {
@@ -13,8 +19,8 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
     body?: string;
   };
   const toParam = params.to || 'someone@someone.com';
-  return Response.redirect(
-    `${appUrl}/mail/inbox?isComposeOpen=true&to=${encodeURIComponent(toParam)}${params.subject ? `&subject=${encodeURIComponent(params.subject)}` : ''}`,
+  return redirect(
+    `/mail/inbox?isComposeOpen=true&to=${encodeURIComponent(toParam)}${params.subject ? `&subject=${encodeURIComponent(params.subject)}` : ''}`,
   );
 }
 

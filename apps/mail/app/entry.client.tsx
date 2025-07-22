@@ -32,11 +32,13 @@ startTransition(() => {
   }
 
   // In React Router v7 with @react-router/dev, the router is automatically created
-  // We just need to render the Root component
+  // We just need to render the Root component - dev tools will handle HydratedRouter
   hydrateRoot(
     rootElement,
     <StrictMode>
-      <Root />
+      <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
+        <Root />
+      </Sentry.ErrorBoundary>
     </StrictMode>,
     {
       onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {

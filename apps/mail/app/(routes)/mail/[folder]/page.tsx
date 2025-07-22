@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router';
+import { redirect } from 'react-router';
 
 import { MailLayout } from '@/components/mail/mail';
 import { useLabels } from '@/hooks/use-labels';
@@ -9,10 +10,15 @@ import type { Route } from './+types/page';
 const ALLOWED_FOLDERS = new Set(['inbox', 'draft', 'sent', 'spam', 'bin', 'archive']);
 
 export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
-  if (!params.folder) return Response.redirect(`${import.meta.env.VITE_PUBLIC_APP_URL}/mail/inbox`);
+  if (!params.folder) return redirect('/mail/inbox');
 
-  const session = await authProxy.api.getSession({ headers: request.headers });
-  if (!session) return Response.redirect(`${import.meta.env.VITE_PUBLIC_APP_URL}/login`);
+  try {
+    const session = await authProxy.api.getSession({ headers: request.headers });
+    if (!session) return redirect('/login');
+  } catch (error) {
+    // Handle client-side auth gracefully
+    console.warn('Auth check failed in loader:', error);
+  }
 
   return {
     folder: params.folder,
