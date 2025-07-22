@@ -119,8 +119,8 @@ app.get('/api/auth/callback/:provider', async (req, res) => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          client_id: process.env.VITE_GOOGLE_CLIENT_ID,
-          client_secret: process.env.VITE_GOOGLE_CLIENT_SECRET,
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
           code: code,
           grant_type: 'authorization_code',
           redirect_uri: `${process.env.VITE_PUBLIC_APP_URL}/api/auth/callback/google`,
