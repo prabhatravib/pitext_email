@@ -19,7 +19,7 @@ import { useStats } from '@/hooks/use-stats';
 import SidebarLabels from './sidebar-labels';
 import { useCallback, useRef } from 'react';
 import { BASE_URL } from '@/lib/constants';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

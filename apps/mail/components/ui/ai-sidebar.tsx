@@ -20,7 +20,7 @@ import { Gauge } from '@/components/ui/gauge';
 import { useParams } from 'react-router-dom';
 
 import { useAgent } from 'agents/react';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { cn } from '@/lib/utils';
 import posthog from 'posthog-js';
 import { toast } from 'sonner';

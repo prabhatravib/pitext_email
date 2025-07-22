@@ -41,7 +41,7 @@ import { Input } from '@/components/ui/input';
 import { EditorContent } from '@tiptap/react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { Toolbar } from './toolbar';
 import pluralize from 'pluralize';
 import { toast } from 'sonner';

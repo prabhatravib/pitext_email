@@ -1,5 +1,5 @@
 import { TriangleAlert } from 'lucide-react';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { m } from '@/src/paraglide/messages';

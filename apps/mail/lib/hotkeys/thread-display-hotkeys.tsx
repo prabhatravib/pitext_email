@@ -5,7 +5,7 @@ import useDelete from '@/hooks/driver/use-delete';
 import { useShortcuts } from './use-hotkey-utils';
 import { useThread } from '@/hooks/use-threads';
 import { useParams } from 'react-router-dom';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { useSetAtom } from 'jotai';
 
 const closeView = (event: KeyboardEvent) => {

@@ -42,7 +42,7 @@ import { m } from '@/src/paraglide/messages';
 import { useParams } from 'react-router-dom';
 
 import { Button } from '../ui/button';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { Categories } from './mail';
 import { useAtom } from 'jotai';
 

@@ -9,7 +9,7 @@ import { useBilling } from '@/hooks/use-billing';
 import { PricingSwitch } from './pricing-switch';
 
 import { useState, } from 'react';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 import { Badge } from './badge';
 import { toast } from 'sonner';

@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 
 import type { Attachment } from '@/types';
 import { m } from '@/src/paraglide/messages';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { X } from '../icons/icons';
 import posthog from 'posthog-js';
 import { toast } from 'sonner';

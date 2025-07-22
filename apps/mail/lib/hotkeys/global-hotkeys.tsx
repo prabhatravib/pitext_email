@@ -2,7 +2,7 @@ import { useCommandPalette } from '@/components/context/command-palette-context'
 import { useOptimisticActions } from '@/hooks/use-optimistic-actions';
 import { enhancedKeyboardShortcuts } from '@/config/shortcuts';
 import { useShortcuts } from './use-hotkey-utils';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 export function GlobalHotkeys() {
   const [, setComposeOpen] = useQueryState('isComposeOpen');

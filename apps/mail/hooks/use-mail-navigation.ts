@@ -4,7 +4,7 @@ import { useOptimisticActions } from './use-optimistic-actions';
 import { useMail } from '@/components/mail/use-mail';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { atom, useAtom } from 'jotai';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 export const focusedIndexAtom = atom<number | null>(null);
 export const mailNavigationCommandAtom = atom<null | 'next' | 'previous'>(null);

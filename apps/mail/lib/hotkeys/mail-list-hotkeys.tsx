@@ -9,7 +9,7 @@ import { useShortcuts } from './use-hotkey-utils';
 import { useThreads } from '@/hooks/use-threads';
 import { cleanSearchValue } from '@/lib/utils';
 import { m } from '@/src/paraglide/messages';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { toast } from 'sonner';
 
 export function MailListHotkeys() {

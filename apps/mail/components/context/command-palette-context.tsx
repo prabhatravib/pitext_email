@@ -56,7 +56,7 @@ import { VisuallyHidden } from 'radix-ui';
 import { m } from '@/src/paraglide/messages';
 import { Pencil2 } from '../icons/icons';
 import { Button } from '../ui/button';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { toast } from 'sonner';
 
 type CommandPaletteContext = {

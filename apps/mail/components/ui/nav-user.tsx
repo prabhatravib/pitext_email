@@ -29,7 +29,7 @@ import { clear as idbClear } from 'idb-keyval';
 import { useLocation } from 'react-router-dom';
 import { m } from '@/src/paraglide/messages';
 import { useTheme } from 'next-themes';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

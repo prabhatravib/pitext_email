@@ -15,7 +15,7 @@ import { CurvedArrow } from '../icons/icons';
 import { Tools } from '../../types/tools';
 import { Button } from '../ui/button';
 import { format } from 'date-fns-tz';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 const ThreadPreview = ({ threadId }: { threadId: string }) => {
   const [, setThreadId] = useQueryState('threadId');

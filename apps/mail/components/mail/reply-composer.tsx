@@ -12,7 +12,7 @@ import { serializeFiles } from '@/lib/schemas';
 import { useDraft } from '@/hooks/use-drafts';
 import { m } from '@/src/paraglide/messages';
 import type { Sender } from '@/types';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { useEffect } from 'react';
 import posthog from 'posthog-js';
 import { toast } from 'sonner';

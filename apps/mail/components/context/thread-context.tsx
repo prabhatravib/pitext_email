@@ -35,7 +35,7 @@ import { useMail } from '../mail/use-mail';
 import { Checkbox } from '../ui/checkbox';
 import { m } from '@/src/paraglide/messages';
 import { useParams } from 'react-router-dom';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { toast } from 'sonner';
 
 interface EmailAction {

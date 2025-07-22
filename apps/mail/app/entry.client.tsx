@@ -3,7 +3,7 @@ import '../instrument';
 import { startTransition, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
-import { createBrowserRouter, RouterProvider, useParams } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, useParams, useSearchParams, useNavigate } from 'react-router-dom';
 
 // Import the root component and page components
 import Root from './root';

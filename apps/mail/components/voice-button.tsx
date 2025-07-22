@@ -3,7 +3,7 @@ import { useVoice } from '@/providers/voice-provider';
 import { motion } from 'motion/react';
 
 import { useSession } from '@/lib/auth-client';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 export function VoiceButton() {
   const { data: session } = useSession();

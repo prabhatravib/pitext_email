@@ -8,7 +8,7 @@ import { useTRPC } from '@/providers/query-provider';
 import { useMail } from '@/components/mail/use-mail';
 import { moveThreadsTo } from '@/lib/thread-actions';
 import { m } from '@/src/paraglide/messages';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { useCallback } from 'react';
 import posthog from 'posthog-js';
 import { useAtom } from 'jotai';

@@ -9,7 +9,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useSettings } from './use-settings';
 import { useParams } from 'react-router';
 import { useTheme } from 'next-themes';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { useMemo } from 'react';
 
 // Demo threads data

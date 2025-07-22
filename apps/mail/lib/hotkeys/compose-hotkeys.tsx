@@ -1,6 +1,6 @@
 import { enhancedKeyboardShortcuts } from '@/config/shortcuts';
 import { useShortcuts } from './use-hotkey-utils';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 export function ComposeHotkeys() {
   const scope = 'compose';

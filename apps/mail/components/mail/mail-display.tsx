@@ -52,7 +52,7 @@ import { MailContent } from './mail-content';
 import { m } from '@/src/paraglide/messages';
 import { useParams } from 'react-router-dom';
 import { FileText } from 'lucide-react';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { Badge } from '../ui/badge';
 import { format } from 'date-fns';
 import { toast } from 'sonner';

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 const useSearchLabels = () => {
   const [data, setData] = useQueryState('labels');

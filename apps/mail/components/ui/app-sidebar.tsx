@@ -24,7 +24,7 @@ import { m } from '@/src/paraglide/messages';
 import { FOLDERS } from '@/lib/utils';
 import { NavUser } from './nav-user';
 import { NavMain } from './nav-main';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isPro, isLoading } = useBilling();

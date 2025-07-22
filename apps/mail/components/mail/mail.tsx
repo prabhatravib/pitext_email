@@ -57,7 +57,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 import { m } from '@/src/paraglide/messages';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { useAtom } from 'jotai';
 import { toast } from 'sonner';
 

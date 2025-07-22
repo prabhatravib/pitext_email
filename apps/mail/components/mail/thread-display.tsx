@@ -49,7 +49,7 @@ import { m } from '@/src/paraglide/messages';
 import MailDisplay from './mail-display';
 
 import { Inbox } from 'lucide-react';
-import { useQueryState } from 'nuqs';
+import { useQueryState } from '@/lib/nuqs-replacement';
 import { format } from 'date-fns';
 import { useAtom } from 'jotai';
 import { toast } from 'sonner';
