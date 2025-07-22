@@ -1,26 +1,9 @@
 import { redirect } from 'react-router';
-import { authProxy } from '@/lib/auth-proxy';
-import type { Route } from './+types/page';
 
-export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  try {
-    const session = await authProxy.api.getSession({ headers: request.headers });
-    if (!session) return redirect('/login');
-  } catch (error) {
-    // In client-only mode, we'll handle auth in the component
-    console.warn('Auth check failed in loader, will handle in component:', error);
-  }
-
-  const url = new URL(request.url);
-  const params = Object.fromEntries(url.searchParams.entries()) as {
-    to?: string;
-    subject?: string;
-    body?: string;
-  };
-  const toParam = params.to || 'someone@someone.com';
-  return redirect(
-    `/mail/inbox?isComposeOpen=true&to=${encodeURIComponent(toParam)}${params.subject ? `&subject=${encodeURIComponent(params.subject)}` : ''}`,
-  );
+export default function CreatePage() {
+  // Redirect to inbox with compose parameters
+  redirect('/mail/inbox?isComposeOpen=true');
+  return null;
 }
 
 // export async function generateMetadata({ searchParams }: any) {
