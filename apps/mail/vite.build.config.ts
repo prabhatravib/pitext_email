@@ -17,8 +17,9 @@ export default defineConfig({
       }
     }),
     reactRouter({
-      ssr: true,
+      ssr: false,
       prerender: false,
+      clientOnly: true,
     })
   ],
   build: {
