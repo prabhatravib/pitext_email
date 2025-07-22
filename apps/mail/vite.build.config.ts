@@ -8,19 +8,13 @@ export default defineConfig({
   base: '/',
   plugins: [
     react({
-      // React 19 specific configuration
       jsxRuntime: 'automatic',
       jsxImportSource: 'react',
-      // Disable React compiler for now to avoid conflicts
       babel: {
         plugins: []
       }
     }),
-    reactRouter({
-      ssr: false,
-      prerender: false,
-      clientOnly: true,
-    })
+    reactRouter()
   ],
   build: {
     sourcemap: false,
@@ -36,10 +30,8 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]'
       },
-      // Ensure React is properly externalized
       external: [],
       onwarn(warning, warn) {
-        // Suppress warnings about React being undefined
         if (warning.code === 'MISSING_EXPORT' && warning.message.includes('React')) {
           return;
         }
@@ -55,17 +47,16 @@ export default defineConfig({
   resolve: {
     alias: {
       tslib: 'tslib/tslib.es6.js',
-      // Add manual path mappings to replace vite-tsconfig-paths functionality
       '@': resolve(__dirname, './'),
       '~/': resolve(__dirname, './'),
-      // Ensure React is properly resolved
       'react': 'react',
       'react-dom': 'react-dom'
     },
   },
   define: {
-    // Ensure React is globally available
     'process.env.NODE_ENV': '"production"',
-    'global': 'globalThis'
+    'global': 'globalThis',
+    // Disable React Router dev tools to prevent HydratedRouter conflicts
+    'process.env.REACT_ROUTER_DEV_TOOLS': 'false',
   }
 }); 

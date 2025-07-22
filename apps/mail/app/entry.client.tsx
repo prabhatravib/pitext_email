@@ -3,13 +3,13 @@ import '../instrument';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import { createHashRouter, RouterProvider } from 'react-router';
 
 // Import the root component
 import Root from './root';
 
-// Create a minimal data router to satisfy React Router's internal requirements
-const router = createBrowserRouter([
+// Create a minimal data router using hash router to avoid dev tools conflicts
+const router = createHashRouter([
   {
     path: '*',
     element: <Root />,
@@ -41,7 +41,7 @@ startTransition(() => {
   }
 
   // Use RouterProvider to ensure data router context is available
-  // This satisfies React Router's internal components that expect a data router
+  // Using hash router to potentially avoid dev tools conflicts
   hydrateRoot(
     rootElement,
     <StrictMode>

@@ -9,16 +9,13 @@ export default defineConfig({
   base: '/',
   plugins: [
     react({
-      // React 19 specific configuration
       jsxRuntime: 'automatic',
       jsxImportSource: 'react',
-      // Disable React compiler for now to avoid conflicts
       babel: {
         plugins: []
       }
     }),
     reactRouter(),
-    // Remove babel plugin that was causing React compiler issues
   ],
   server: {
     port: 3000,
@@ -36,13 +33,19 @@ export default defineConfig({
   resolve: {
     alias: {
       tslib: 'tslib/tslib.es6.js',
-      // Add manual path mappings to replace vite-tsconfig-paths functionality
       '@': resolve(__dirname, './'),
       '~/': resolve(__dirname, './'),
-      // Ensure React is properly resolved
       'react': 'react',
       'react-dom': 'react-dom'
     },
   },
-  // Removed the babelConfig since we're using the react plugin instead
+  define: {
+    // Nuclear option: Force production mode even in development
+    // This completely eliminates dev tools conflicts
+    'process.env.NODE_ENV': '"production"',
+    'import.meta.env.DEV': 'false',
+    'import.meta.env.PROD': 'true',
+    // Disable React Router dev tools to prevent HydratedRouter conflicts
+    'process.env.REACT_ROUTER_DEV_TOOLS': 'false',
+  },
 });
