@@ -7,6 +7,7 @@ const demoConnection = {
   providerId: 'google' as const,
   email: 'demo@gmail.com',
   name: 'Demo User',
+  picture: null,
   isActive: true,
   createdAt: new Date(),
   updatedAt: new Date(),

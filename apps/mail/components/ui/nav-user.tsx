@@ -80,7 +80,8 @@ export function NavUser() {
   };
 
   if (!isRendered) return null;
-  if (!session) return null;
+  // Don't return null if no session - show demo user instead
+  // if (!session) return null;
 
   return (
     <div className="flex flex-col gap-2">
@@ -101,7 +102,7 @@ export function NavUser() {
                       <AvatarFallback className="rounded-[5px] text-[10px]">
                         {(activeConnection?.name || activeConnection?.email || '')
                           .split(' ')
-                          .map((n: string) => n[0])
+                          .map((n: any) => n[0])
                           .join('')
                           .toUpperCase()
                           .slice(0, 2)}
@@ -132,7 +133,7 @@ export function NavUser() {
                           <span>
                             {(activeConnection.name || session.user.name || 'User')
                               .split(' ')
-                              .map((n) => n[0])
+                              .map((n: any) => n[0])
                               .join('')
                               .toUpperCase()
                               .slice(0, 2)}
@@ -229,7 +230,7 @@ export function NavUser() {
                   <span>
                     {(activeConnection?.name || session?.user.name || 'User')
                       .split(' ')
-                      .map((n) => n[0])
+                      .map((n: any) => n[0])
                       .join('')
                       .toUpperCase()
                       .slice(0, 2)}

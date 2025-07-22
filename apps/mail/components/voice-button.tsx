@@ -23,7 +23,16 @@ export function VoiceButton() {
   };
 
   if (!session) {
-    return null;
+    // Don't return null - show demo voice button
+    return (
+      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+        <button type="button" disabled>
+          <div className="dark:bg[#141414] flex h-7 items-center justify-center rounded-sm bg-[#262626] px-2 opacity-50">
+            <Mic className="h-4 w-4 text-white dark:text-[#929292]" />
+          </div>
+        </button>
+      </motion.div>
+    );
   }
 
   if (!isConnected) {
