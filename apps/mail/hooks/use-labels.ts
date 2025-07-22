@@ -14,11 +14,35 @@ const desiredSystemLabels = new Set([
 
 export function useLabels() {
   const trpc = useTRPC();
-  const labelQuery = useQuery(
-    trpc.labels.list.queryOptions(void 0, {
-      staleTime: 1000 * 60 * 60, // 1 hour
-    }),
-  );
+  
+  // For demo mode, return mock labels instead of making tRPC calls
+  const mockLabels = [
+    {
+      id: 'INBOX',
+      name: 'INBOX',
+      type: 'system' as const,
+      color: { backgroundColor: '#1C2A41', textColor: '#D8E6FD' },
+    },
+    {
+      id: 'STARRED',
+      name: 'STARRED',
+      type: 'system' as const,
+      color: { backgroundColor: '#1C2A41', textColor: '#D8E6FD' },
+    },
+    {
+      id: 'SENT',
+      name: 'SENT',
+      type: 'system' as const,
+      color: { backgroundColor: '#1C2A41', textColor: '#D8E6FD' },
+    },
+  ];
+
+  const labelQuery = {
+    data: mockLabels,
+    isLoading: false,
+    error: null,
+    refetch: () => Promise.resolve(),
+  };
 
   const { userLabels, systemLabels } = useMemo(() => {
     if (!labelQuery.data) return { userLabels: [], systemLabels: [] };

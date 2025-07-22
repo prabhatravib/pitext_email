@@ -33,19 +33,21 @@ export const makeQueryClient = (connectionId: string | null) =>
       onError: (err, { meta }) => {
         if (meta && meta.noGlobalError === true) return;
         if (meta && typeof meta.customError === 'string') console.error(meta.customError);
-        else if (
-          err.message === 'Required scopes missing' ||
-          err.message.includes('Invalid connection')
-        ) {
-          signOut({
-            fetchOptions: {
-              onSuccess: () => {
-                if (window.location.href.includes('/login')) return;
-                window.location.href = '/login?error=required_scopes_missing';
-              },
-            },
-          });
-        } else console.error(err.message || 'Something went wrong');
+        // Disable redirect to login for demo mode
+        // else if (
+        //   err.message === 'Required scopes missing' ||
+        //   err.message.includes('Invalid connection')
+        // ) {
+        //   signOut({
+        //     fetchOptions: {
+        //       onSuccess: () => {
+        //         if (window.location.href.includes('/login')) return;
+        //         window.location.href = '/login?error=required_scopes_missing';
+        //       },
+        //     },
+        //   });
+        // } else 
+        console.error(err.message || 'Something went wrong');
       },
     }),
     defaultOptions: {

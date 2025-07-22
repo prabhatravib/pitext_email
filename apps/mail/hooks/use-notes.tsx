@@ -10,22 +10,13 @@ export const useThreadNotes = (threadId: string) => {
   const trpc = useTRPC();
   const { data: activeConnection } = useActiveConnection();
 
-  const noteQuery = useQuery(
-    trpc.notes.list.queryOptions(
-      { threadId },
-      {
-        enabled: !!activeConnection?.id && !!threadId,
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        initialData: { notes: [] as Note[] },
-        meta: {
-          customError: m['common.notes.errors.failedToLoadNotes'](),
-        },
-      },
-    ),
-  );
+  // For demo mode, return empty notes instead of making tRPC calls
+  const mockNotes = {
+    data: { notes: [] as Note[] },
+    isLoading: false,
+    error: null,
+  };
 
-  return noteQuery;
+  // Use mock notes for now to ensure the interface loads
+  return mockNotes;
 };

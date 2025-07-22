@@ -31,36 +31,37 @@ export const NotificationProvider = () => {
   const [searchValue] = useSearchValue();
   const { labels } = useSearchLabels();
 
-  usePartySocket({
-    party: 'zero-agent',
-    room: activeConnection?.id ? String(activeConnection.id) : 'general',
-    prefix: 'agents',
-    maxRetries: 3,
-    host: import.meta.env.VITE_PUBLIC_BACKEND_URL!,
-    onMessage: async (message: MessageEvent<string>) => {
-      try {
-        const { type } = JSON.parse(message.data);
-        if (type === IncomingMessageType.Mail_Get) {
-          const { threadId } = JSON.parse(message.data);
-          queryClient.invalidateQueries({
-            queryKey: trpc.mail.get.queryKey({ id: threadId }),
-          });
-          console.log('invalidated mail get', threadId);
-        } else if (type === IncomingMessageType.Mail_List) {
-          const { folder } = JSON.parse(message.data);
-          queryClient.invalidateQueries({
-            queryKey: trpc.mail.listThreads.infiniteQueryKey({
-              folder,
-              labelIds: labels,
-              q: searchValue.value,
-            }),
-          });
-        }
-      } catch (error) {
-        console.error('error parsing party message', error);
-      }
-    },
-  });
+  // Disable party socket for demo mode to prevent backend connection attempts
+  // usePartySocket({
+  //   party: 'zero-agent',
+  //   room: activeConnection?.id ? String(activeConnection.id) : 'general',
+  //   prefix: 'agents',
+  //   maxRetries: 3,
+  //   host: import.meta.env.VITE_PUBLIC_BACKEND_URL!,
+  //   onMessage: async (message: MessageEvent<string>) => {
+  //     try {
+  //       const { type } = JSON.parse(message.data);
+  //       if (type === IncomingMessageType.Mail_Get) {
+  //         const { threadId } = JSON.parse(message.data);
+  //         queryClient.invalidateQueries({
+  //           queryKey: trpc.mail.get.queryKey({ id: threadId }),
+  //         });
+  //         console.log('invalidated mail get', threadId);
+  //       } else if (type === IncomingMessageType.Mail_List) {
+  //         const { folder } = JSON.parse(message.data);
+  //         queryClient.invalidateQueries({
+  //           queryKey: trpc.mail.listThreads.infiniteQueryKey({
+  //             folder,
+  //             labelIds: labels,
+  //             q: searchValue.value,
+  //           }),
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error('error parsing party message', error);
+  //     }
+  //   },
+  // });
 
   return <></>;
 };

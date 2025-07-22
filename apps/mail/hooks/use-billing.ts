@@ -61,78 +61,35 @@ const FEATURE_IDS = {
 const PRO_PLANS = ['pro-example', 'pro_annual', 'team', 'enterprise'] as const;
 
 export const useBilling = () => {
-  const { customer, refetch, isLoading, error } = useCustomer();
-  const { attach, track, openBillingPortal } = useAutumn();
+  // For demo mode, return mock billing data instead of making tRPC calls
+  const mockCustomer = {
+    data: {
+      id: 'demo-customer',
+      email: 'demo@gmail.com',
+      name: 'Demo User',
+      features: DEFAULT_FEATURES,
+      subscription: null,
+    },
+    isLoading: false,
+    error: null,
+    refetch: () => Promise.resolve(),
+  };
 
-  useEffect(() => {
-    if (error) signOut();
-  }, [error]);
+  const mockAutumn = {
+    attach: () => Promise.resolve(),
+    track: () => Promise.resolve(),
+    openBillingPortal: () => Promise.resolve(),
+  };
 
-  const { isPro, ...customerFeatures } = useMemo(() => {
-    const isPro =
-      customer?.products && Array.isArray(customer.products)
-        ? customer.products.some((product) =>
-            PRO_PLANS.some((plan) => product.id?.includes(plan) || product.name?.includes(plan)),
-          )
-        : false;
-
-    if (!customer?.features) return { isPro, ...DEFAULT_FEATURES };
-
-    const features = { ...DEFAULT_FEATURES };
-
-    if (customer.features[FEATURE_IDS.CHAT]) {
-      const feature = customer.features[FEATURE_IDS.CHAT];
-      features.chatMessages = {
-        total: feature.included_usage || 0,
-        remaining: feature.balance || 0,
-        unlimited: feature.unlimited ?? false,
-        enabled: (feature.unlimited ?? false) || Number(feature.balance) > 0,
-        usage: feature.usage || 0,
-        nextResetAt: feature.next_reset_at ?? null,
-        interval: feature.interval || '',
-        included_usage: feature.included_usage || 0,
-      };
-    }
-
-    if (customer.features[FEATURE_IDS.CONNECTIONS]) {
-      const feature = customer.features[FEATURE_IDS.CONNECTIONS];
-      features.connections = {
-        total: feature.included_usage || 0,
-        remaining: feature.balance || 0,
-        unlimited: feature.unlimited ?? false,
-        enabled: (feature.unlimited ?? false) || Number(feature.balance) > 0,
-        usage: feature.usage || 0,
-        nextResetAt: feature.next_reset_at ?? null,
-        interval: feature.interval || '',
-        included_usage: feature.included_usage || 0,
-      };
-    }
-
-    if (customer.features[FEATURE_IDS.BRAIN]) {
-      const feature = customer.features[FEATURE_IDS.BRAIN];
-      features.brainActivity = {
-        total: feature.included_usage || 0,
-        remaining: feature.balance || 0,
-        unlimited: feature.unlimited ?? false,
-        enabled: (feature.unlimited ?? false) || Number(feature.balance) > 0,
-        usage: feature.usage || 0,
-        nextResetAt: feature.next_reset_at ?? null,
-        interval: feature.interval || '',
-        included_usage: feature.included_usage || 0,
-      };
-    }
-
-    return { isPro, ...features };
-  }, [customer]);
-
+  // Use mock data for now to ensure the interface loads
   return {
-    isLoading,
-    customer,
-    refetch,
-    attach,
-    track,
-    openBillingPortal,
-    isPro,
-    ...customerFeatures,
+    customer: mockCustomer.data,
+    isLoading: mockCustomer.isLoading,
+    error: mockCustomer.error,
+    refetch: mockCustomer.refetch,
+    attach: mockAutumn.attach,
+    track: mockAutumn.track,
+    openBillingPortal: mockAutumn.openBillingPortal,
+    isPro: false, // Demo mode is not pro
   };
 };
