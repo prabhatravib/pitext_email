@@ -1,29 +1,10 @@
 import { useParams, useNavigate } from 'react-router';
-import { redirect } from 'react-router';
 
 import { MailLayout } from '@/components/mail/mail';
 import { useLabels } from '@/hooks/use-labels';
-import { authProxy } from '@/lib/auth-proxy';
 import { useEffect, useState } from 'react';
-import type { Route } from './+types/page';
 
 const ALLOWED_FOLDERS = new Set(['inbox', 'draft', 'sent', 'spam', 'bin', 'archive']);
-
-export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
-  if (!params.folder) return redirect('/mail/inbox');
-
-  try {
-    const session = await authProxy.api.getSession({ headers: request.headers });
-    if (!session) return redirect('/login');
-  } catch (error) {
-    // In client-only mode, we'll handle auth in the component
-    console.warn('Auth check failed in loader, will handle in component:', error);
-  }
-
-  return {
-    folder: params.folder,
-  };
-}
 
 export default function MailPage() {
   const params = useParams<{ folder: string }>();

@@ -31,8 +31,8 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // Let React Router dev tools handle everything
-  // This should resolve both HydratedRouter and useLoaderData errors
+  // Simple approach - let React Router dev tools handle everything
+  // No data router requirement since we removed all clientLoader functions
   hydrateRoot(
     rootElement,
     <StrictMode>

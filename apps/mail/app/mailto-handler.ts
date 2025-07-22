@@ -246,40 +246,8 @@ async function createDraftFromMailto(mailtoData: {
   return null;
 }
 
-export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  const session = await authProxy.api.getSession({ headers: request.headers });
-  const appUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-  if (!session) return Response.redirect(`${appUrl}/login`);
-
-  const url = new URL(request.url);
-
-  // Get the mailto parameter from the URL
-  const mailto = url.searchParams.get('mailto');
-
-  if (!mailto) return Response.redirect(`${appUrl}/mail/compose`);
-
-  // Parse the mailto URL
-  const mailtoData = await parseMailtoUrl(mailto);
-
-  // If parsing failed, redirect to empty compose
-  if (!mailtoData) return Response.redirect(`${appUrl}/mail/compose`);
-
-  // Create a draft from the mailto data
-  const draftId = await createDraftFromMailto(mailtoData);
-
-  // If draft creation failed, redirect to empty compose with the parsed data as a fallback
-  if (!draftId) {
-    const fallbackUrl = new URL(`${appUrl}/mail/compose`);
-    if (mailtoData.to) fallbackUrl.searchParams.append('to', mailtoData.to);
-    if (mailtoData.subject) fallbackUrl.searchParams.append('subject', mailtoData.subject);
-    if (mailtoData.body) fallbackUrl.searchParams.append('body', mailtoData.body);
-    if (mailtoData.cc) fallbackUrl.searchParams.append('cc', mailtoData.cc);
-    if (mailtoData.bcc) fallbackUrl.searchParams.append('bcc', mailtoData.bcc);
-    return Response.redirect(fallbackUrl.toString());
-  }
-
-  // Redirect to compose with the draft ID
-  return Response.redirect(
-    `${appUrl}/mail/compose?draftId=${draftId}`,
-  );
+export default function MailtoHandler() {
+  // This component will handle mailto processing in the component itself
+  // rather than in a loader to avoid data router requirements
+  return null;
 }

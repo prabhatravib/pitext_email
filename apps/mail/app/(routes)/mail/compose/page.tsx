@@ -6,34 +6,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { CreateEmail } from '@/components/create/create-email';
-import { redirect } from 'react-router';
-import { authProxy } from '@/lib/auth-proxy';
 import { useSearchParams } from 'react-router';
-import type { Route } from './+types/page';
-
-export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  try {
-    const session = await authProxy.api.getSession({ headers: request.headers });
-    if (!session) return redirect('/login');
-  } catch (error) {
-    // In client-only mode, we'll handle auth in the component
-    console.warn('Auth check failed in loader, will handle in component:', error);
-  }
-
-  const url = new URL(request.url);
-  if (url.searchParams.get('to')?.startsWith('mailto:')) {
-    return redirect(`/mail/compose/handle-mailto?mailto=${encodeURIComponent(url.searchParams.get('to') ?? '')}`);
-  }
-
-  return Object.fromEntries(url.searchParams.entries()) as {
-    to?: string;
-    subject?: string;
-    body?: string;
-    draftId?: string;
-    cc?: string;
-    bcc?: string;
-  };
-}
 
 export default function ComposePage() {
   const [searchParams] = useSearchParams();
@@ -50,16 +23,15 @@ export default function ComposePage() {
   return (
     <Dialog open={true}>
       <DialogTitle></DialogTitle>
-      <DialogDescription></DialogDescription>
-      <DialogTrigger></DialogTrigger>
-      <DialogContent className="h-screen w-screen max-w-none border-none bg-[#FAFAFA] p-0 shadow-none dark:bg-[#141414]">
+      <DialogContent className="max-w-4xl">
+        <DialogDescription></DialogDescription>
         <CreateEmail
-          initialTo={params.to || ''}
-          initialSubject={params.subject || ''}
-          initialBody={params.body || ''}
-          initialCc={params.cc || ''}
-          initialBcc={params.bcc || ''}
-          draftId={params.draftId || null}
+          initialTo={params.to}
+          initialSubject={params.subject}
+          initialBody={params.body}
+          initialCc={params.cc}
+          initialBcc={params.bcc}
+          draftId={params.draftId || undefined}
         />
       </DialogContent>
     </Dialog>
