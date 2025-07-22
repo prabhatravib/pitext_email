@@ -34,7 +34,7 @@ import { FOLDERS, LABELS } from '@/lib/utils';
 import { useMail } from '../mail/use-mail';
 import { Checkbox } from '../ui/checkbox';
 import { m } from '@/paraglide/messages';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 

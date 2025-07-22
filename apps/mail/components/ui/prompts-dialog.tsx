@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { Paper } from '../icons/icons';
 import { Textarea } from './textarea';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 

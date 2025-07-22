@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { CreateEmail } from '@/components/create/create-email';
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 export default function ComposePage() {
   const [searchParams] = useSearchParams();

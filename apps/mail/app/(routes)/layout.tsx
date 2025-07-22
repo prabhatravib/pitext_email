@@ -2,7 +2,7 @@ import { HotkeyProviderWrapper } from '@/components/providers/hotkey-provider-wr
 import { CommandPaletteProvider } from '@/components/context/command-palette-context';
 import { RouterProviders } from '@/providers/client-providers';
 
-import { Outlet } from 'react-router';
+import { Outlet } from 'react-router-dom';
 
 
 export default function Layout() {

@@ -39,7 +39,7 @@ import { Check, Star } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 
 import { m } from '@/paraglide/messages';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import { Button } from '../ui/button';
 import { useQueryState } from 'nuqs';

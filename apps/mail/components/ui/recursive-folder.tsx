@@ -4,7 +4,7 @@ import type { Label, Label as LabelType } from '@/types';
 import { useSidebar } from '../context/sidebar-context';
 import useSearchLabels from '@/hooks/use-labels-search';
 import { Folder } from '../magicui/file-tree';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { useCallback } from 'react';
 import * as React from 'react';

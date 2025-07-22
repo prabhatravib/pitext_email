@@ -1,4 +1,4 @@
-import { redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 
 export default function SettingsPage() {
   redirect('/settings/general');

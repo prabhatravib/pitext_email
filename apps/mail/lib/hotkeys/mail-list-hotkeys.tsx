@@ -2,7 +2,7 @@ import { useOptimisticActions } from '@/hooks/use-optimistic-actions';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { enhancedKeyboardShortcuts } from '@/config/shortcuts';
 import { useSearchValue } from '@/hooks/use-search-value';
-import { useLocation, useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router-dom';
 import { useMail } from '@/components/mail/use-mail';
 import { Categories } from '@/components/mail/mail';
 import { useShortcuts } from './use-hotkey-utils';

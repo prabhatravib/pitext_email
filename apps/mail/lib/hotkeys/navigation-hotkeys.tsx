@@ -1,6 +1,6 @@
 import { enhancedKeyboardShortcuts } from '@/config/shortcuts';
 import { useShortcuts } from './use-hotkey-utils';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 export function NavigationHotkeys() {
   const navigate = useNavigate();

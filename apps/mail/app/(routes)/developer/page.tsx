@@ -1,7 +1,7 @@
 import { Github, Book, Users, Terminal, Code2, Webhook, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const developerResources = [
   {

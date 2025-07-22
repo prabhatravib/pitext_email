@@ -12,7 +12,7 @@ import { AnimatedNumber } from '@/components/ui/animated-number';
 import { signIn, useSession } from '@/lib/auth-client';
 import { Separator } from '@/components/ui/separator';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';

@@ -1,7 +1,7 @@
 // @ts-expect-error react-dom provides ESM browser build without TS typings yet
 import { renderToReadableStream } from 'react-dom/server.browser';
-import type { AppLoadContext, EntryContext } from 'react-router';
-import { ServerRouter } from 'react-router';
+import type { AppLoadContext, EntryContext } from 'react-router-dom';
+import { ServerRouter } from 'react-router-dom';
 import { isbot } from 'isbot';
 
 export default async function handleRequest(

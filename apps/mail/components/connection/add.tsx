@@ -8,7 +8,7 @@ import {
 } from '../ui/dialog';
 import { authClient } from '@/lib/auth-client';
 import { UserPlus } from 'lucide-react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { m } from '@/paraglide/messages';
 import { motion } from 'motion/react';
 import { Button } from '../ui/button';

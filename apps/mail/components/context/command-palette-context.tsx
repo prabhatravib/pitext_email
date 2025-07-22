@@ -40,7 +40,7 @@ import { getMainSearchTerm, parseNaturalLanguageSearch } from '@/lib/utils';
 import { DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useSearchValue } from '@/hooks/use-search-value';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { navigationConfig } from '@/config/navigation';
 import { Separator } from '@/components/ui/separator';
 import { useTRPC } from '@/providers/query-provider';

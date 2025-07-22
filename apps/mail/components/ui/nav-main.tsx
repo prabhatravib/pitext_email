@@ -10,7 +10,7 @@ import { useSidebar } from '../context/sidebar-context';
 import { useTRPC } from '@/providers/query-provider';
 import { type NavItem } from '@/config/navigation';
 import type { Label as LabelType } from '@/types';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 import { m } from '../../src/paraglide/messages.js';
 import { Button } from '@/components/ui/button';
 import { useLabels } from '@/hooks/use-labels';

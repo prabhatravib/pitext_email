@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 

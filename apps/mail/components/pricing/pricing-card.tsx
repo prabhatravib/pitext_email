@@ -2,7 +2,7 @@ import { PurpleThickCheck, ThickCheck } from '../icons/icons';
 import { useSession, signIn } from '@/lib/auth-client';
 import { PricingSwitch } from '../ui/pricing-switch';
 import { useBilling } from '@/hooks/use-billing';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';

@@ -4,7 +4,7 @@ import { trpcClient } from '@/providers/query-provider';
 import { useMail } from '@/components/mail/use-mail';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useThreads } from '@/hooks/use-threads';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { Check } from '../icons/icons';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

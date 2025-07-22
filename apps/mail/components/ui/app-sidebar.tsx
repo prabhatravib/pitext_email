@@ -18,7 +18,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { useAIFullScreen } from './ai-sidebar';
 import { useStats } from '@/hooks/use-stats';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import { m } from '@/paraglide/messages';
 import { FOLDERS } from '@/lib/utils';

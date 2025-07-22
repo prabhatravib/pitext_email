@@ -4,7 +4,7 @@ import useMoveTo from '@/hooks/driver/use-move-to';
 import useDelete from '@/hooks/driver/use-delete';
 import { useShortcuts } from './use-hotkey-utils';
 import { useThread } from '@/hooks/use-threads';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { useQueryState } from 'nuqs';
 import { useSetAtom } from 'jotai';
 

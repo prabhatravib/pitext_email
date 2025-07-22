@@ -28,7 +28,7 @@ import {
 import { PixelatedBackground, PixelatedLeft, PixelatedRight } from '@/components/home/pixelated-bg';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { signIn, useSession } from '@/lib/auth-client';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Balancer } from 'react-wrap-balancer';
 import { Navigation } from '../navigation';

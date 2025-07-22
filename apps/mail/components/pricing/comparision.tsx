@@ -1,7 +1,7 @@
 import { Plus, PurpleThickCheck, ThickCheck } from '../icons/icons';
 import { useSession, signIn } from '@/lib/auth-client';
 import { useBilling } from '@/hooks/use-billing';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function Comparision() {

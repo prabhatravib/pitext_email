@@ -40,7 +40,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { cleanHtml } from '@/lib/email-utils';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import ReplyCompose from './reply-composer';
 import { NotesPanel } from './note-panel';

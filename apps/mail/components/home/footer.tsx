@@ -1,7 +1,7 @@
 import { LinkedIn, Twitter, Discord } from '../icons/icons';
 import { motion } from 'motion/react';
 import { Button } from '../ui/button';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useRef } from 'react';
 
 const socialLinks = [

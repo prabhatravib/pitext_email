@@ -34,7 +34,7 @@ import { isMac } from '@/lib/hotkeys/use-hotkey-utils';
 import { MailList } from '@/components/mail/mail-list';
 import { useHotkeysContext } from 'react-hotkeys-hook';
 import SelectAllCheckbox from './select-all-checkbox';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMail } from '@/components/mail/use-mail';
 import { SidebarToggle } from '../ui/sidebar-toggle';
 import { PricingDialog } from '../ui/pricing-dialog';
