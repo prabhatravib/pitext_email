@@ -1,3 +1,4 @@
+import './init-paraglide'; // Initialize Paraglide before anything else
 import '../instrument';
 
 import { startTransition, StrictMode } from 'react';
