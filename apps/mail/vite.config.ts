@@ -1,4 +1,3 @@
-import { reactRouter } from '@react-router/dev/vite';
 import babel from 'vite-plugin-babel';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
@@ -15,7 +14,6 @@ export default defineConfig({
         plugins: []
       }
     }),
-    reactRouter(),
   ],
   server: {
     port: 3000,
@@ -38,14 +36,5 @@ export default defineConfig({
       'react': 'react',
       'react-dom': 'react-dom'
     },
-  },
-  define: {
-    // Nuclear option: Force production mode even in development
-    // This completely eliminates dev tools conflicts
-    'process.env.NODE_ENV': '"production"',
-    'import.meta.env.DEV': 'false',
-    'import.meta.env.PROD': 'true',
-    // Disable React Router dev tools to prevent HydratedRouter conflicts
-    'process.env.REACT_ROUTER_DEV_TOOLS': 'false',
   },
 });

@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import { reactRouter } from '@react-router/dev/vite';
 import tailwindcss from 'tailwindcss';
 import { resolve } from 'path';
 import react from '@vitejs/plugin-react';
@@ -14,7 +13,6 @@ export default defineConfig({
         plugins: []
       }
     }),
-    reactRouter()
   ],
   build: {
     sourcemap: false,
@@ -55,8 +53,6 @@ export default defineConfig({
   },
   define: {
     'process.env.NODE_ENV': '"production"',
-    'global': 'globalThis',
-    // Disable React Router dev tools to prevent HydratedRouter conflicts
-    'process.env.REACT_ROUTER_DEV_TOOLS': 'false',
+    'global': 'globalThis'
   }
 }); 

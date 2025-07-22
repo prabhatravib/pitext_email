@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const buildDir = path.join(__dirname, '../build/client/client');
+const buildDir = path.join(__dirname, '../build/client');
 const assetsDir = path.join(buildDir, 'assets');
 const indexPath = path.join(buildDir, 'index.html');
 
@@ -19,22 +19,22 @@ if (!fs.existsSync(indexPath)) {
 
 let html = fs.readFileSync(indexPath, 'utf8');
 
-// Find the entry client file
-const entryClientFiles = fs.readdirSync(assetsDir).filter(file => 
-  file.startsWith('entry.client-') && file.endsWith('.js')
+// Find the main entry file (either entry.client or index)
+const entryFiles = fs.readdirSync(assetsDir).filter(file => 
+  (file.startsWith('entry.client-') || file.startsWith('index-')) && file.endsWith('.js')
 );
 
-if (entryClientFiles.length === 0) {
-  console.error('❌ No entry client file found in assets directory');
+if (entryFiles.length === 0) {
+  console.error('❌ No entry file found in assets directory');
   process.exit(1);
 }
 
-const entryClientFile = entryClientFiles[0];
-console.log(`📄 Found entry client file: ${entryClientFile}`);
+const entryFile = entryFiles[0];
+console.log(`📄 Found entry file: ${entryFile}`);
 
 // Replace the source reference with the built asset reference
 const oldReference = '/app/entry.client.tsx';
-const newReference = `/assets/${entryClientFile}`;
+const newReference = `/assets/${entryFile}`;
 
 if (html.includes(oldReference)) {
   html = html.replace(oldReference, newReference);
