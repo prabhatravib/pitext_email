@@ -18,7 +18,7 @@ import { Trash, Unplug } from 'lucide-react';
 import { useThreads } from '@/hooks/use-threads';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

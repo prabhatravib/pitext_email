@@ -33,7 +33,7 @@
     "pathPattern": "./messages/{locale}.json"
   },
   "plugin.inlang.paraglide-js": {
-    "outputPath": "./paraglide/messages.js",
+    "outputPath": "./src/paraglide/messages.js",
     "pathPattern": "./messages/{locale}.json"
   }
 }

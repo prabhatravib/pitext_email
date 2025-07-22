@@ -45,7 +45,7 @@ import { useParams } from 'react-router-dom';
 import ReplyCompose from './reply-composer';
 import { NotesPanel } from './note-panel';
 import { cn, FOLDERS } from '@/lib/utils';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import MailDisplay from './mail-display';
 
 import { Inbox } from 'lucide-react';

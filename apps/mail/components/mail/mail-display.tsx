@@ -49,7 +49,7 @@ import { useThread } from '@/hooks/use-threads';
 import { BimiAvatar } from '../ui/bimi-avatar';
 import { RenderLabels } from './render-labels';
 import { MailContent } from './mail-content';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { useParams } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 import { useQueryState } from 'nuqs';

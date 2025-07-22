@@ -20,7 +20,7 @@ import { useAIFullScreen } from './ai-sidebar';
 import { useStats } from '@/hooks/use-stats';
 import { useLocation } from 'react-router-dom';
 
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { FOLDERS } from '@/lib/utils';
 import { NavUser } from './nav-user';
 import { NavMain } from './nav-main';

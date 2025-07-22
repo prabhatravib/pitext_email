@@ -15,7 +15,7 @@ import {
   LockIcon,
 } from '@/components/icons/icons';
 import { MessageSquareIcon } from 'lucide-react';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 
 export interface NavItem {
   id?: string;

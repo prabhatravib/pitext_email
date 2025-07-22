@@ -5,7 +5,7 @@ import { fixNonReadableColors } from '@/lib/email-utils';
 import { useTRPC } from '@/providers/query-provider';
 import { getBrowserTimezone } from '@/lib/timezones';
 import { useSettings } from '@/hooks/use-settings';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

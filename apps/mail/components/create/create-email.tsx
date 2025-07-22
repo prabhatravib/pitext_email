@@ -13,7 +13,7 @@ import { useDraft } from '@/hooks/use-drafts';
 import { useEffect, useState } from 'react';
 
 import type { Attachment } from '@/types';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { useQueryState } from 'nuqs';
 import { X } from '../icons/icons';
 import posthog from 'posthog-js';

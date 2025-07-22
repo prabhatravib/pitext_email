@@ -38,7 +38,7 @@ import { useDraft } from '@/hooks/use-drafts';
 import { Check, Star } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { useParams } from 'react-router-dom';
 
 import { Button } from '../ui/button';

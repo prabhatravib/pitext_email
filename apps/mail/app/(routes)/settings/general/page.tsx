@@ -34,7 +34,7 @@ import { locales as localesData } from '@/locales';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 // import { useRevalidator } from 'react-router-dom';
-import { m } from '@/paraglide/messages';
+import { m } from '@/src/paraglide/messages';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import * as z from 'zod';
