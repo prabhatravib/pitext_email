@@ -24,6 +24,30 @@ const isGmailAuthenticated = () => {
   return !!getGmailToken();
 };
 
+// Get session from server
+const getServerSession = async () => {
+  try {
+    const response = await fetch('/api/auth/session', {
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const session = await response.json();
+      if (session.user) {
+        // Store tokens in localStorage for client-side access
+        localStorage.setItem('gmail_access_token', session.access_token || '');
+        localStorage.setItem('gmail_refresh_token', session.refresh_token || '');
+        localStorage.setItem('gmail_user_email', session.user.email || '');
+        localStorage.setItem('gmail_user_name', session.user.name || '');
+        return session;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to get server session:', error);
+  }
+  return null;
+};
+
 // Gmail OAuth functions
 export const signIn = {
   social: async ({ provider, callbackURL }: { provider: string; callbackURL: string }) => {
@@ -31,7 +55,7 @@ export const signIn = {
       // Redirect to Google OAuth
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${GOOGLE_CLIENT_ID}&` +
-        `redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI + '/auth/callback')}&` +
+        `redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI + '/api/auth/callback/google')}&` +
         `scope=${encodeURIComponent(GMAIL_SCOPES)}&` +
         `response_type=code&` +
         `access_type=offline&` +
@@ -43,6 +67,16 @@ export const signIn = {
 };
 
 export const signOut = async () => {
+  // Clear server-side session
+  try {
+    await fetch('/api/auth/sign-out', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (error) {
+    console.error('Failed to sign out from server:', error);
+  }
+  
   // Clear Gmail tokens (this ends the "session")
   localStorage.removeItem('gmail_access_token');
   localStorage.removeItem('gmail_refresh_token');
@@ -53,6 +87,13 @@ export const signOut = async () => {
 
 // Simple session check - just check if we have Gmail token
 export const getSession = async () => {
+  // First try to get session from server
+  const serverSession = await getServerSession();
+  if (serverSession) {
+    return serverSession;
+  }
+
+  // Fallback to client-side session
   if (isGmailAuthenticated()) {
     // User is authenticated with Gmail
     return {

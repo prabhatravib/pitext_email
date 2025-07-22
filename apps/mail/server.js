@@ -24,6 +24,21 @@ app.use((req, res, next) => {
   next();
 });
 
+// Simple cookie parsing middleware
+app.use((req, res, next) => {
+  req.cookies = {};
+  const cookieHeader = req.headers.cookie;
+  if (cookieHeader) {
+    cookieHeader.split(';').forEach(cookie => {
+      const [name, value] = cookie.trim().split('=');
+      if (name && value) {
+        req.cookies[name] = decodeURIComponent(value);
+      }
+    });
+  }
+  next();
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Frontend server is running' });
@@ -60,6 +75,7 @@ app.post('/api/auth/sign-in', (req, res) => {
 });
 
 app.post('/api/auth/sign-out', (req, res) => {
+  res.clearCookie('gmail_session');
   res.json({
     success: true,
     message: 'Signed out successfully'
@@ -80,12 +96,128 @@ app.get('/api/auth/providers', (req, res) => {
   });
 });
 
-app.get('/api/auth/callback/:provider', (req, res) => {
-  res.json({
-    user: null,
-    session: null,
-    status: 'unauthenticated'
-  });
+app.get('/api/auth/callback/:provider', async (req, res) => {
+  const { provider } = req.params;
+  const { code, error } = req.query;
+
+  if (error) {
+    console.error('OAuth error:', error);
+    return res.redirect('/settings/connections?error=' + error);
+  }
+
+  if (!code) {
+    console.error('No authorization code received');
+    return res.redirect('/settings/connections?error=no_code');
+  }
+
+  if (provider === 'google') {
+    try {
+      // Exchange authorization code for tokens
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: process.env.VITE_GOOGLE_CLIENT_ID,
+          client_secret: process.env.VITE_GOOGLE_CLIENT_SECRET,
+          code: code,
+          grant_type: 'authorization_code',
+          redirect_uri: `${process.env.VITE_PUBLIC_APP_URL}/api/auth/callback/google`,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        console.error('Token exchange failed:', await tokenResponse.text());
+        return res.redirect('/settings/connections?error=token_exchange_failed');
+      }
+
+      const tokenData = await tokenResponse.json();
+      
+      // Get user info
+      const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          'Authorization': `Bearer ${tokenData.access_token}`,
+        },
+      });
+
+      if (!userInfoResponse.ok) {
+        console.error('User info fetch failed:', await userInfoResponse.text());
+        return res.redirect('/settings/connections?error=user_info_failed');
+      }
+
+      const userInfo = await userInfoResponse.json();
+
+      // Create a simple session token (in production, use proper JWT)
+      const sessionToken = Buffer.from(JSON.stringify({
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        user_email: userInfo.email,
+        user_name: userInfo.name,
+        expires_at: Date.now() + (tokenData.expires_in * 1000)
+      })).toString('base64');
+
+      // Set session cookie
+      res.cookie('gmail_session', sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: tokenData.expires_in * 1000
+      });
+
+      // Redirect to mail interface
+      res.redirect('/mail/inbox');
+    } catch (err) {
+      console.error('OAuth callback error:', err);
+      res.redirect('/settings/connections?error=callback_failed');
+    }
+  } else {
+    res.redirect('/settings/connections?error=unsupported_provider');
+  }
+});
+
+// Session endpoint
+app.get('/api/auth/session', (req, res) => {
+  const sessionCookie = req.cookies.gmail_session;
+  
+  if (!sessionCookie) {
+    return res.json({ user: null, session: null });
+  }
+
+  try {
+    const sessionData = JSON.parse(Buffer.from(sessionCookie, 'base64').toString());
+    
+    // Check if session is expired
+    if (sessionData.expires_at && Date.now() > sessionData.expires_at) {
+      res.clearCookie('gmail_session');
+      return res.json({ user: null, session: null });
+    }
+
+    res.json({
+      user: {
+        id: 'gmail-user',
+        email: sessionData.user_email,
+        name: sessionData.user_name,
+        image: null,
+        emailVerified: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      session: {
+        id: 'gmail-session',
+        userId: 'gmail-user',
+        expiresAt: new Date(sessionData.expires_at),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      access_token: sessionData.access_token,
+      refresh_token: sessionData.refresh_token,
+    });
+  } catch (error) {
+    console.error('Session parsing error:', error);
+    res.clearCookie('gmail_session');
+    res.json({ user: null, session: null });
+  }
 });
 
 // Autumn API endpoints (for customer management)
