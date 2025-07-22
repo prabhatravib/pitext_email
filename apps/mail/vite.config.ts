@@ -44,9 +44,5 @@ export default defineConfig({
       'react-dom': 'react-dom'
     },
   },
-  define: {
-    // Ensure React is globally available
-    'process.env.NODE_ENV': '"development"',
-    'global': 'globalThis'
-  }
+  // Removed the babelConfig since we're using the react plugin instead
 });

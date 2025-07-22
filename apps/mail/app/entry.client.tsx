@@ -3,9 +3,22 @@ import '../instrument';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 
 // Import the root component
 import Root from './root';
+
+// Check if we're in development mode
+const isDevelopment = import.meta.env.DEV;
+
+// In production, we need to create a data router explicitly
+// In development, React Router dev tools handle this automatically
+const router = !isDevelopment ? createBrowserRouter([
+  {
+    path: '*',
+    element: <Root />,
+  },
+]) : null;
 
 startTransition(() => {
   let rootElement = document.getElementById('root');
@@ -31,12 +44,18 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // Let dev tools handle router creation - NO manual RouterProvider
+  // Use different approaches for dev and production
   hydrateRoot(
     rootElement,
     <StrictMode>
       <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
-        <Root />
+        {isDevelopment ? (
+          // In development, let dev tools handle router creation
+          <Root />
+        ) : (
+          // In production, use RouterProvider to ensure data router functionality
+          <RouterProvider router={router!} />
+        )}
       </Sentry.ErrorBoundary>
     </StrictMode>
   );
