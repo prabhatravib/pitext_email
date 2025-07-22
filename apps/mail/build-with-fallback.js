@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { build } from 'vite';
-import { resolve } from 'path';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
@@ -20,9 +20,9 @@ async function buildWithFallback() {
     process.env.CI = 'true';
     
     // Check if required files exist
-    const indexHtmlPath = resolve(process.cwd(), 'index.html');
-    const viteBuildConfigPath = resolve(process.cwd(), 'vite.build.config.ts');
-    const entryClientPath = resolve(process.cwd(), 'app/entry.client.tsx');
+    const indexHtmlPath = path.resolve(process.cwd(), 'index.html');
+    const viteBuildConfigPath = path.resolve(process.cwd(), 'vite.build.config.ts');
+    const entryClientPath = path.resolve(process.cwd(), 'app/entry.client.tsx');
     
     console.log('Checking required files...');
     console.log('index.html path:', indexHtmlPath);
@@ -47,7 +47,7 @@ async function buildWithFallback() {
     console.log('Starting Vite build...');
     
     // Ensure build directory exists
-    const buildDir = resolve(process.cwd(), 'build/client');
+    const buildDir = path.resolve(process.cwd(), 'build/client');
     if (!fs.existsSync(buildDir)) {
       fs.mkdirSync(buildDir, { recursive: true });
       console.log('Created build directory:', buildDir);
@@ -63,9 +63,9 @@ async function buildWithFallback() {
     console.log('Build result:', result);
     
     // Verify the build output
-    const buildPath = resolve(process.cwd(), 'build/client');
-    const indexPath = resolve(buildPath, 'index.html');
-    const assetsDir = resolve(buildPath, 'assets');
+    const buildPath = path.resolve(process.cwd(), 'build/client');
+    const indexPath = path.resolve(buildPath, 'index.html');
+    const assetsDir = path.resolve(buildPath, 'assets');
     
     console.log('Verifying build output...');
     console.log('Build directory exists:', fs.existsSync(buildPath));
@@ -104,7 +104,7 @@ async function buildWithFallback() {
         }
       `;
       
-      const fallbackPath = resolve(assetsDir, 'entry.client-fallback.js');
+      const fallbackPath = path.resolve(assetsDir, 'entry.client-fallback.js');
       fs.writeFileSync(fallbackPath, fallbackEntryClient);
       console.log('✅ Created fallback entry client:', fallbackPath);
     } else {
@@ -132,7 +132,7 @@ async function buildWithFallback() {
           }
         `;
         
-        const fallbackPath = resolve(assetsDir, 'entry.client-fallback.js');
+        const fallbackPath = path.resolve(assetsDir, 'entry.client-fallback.js');
         fs.writeFileSync(fallbackPath, fallbackEntryClient);
         console.log('✅ Created fallback entry client:', fallbackPath);
       }
@@ -150,7 +150,7 @@ async function buildWithFallback() {
     
     // Final verification
     console.log('Final verification...');
-    const finalAssetsDir = resolve(buildPath, 'assets');
+    const finalAssetsDir = path.resolve(buildPath, 'assets');
     const finalAssetFiles = fs.existsSync(finalAssetsDir) ? fs.readdirSync(finalAssetsDir) : [];
     console.log('Final assets directory contents:', finalAssetFiles);
     
@@ -162,15 +162,15 @@ async function buildWithFallback() {
     // Create emergency fallback
     console.log('Creating emergency fallback...');
     try {
-      const buildDir = resolve(process.cwd(), 'build/client');
-      const assetsDir = resolve(buildDir, 'assets');
+      const buildDir = path.resolve(process.cwd(), 'build/client');
+      const assetsDir = path.resolve(buildDir, 'assets');
       
       fs.mkdirSync(buildDir, { recursive: true });
       fs.mkdirSync(assetsDir, { recursive: true });
       
       // Copy fallback index.html
-      const fallbackIndexPath = resolve(process.cwd(), 'fallback-index.html');
-      const indexPath = resolve(buildDir, 'index.html');
+      const fallbackIndexPath = path.resolve(process.cwd(), 'fallback-index.html');
+      const indexPath = path.resolve(buildDir, 'index.html');
       
       if (fs.existsSync(fallbackIndexPath)) {
         fs.copyFileSync(fallbackIndexPath, indexPath);
@@ -207,7 +207,7 @@ async function buildWithFallback() {
         document.getElementById('root').innerHTML = '<div style="padding: 20px; text-align: center;"><h1>Build Error</h1><p>The application failed to build properly. Please check the deployment logs.</p></div>';
       `;
       
-      const fallbackPath = resolve(assetsDir, 'entry.client-fallback.js');
+      const fallbackPath = path.resolve(assetsDir, 'entry.client-fallback.js');
       fs.writeFileSync(fallbackPath, fallbackEntryClient);
       console.log('✅ Created emergency fallback entry client');
       
