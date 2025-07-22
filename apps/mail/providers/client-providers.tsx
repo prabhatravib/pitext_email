@@ -7,6 +7,26 @@ import { Provider as JotaiProvider } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import Toaster from '@/components/ui/toast';
 import { ThemeProvider } from 'next-themes';
+import { overwriteGetUrlOrigin } from '@/src/paraglide/runtime';
+
+// Override Paraglide's getUrlOrigin to prevent Invalid URL errors
+overwriteGetUrlOrigin(() => {
+  try {
+    const appUrl = import.meta.env.VITE_PUBLIC_APP_URL;
+    if (appUrl && appUrl !== 'undefined' && appUrl !== 'null') {
+      return appUrl;
+    }
+    
+    if (typeof window !== 'undefined' && window.location.origin) {
+      return window.location.origin;
+    }
+    
+    return 'http://localhost:3000';
+  } catch (error) {
+    console.error('Error in getUrlOrigin:', error);
+    return 'http://localhost:3000';
+  }
+});
 
 // Providers that don't depend on React Router context
 export function BaseProviders({ children }: PropsWithChildren) {
