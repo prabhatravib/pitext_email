@@ -347,11 +347,19 @@ function AISidebar({ className }: AISidebarProps) {
 
   const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
 
-  const agent = useAgent({
-    agent: 'ZeroAgent',
-    name: activeConnection?.id ? String(activeConnection.id) : 'general',
-    host: backendUrl,
-  });
+  // Disable agent for Gmail-only version to prevent WebSocket connection issues
+  // const agent = useAgent({
+  //   agent: 'ZeroAgent',
+  //   name: activeConnection?.id ? String(activeConnection.id) : 'general',
+  //   host: backendUrl,
+  // });
+
+  // Mock agent for Gmail-only version
+  const agent = {
+    id: 'mock-agent',
+    name: 'MockAgent',
+    // Add any other properties that useAgentChat expects
+  };
 
   const chatState = useAgentChat({
     getInitialMessages: async () => {
@@ -366,63 +374,16 @@ function AISidebar({ className }: AISidebarProps) {
     },
     onError(error) {
       console.error('Error in useChat', error);
-      posthog.capture('AI Chat Error', {
-        error: error.message,
-        threadId: threadId ?? undefined,
-        currentFolder: folder ?? undefined,
-        currentFilter: searchValue.value ?? undefined,
-        messages: chatState.messages,
-      });
-      toast.error('Error, please try again later');
+      toast.error('AI features are currently disabled in Gmail-only mode');
     },
     onResponse: (response) => {
-      posthog.capture('AI Chat Response', {
-        response,
-        threadId: threadId ?? undefined,
-        currentFolder: folder ?? undefined,
-        currentFilter: searchValue.value ?? undefined,
-        messages: chatState.messages,
-      });
       if (!response.ok) {
         throw new Error('Failed to send message');
       }
     },
     async onToolCall({ toolCall }) {
       console.warn('toolCall', toolCall);
-      posthog.capture('AI Chat Tool Call', {
-        toolCall,
-        threadId: threadId ?? undefined,
-        currentFolder: folder ?? undefined,
-        currentFilter: searchValue.value ?? undefined,
-        messages: chatState.messages,
-      });
-      switch (toolCall.toolName) {
-        case Tools.CreateLabel:
-        case Tools.DeleteLabel:
-          await refetchLabels();
-          break;
-        case Tools.SendEmail:
-          await queryClient.invalidateQueries({
-            queryKey: trpc.mail.listThreads.queryKey({ folder: 'sent' }),
-          });
-          break;
-        case Tools.MarkThreadsRead:
-        case Tools.MarkThreadsUnread:
-        case Tools.ModifyLabels:
-        case Tools.BulkDelete:
-          console.log('modifyLabels', toolCall.args);
-          await refetchLabels();
-          await Promise.all(
-            (toolCall.args as { threadIds: string[] }).threadIds.map((id) =>
-              queryClient.invalidateQueries({
-                queryKey: trpc.mail.get.queryKey({ id }),
-              }),
-            ),
-          );
-          break;
-      }
-      await track({ featureId: 'chat-messages', value: 1 });
-      await refetchBilling();
+      toast.error('AI features are currently disabled in Gmail-only mode');
     },
   });
 

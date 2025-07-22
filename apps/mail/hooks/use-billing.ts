@@ -91,5 +91,6 @@ export const useBilling = () => {
     track: mockAutumn.track,
     openBillingPortal: mockAutumn.openBillingPortal,
     isPro: false, // Demo mode is not pro
+    chatMessages: DEFAULT_FEATURES.chatMessages, // Add this to fix the undefined error
   };
 };
