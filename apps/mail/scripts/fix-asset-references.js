@@ -49,9 +49,9 @@ if (!fs.existsSync(indexPath)) {
 let html = fs.readFileSync(indexPath, 'utf8');
 console.log('📄 Read index.html, length:', html.length);
 
-// Find the main entry file (either entry.client or index)
+// Find the main entry file (either entry.client or main)
 const entryFiles = fs.readdirSync(assetsDir).filter(file => 
-  (file.startsWith('entry.client-') || file.startsWith('index-')) && file.endsWith('.js')
+  (file.startsWith('entry.client-') || file.startsWith('main-')) && file.endsWith('.js')
 );
 
 console.log('🔍 Found entry files:', entryFiles);
@@ -62,10 +62,21 @@ if (entryFiles.length === 0) {
   try {
     const assetFiles = fs.readdirSync(assetsDir);
     console.log(assetFiles);
+    
+    // Try to find any JavaScript file as fallback
+    const jsFiles = assetFiles.filter(file => file.endsWith('.js'));
+    if (jsFiles.length > 0) {
+      console.log('📁 JavaScript files available:', jsFiles);
+      entryFiles.push(jsFiles[0]);
+      console.log(`✅ Using fallback JavaScript file: ${jsFiles[0]}`);
+    }
   } catch (e) {
     console.error('Could not read assets directory:', e.message);
   }
-  process.exit(1);
+  
+  if (entryFiles.length === 0) {
+    process.exit(1);
+  }
 }
 
 const entryFile = entryFiles[0];

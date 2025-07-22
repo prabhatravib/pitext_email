@@ -372,9 +372,16 @@ if (!buildPath) {
   app.get('/app/entry.client.tsx', (req, res) => {
     // Find the actual entry.client.js file in the assets directory
     const assetsDir = path.join(buildPath, 'assets');
+    console.log(`🔍 Looking for entry client file in: ${assetsDir}`);
+    
     if (fs.existsSync(assetsDir)) {
       const files = fs.readdirSync(assetsDir);
-      const entryClientFile = files.find(file => file.startsWith('entry.client-') && file.endsWith('.js'));
+      console.log(`📁 Available files in assets directory:`, files);
+      
+      // Try to find the entry client file with different patterns
+      const entryClientFile = files.find(file => 
+        (file.startsWith('entry.client-') || file.startsWith('main-')) && file.endsWith('.js')
+      );
       
       if (entryClientFile) {
         console.log(`📄 Serving entry.client.js as /app/entry.client.tsx: ${entryClientFile}`);
@@ -383,12 +390,10 @@ if (!buildPath) {
         res.sendFile(filePath);
         return;
       }
-    }
-    
-    // If not found, try to find any JavaScript file that might be the entry point
-    if (fs.existsSync(assetsDir)) {
-      const files = fs.readdirSync(assetsDir);
+      
+      // If not found, try to find any JavaScript file that might be the entry point
       const jsFiles = files.filter(file => file.endsWith('.js'));
+      console.log(`📁 JavaScript files found:`, jsFiles);
       
       if (jsFiles.length > 0) {
         // Use the first JS file as fallback
@@ -399,6 +404,9 @@ if (!buildPath) {
         res.sendFile(filePath);
         return;
       }
+    } else {
+      console.log(`❌ Assets directory does not exist: ${assetsDir}`);
+      console.log(`📁 Build directory contents:`, fs.existsSync(buildPath) ? fs.readdirSync(buildPath) : 'Build directory does not exist');
     }
     
     // If still not found, return 404
