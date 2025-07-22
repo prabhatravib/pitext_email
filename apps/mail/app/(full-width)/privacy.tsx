@@ -16,7 +16,14 @@ export default function PrivacyPolicy() {
   const { copiedValue: copiedSection, copyToClipboard } = useCopyToClipboard();
 
   const handleCopyLink = (sectionId: string) => {
-    const url = `${window.location.origin}${window.location.pathname}#${sectionId}`;
+    // Validate window.location.origin before using it
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+    if (!origin || origin === 'undefined' || origin === 'null') {
+      console.error('Invalid window.location.origin');
+      return;
+    }
+
+    const url = `${origin}${window.location.pathname}#${sectionId}`;
     copyToClipboard(url, sectionId);
   };
 

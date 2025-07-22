@@ -95,10 +95,17 @@ export default function PricingCard() {
     }
 
     if (attach) {
+      // Validate window.location.origin before using it
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+      if (!origin || origin === 'undefined' || origin === 'null') {
+        console.error('Invalid window.location.origin');
+        return;
+      }
+
       toast.promise(
         attach({
           productId: isAnnual ? 'pro_annual' : 'pro-example',
-          successUrl: `${window.location.origin}/mail/inbox?success=true`,
+          successUrl: `${origin}/mail/inbox?success=true`,
         }),
         {
           success: 'Redirecting to payment...',
@@ -163,7 +170,14 @@ export default function PricingCard() {
               if (session) {
                 navigate('/mail/inbox');
               } else {
-                handleGoogleSignIn(`${window.location.origin}/mail`, {
+                // Validate window.location.origin before using it
+                const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+                if (!origin || origin === 'undefined' || origin === 'null') {
+                  console.error('Invalid window.location.origin');
+                  return;
+                }
+                
+                handleGoogleSignIn(`${origin}/mail`, {
                   loading: undefined,
                   success: undefined,
                 });

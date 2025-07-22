@@ -196,10 +196,17 @@ export function Navigation() {
                 if (session) {
                   navigate('/mail/inbox');
                 } else {
+                  // Validate window.location.origin before using it
+                  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+                  if (!origin || origin === 'undefined' || origin === 'null') {
+                    console.error('Invalid window.location.origin');
+                    return;
+                  }
+
                   toast.promise(
                     signIn.social({
                       provider: 'google',
-                      callbackURL: `${window.location.origin}/mail`,
+                      callbackURL: `${origin}/mail`,
                     }),
                     {
                       error: 'Login redirect failed',

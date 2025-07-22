@@ -45,17 +45,22 @@ export const getListUnsubscribeAction = ({
   }
 
   // NOTE: List-Unsubscribe can contain multiple URLs, but the spec says to process the first one we can.
-  const url = new URL(match[1]);
+  try {
+    const url = new URL(match[1]);
 
-  if (url.protocol.startsWith('http')) {
-    return processHttpUrl(url, listUnsubscribePost);
-  }
+    if (url.protocol.startsWith('http')) {
+      return processHttpUrl(url, listUnsubscribePost);
+    }
 
-  if (url.protocol === 'mailto:') {
-    const emailAddress = url.pathname;
-    const subject = new URLSearchParams(url.search).get('subject') || '';
+    if (url.protocol === 'mailto:') {
+      const emailAddress = url.pathname;
+      const subject = new URLSearchParams(url.search).get('subject') || '';
 
-    return { type: 'email', emailAddress, subject, host: url.hostname };
+      return { type: 'email', emailAddress, subject, host: url.hostname };
+    }
+  } catch {
+    // If URL construction fails, return null
+    return null;
   }
 
   return null;

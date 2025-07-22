@@ -62,12 +62,19 @@ export const AddConnectionDialog = ({
             <Button
               variant="outline"
               className="h-24 w-48 flex-col items-center justify-center gap-2"
-              onClick={async () =>
+              onClick={async () => {
+                // Validate window.location.origin before using it
+                const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+                if (!origin || origin === 'undefined' || origin === 'null') {
+                  console.error('Invalid window.location.origin');
+                  return;
+                }
+
                 await authClient.linkSocial({
                   provider: 'google',
-                  callbackURL: `${window.location.origin}${pathname}`,
-                })
-              }
+                  callbackURL: `${origin}${pathname}`,
+                });
+              }}
             >
               <svg className="size-6" viewBox="0 0 24 24">
                 <path

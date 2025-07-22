@@ -26,10 +26,17 @@ export default function Comparision() {
     }
 
     if (attach) {
+      // Validate window.location.origin before using it
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+      if (!origin || origin === 'undefined' || origin === 'null') {
+        console.error('Invalid window.location.origin');
+        return;
+      }
+
       toast.promise(
         attach({
           productId: 'pro-example',
-          successUrl: `${window.location.origin}/mail/inbox?success=true`,
+          successUrl: `${origin}/mail/inbox?success=true`,
         }),
         {
           success: 'Redirecting to payment...',
@@ -154,10 +161,17 @@ export default function Comparision() {
                     navigate('/mail/inbox');
                   } else {
                     // User is not logged in, show sign-in dialog
+                    // Validate window.location.origin before using it
+                    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+                    if (!origin || origin === 'undefined' || origin === 'null') {
+                      console.error('Invalid window.location.origin');
+                      return;
+                    }
+
                     toast.promise(
                       signIn.social({
                         provider: 'google',
-                        callbackURL: `${window.location.origin}/mail`,
+                        callbackURL: `${origin}/mail`,
                       }),
                       {
                         error: 'Login redirect failed',
