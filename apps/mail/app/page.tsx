@@ -1,30 +1,31 @@
 import HomeContent from '@/components/home/HomeContent';
 import { useActiveConnection } from '@/hooks/use-connections';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { MailLayout } from '@/components/mail/mail';
 
 export default function HomePage() {
-  const { data: activeConnection } = useActiveConnection();
-  const navigate = useNavigate();
+  const { data: activeConnection, isLoading } = useActiveConnection();
 
-  useEffect(() => {
-    // If Gmail is connected, redirect to email interface
-    if (activeConnection) {
-      navigate('/mail/inbox');
-    }
-  }, [activeConnection, navigate]);
+  console.log('HomePage: activeConnection', { activeConnection, isLoading });
 
-  // If Gmail is connected, show loading while redirecting
-  if (activeConnection) {
+  // If still loading, show loading state
+  if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
-          <p className="text-muted-foreground">Loading your inbox...</p>
+          <p className="text-muted-foreground">Checking connection...</p>
         </div>
       </div>
     );
   }
 
+  // If we have a connection (demo or real), show the email interface
+  if (activeConnection) {
+    console.log('HomePage: Showing email interface');
+    return <MailLayout />;
+  }
+
+  // Otherwise show the home page
+  console.log('HomePage: Showing home content');
   return <HomeContent />;
 }
