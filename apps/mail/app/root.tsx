@@ -6,8 +6,6 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Outlet } from 'react-router-dom';
 import { type PropsWithChildren } from 'react';
-import { ProviderChecker } from '@/components/debug/provider-checker';
-
 const getUrl = () => {
   // Use a consistent approach to avoid hydration mismatches
   return import.meta.env.VITE_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -15,13 +13,11 @@ const getUrl = () => {
 
 export function Layout({ children }: PropsWithChildren) {
   return (
-    <ProviderChecker>
-      <ServerProviders connectionId="gmail">
-        <BaseProviders>
-          {children}
-        </BaseProviders>
-      </ServerProviders>
-    </ProviderChecker>
+    <ServerProviders connectionId="gmail">
+      <BaseProviders>
+        {children}
+      </BaseProviders>
+    </ServerProviders>
   );
 }
 

@@ -1,6 +1,6 @@
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './sidebar';
 import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useCommandPalette } from '../context/command-palette-context.jsx';
+import { useCommandPalette } from '../context/command-palette-context';
 import { LabelDialog } from '@/components/labels/label-dialog';
 import { useActiveConnection } from '@/hooks/use-connections';
 import { useMutation, useQuery } from '@tanstack/react-query';
