@@ -11,6 +11,7 @@
     "build:client": "vite build --mode client",
     "start": "node server.js",
     "start:render": "node server.js",
+    "test:deployment": "node test-deployment.js",
     "types": "wrangler types",
     "deploy": "wrangler deploy",
     "lint": "eslint .",

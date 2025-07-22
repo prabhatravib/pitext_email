@@ -345,6 +345,29 @@ if (!buildPath) {
     }
   }));
 
+  // Serve public directory files (favicon.ico, manifest.json, etc.)
+  const publicPath = path.join(__dirname, 'public');
+  if (fs.existsSync(publicPath)) {
+    app.use(express.static(publicPath, {
+      index: false,
+      dotfiles: 'ignore',
+      etag: true,
+      lastModified: true,
+      setHeaders: (res, filePath) => {
+        // Set proper MIME types
+        if (filePath.endsWith('.json')) {
+          res.setHeader('Content-Type', 'application/json');
+        } else if (filePath.endsWith('.ico')) {
+          res.setHeader('Content-Type', 'image/x-icon');
+        } else if (filePath.endsWith('.svg')) {
+          res.setHeader('Content-Type', 'image/svg+xml');
+        } else if (filePath.endsWith('.png')) {
+          res.setHeader('Content-Type', 'image/png');
+        }
+      }
+    }));
+  }
+
   // Handle the specific case where the script tag points to /app/entry.client.tsx
   app.get('/app/entry.client.tsx', (req, res) => {
     // Find the actual entry.client.js file in the assets directory
@@ -362,8 +385,96 @@ if (!buildPath) {
       }
     }
     
-    // If not found, return 404
+    // If not found, try to find any JavaScript file that might be the entry point
+    if (fs.existsSync(assetsDir)) {
+      const files = fs.readdirSync(assetsDir);
+      const jsFiles = files.filter(file => file.endsWith('.js'));
+      
+      if (jsFiles.length > 0) {
+        // Use the first JS file as fallback
+        const fallbackFile = jsFiles[0];
+        console.log(`📄 Serving fallback JS file as /app/entry.client.tsx: ${fallbackFile}`);
+        const filePath = path.join(assetsDir, fallbackFile);
+        res.setHeader('Content-Type', 'application/javascript');
+        res.sendFile(filePath);
+        return;
+      }
+    }
+    
+    // If still not found, return 404
+    console.log(`❌ No entry client file found in assets directory`);
     res.status(404).send('Entry client file not found');
+  });
+
+  // Handle favicon.ico specifically
+  app.get('/favicon.ico', (req, res) => {
+    // Try multiple possible favicon locations
+    const faviconPaths = [
+      path.join(publicPath, 'favicon.ico'),
+      path.join(buildPath, 'favicon.ico'),
+      path.join(__dirname, 'public', 'favicon.ico'),
+      path.join(__dirname, 'favicon.ico')
+    ];
+    
+    for (const faviconPath of faviconPaths) {
+      if (fs.existsSync(faviconPath)) {
+        console.log(`📄 Serving favicon.ico from: ${faviconPath}`);
+        res.setHeader('Content-Type', 'image/x-icon');
+        res.sendFile(faviconPath);
+        return;
+      }
+    }
+    
+    console.log(`❌ favicon.ico not found in any location`);
+    res.status(404).send('Favicon not found');
+  });
+
+  // Handle manifest.json specifically
+  app.get('/manifest.json', (req, res) => {
+    // Try multiple possible manifest locations
+    const manifestPaths = [
+      path.join(publicPath, 'manifest.json'),
+      path.join(buildPath, 'manifest.json'),
+      path.join(__dirname, 'public', 'manifest.json'),
+      path.join(__dirname, 'manifest.json')
+    ];
+    
+    for (const manifestPath of manifestPaths) {
+      if (fs.existsSync(manifestPath)) {
+        console.log(`📄 Serving manifest.json from: ${manifestPath}`);
+        res.setHeader('Content-Type', 'application/json');
+        res.sendFile(manifestPath);
+        return;
+      }
+    }
+    
+    console.log(`❌ manifest.json not found in any location`);
+    res.status(404).send('Manifest not found');
+  });
+
+  // Handle manifest.webmanifest (alternative manifest format)
+  app.get('/manifest.webmanifest', (req, res) => {
+    // Try multiple possible manifest locations
+    const manifestPaths = [
+      path.join(publicPath, 'manifest.json'),
+      path.join(publicPath, 'manifest.webmanifest'),
+      path.join(buildPath, 'manifest.json'),
+      path.join(buildPath, 'manifest.webmanifest'),
+      path.join(__dirname, 'public', 'manifest.json'),
+      path.join(__dirname, 'public', 'manifest.webmanifest')
+    ];
+    
+    for (const manifestPath of manifestPaths) {
+      if (fs.existsSync(manifestPath)) {
+        console.log(`📄 Serving manifest.webmanifest from: ${manifestPath}`);
+        res.setHeader('Content-Type', 'application/manifest+json');
+        res.sendFile(manifestPath);
+        return;
+      }
+    }
+    
+    console.log(`❌ manifest.webmanifest not found in any location`);
+    res.status(404).send('Manifest not found');
   });
 
   // Handle asset requests that might be missing

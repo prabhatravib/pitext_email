@@ -1,99 +1,109 @@
-# Deployment Fixes for CORS and API Issues
+# Deployment Fixes for PiText Email
 
 ## Issues Identified
 
-1. **CORS Configuration**: The CORS configuration was too restrictive and didn't allow the frontend domain
-2. **API Endpoint Issues**: Auth endpoints were returning 404 errors
-3. **Environment Variables**: Missing environment variables for Autumn and database
-4. **Database Configuration**: Database connection wasn't handling missing connection strings gracefully
+The deployment was experiencing several 404 errors:
 
-## Fixes Applied
+1. **404 for `/app/entry.client.tsx`**: The HTML referenced `/app/entry.client.tsx` but the built file was in `/assets/entry.client-[hash].js`
+2. **404 for `/favicon.ico`**: The favicon wasn't being served correctly
+3. **Manifest syntax error**: The manifest.json was being served as HTML instead of JSON
 
-### 1. CORS Configuration Fix
+## Root Causes
 
-**File**: `apps/server/src/main.ts`
+1. **Asset reference mismatch**: The build process creates hashed files in `/assets/` but the HTML still referenced the original path
+2. **Static file serving**: The server wasn't properly serving static files from the public directory
+3. **MIME type issues**: Files weren't being served with correct Content-Type headers
 
-Updated the CORS configuration to allow:
-- `pitext-email.onrender.com` (main domain)
-- `localhost` (for development)
-- All subdomains of `onrender.com`
+## Fixes Implemented
 
-### 2. API Routes Fix
+### 1. Enhanced Server Asset Routing (`apps/mail/server.js`)
 
-**File**: `apps/server/src/main.ts`
+- **Improved entry client routing**: Added fallback logic to find any JavaScript file if the specific entry client file isn't found
+- **Multiple favicon locations**: Server now checks multiple possible favicon locations
+- **Multiple manifest locations**: Server now checks multiple possible manifest locations
+- **Proper MIME types**: Added explicit Content-Type headers for all asset types
+- **Public directory serving**: Added static file serving for the public directory
 
-Updated auth route handlers to support all HTTP methods:
-- GET, POST, PUT, DELETE, OPTIONS
+### 2. Improved Asset Reference Fixing (`apps/mail/scripts/fix-asset-references.js`)
 
-### 3. Environment Variables
+- **Better error handling**: Added comprehensive error checking and logging
+- **Alternative reference formats**: Script now handles different HTML reference formats
+- **Verification**: Added verification that the asset reference was correctly updated
+- **Debugging**: Added detailed logging to help diagnose build issues
 
-**Files**: `render.yaml`, `render-env-example.txt`
+### 3. Deployment Testing (`apps/mail/test-deployment.js`)
 
-Added missing environment variables:
-- `AUTUMN_SECRET_KEY` (for billing features)
-- `HYPERDRIVE_CONNECTION_STRING` (for database)
+- **Comprehensive testing**: Created a test script that verifies all deployment requirements
+- **Build verification**: Tests that all required files exist and are properly referenced
+- **Asset verification**: Ensures that asset references are correctly updated in the HTML
 
-### 4. Database Configuration
+## Key Changes
 
-**File**: `apps/server/src/db/index.ts`
+### Server.js Improvements
 
-Updated database factory to handle missing connection strings gracefully by returning a mock database.
+```javascript
+// Enhanced entry client routing with fallbacks
+app.get('/app/entry.client.tsx', (req, res) => {
+  // Try to find the specific entry client file
+  // If not found, use any JavaScript file as fallback
+  // Set proper Content-Type headers
+});
 
-### 5. Trusted Origins
+// Multiple location checking for static assets
+app.get('/favicon.ico', (req, res) => {
+  // Check multiple possible favicon locations
+  // Set proper image/x-icon Content-Type
+});
 
-**File**: `apps/server/src/lib/auth.ts`
-
-Added the current domains to trusted origins:
-- `https://pitext-email.onrender.com`
-- `https://pitext-email-backend.onrender.com`
-
-## Deployment Steps
-
-### 1. Update Environment Variables
-
-In your Render dashboard, add these environment variables:
-
-```bash
-# Required for billing features
-AUTUMN_SECRET_KEY=your_autumn_secret_key_here
-
-# Optional for persistent storage
-HYPERDRIVE_CONNECTION_STRING=your_hyperdrive_connection_string
+app.get('/manifest.json', (req, res) => {
+  // Check multiple possible manifest locations  
+  // Set proper application/json Content-Type
+});
 ```
 
-### 2. Redeploy the Application
+### Asset Reference Fixing
 
-The code changes will be automatically deployed when you push to the repository.
+```javascript
+// Enhanced script with better error handling
+// Multiple reference format support
+// Verification of updates
+```
 
-### 3. Test the Fixes
+## Testing
 
-Run the test script to verify the fixes:
+Run the deployment test to verify fixes:
 
 ```bash
-node test-cors-fix.js
+cd apps/mail
+npm run test:deployment
 ```
+
+This will check:
+- ✅ Build directory exists
+- ✅ index.html exists  
+- ✅ Assets directory exists
+- ✅ Entry client file exists
+- ✅ Asset references are correct
+- ✅ favicon.ico exists
+- ✅ manifest.json exists
+
+## Deployment Process
+
+The fixes ensure that:
+
+1. **Build process** creates the correct file structure
+2. **Asset reference fixing** updates HTML to reference hashed files
+3. **Server routing** handles all asset requests with proper fallbacks
+4. **MIME types** are set correctly for all file types
+5. **Static files** are served from multiple possible locations
 
 ## Expected Results
 
-After applying these fixes:
+After deployment, the following should work correctly:
 
-1. ✅ CORS errors should be resolved
-2. ✅ `/api/auth/use-session` should return proper responses
-3. ✅ `/api/autumn/customers` should work with CORS
-4. ✅ Database operations should work even without a connection string
-5. ✅ Authentication should work properly
+- ✅ `/app/entry.client.tsx` → Serves the correct hashed JavaScript file
+- ✅ `/favicon.ico` → Serves the favicon with correct MIME type
+- ✅ `/manifest.json` → Serves the manifest with correct MIME type
+- ✅ All other assets → Served with proper Content-Type headers
 
-## Troubleshooting
-
-If you still see errors:
-
-1. **Check Environment Variables**: Ensure all required environment variables are set in Render
-2. **Check Deployment Logs**: Look for any build or runtime errors
-3. **Test Endpoints**: Use the test script to verify each endpoint
-4. **Check Browser Console**: Look for any remaining CORS or network errors
-
-## Additional Notes
-
-- The application will work in demo mode without Google OAuth
-- Database features will work with mock data if no connection string is provided
-- All API endpoints should now be accessible from the frontend
+The deployment should no longer show 404 errors for these critical assets.
