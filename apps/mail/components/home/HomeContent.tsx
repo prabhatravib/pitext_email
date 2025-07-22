@@ -27,7 +27,7 @@ import {
 } from '../icons/icons';
 import { PixelatedBackground, PixelatedLeft, PixelatedRight } from '@/components/home/pixelated-bg';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { signIn, useSession } from '@/lib/auth-client';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Balancer } from 'react-wrap-balancer';
@@ -35,7 +35,7 @@ import { Navigation } from '../navigation';
 import { useTheme } from 'next-themes';
 import { motion } from 'motion/react';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
+
 import Footer from './footer';
 import React from 'react';
 
@@ -59,7 +59,6 @@ const tabs = [
 export default function HomeContent() {
   const { setTheme } = useTheme();
   const navigate = useNavigate();
-  const { data: session } = useSession();
 
   useEffect(() => {
     setTheme('dark');
@@ -118,31 +117,20 @@ export default function HomeContent() {
           </Link>
         </motion.div>
 
-        {/* Get Started button only visible for mobile screens */}
+        {/* Get Started button - redirect to Gmail connection */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="mb-6 md:hidden"
+          className="mb-6"
         >
           <Button
             onClick={() => {
-              if (session) {
-                navigate('/mail/inbox');
-              } else {
-                toast.promise(
-                  signIn.social({
-                    provider: 'google',
-                    callbackURL: `${window.location.origin}/mail`,
-                  }),
-                  {
-                    error: 'Login redirect failed',
-                  },
-                );
-              }
+              navigate('/settings/connections');
             }}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Get Started
+            Connect Gmail & Get Started
           </Button>
         </motion.div>
       </section>

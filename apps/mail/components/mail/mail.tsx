@@ -385,7 +385,6 @@ export function MailLayout() {
   const [, clearBulkSelection] = useAtom(clearBulkSelectionAtom);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { data: session, isPending } = useSession();
   const prevFolderRef = useRef(folder);
   const { enableScope, disableScope } = useHotkeysContext();
   const { data: activeConnection } = useActiveConnection();
@@ -399,11 +398,30 @@ export function MailLayout() {
     prevFolderRef.current = folder;
   }, [folder, mail.bulkSelected.length, clearBulkSelection]);
 
+  // Check if Gmail is connected instead of complex authentication
   useEffect(() => {
-    if (!session?.user && !isPending) {
-      navigate('/login');
+    console.log('MailLayout: Checking Gmail connection', { 
+      hasConnection: !!activeConnection,
+      connectionId: activeConnection?.id 
+    });
+    
+    if (!activeConnection) {
+      console.log('MailLayout: No Gmail connection, redirecting to settings');
+      navigate('/settings/connections');
     }
-  }, [session?.user, isPending]);
+  }, [activeConnection, navigate]);
+
+  // Show loading state while checking connection
+  if (!activeConnection) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+          <p className="text-muted-foreground">Connecting to Gmail...</p>
+        </div>
+      </div>
+    );
+  }
 
   const [{ isFetching, refetch: refetchThreads }] = useThreads();
   const isDesktop = useMediaQuery('(min-width: 768px)');
