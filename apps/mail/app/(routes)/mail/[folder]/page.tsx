@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 
 import { MailLayout } from '@/components/mail/mail';
 import { useLabels } from '@/hooks/use-labels';
@@ -20,7 +20,8 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
 }
 
 export default function MailPage() {
-  const { folder } = useLoaderData<typeof clientLoader>();
+  const params = useParams<{ folder: string }>();
+  const folder = params?.folder ?? 'inbox';
   const navigate = useNavigate();
   const [isLabelValid, setIsLabelValid] = useState<boolean | null>(true);
 

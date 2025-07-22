@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { CreateEmail } from '@/components/create/create-email';
 import { authProxy } from '@/lib/auth-proxy';
-import { useLoaderData } from 'react-router';
+import { useSearchParams } from 'react-router';
 import type { Route } from './+types/page';
 
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
@@ -31,7 +31,16 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 }
 
 export default function ComposePage() {
-  const params = useLoaderData<typeof clientLoader>();
+  const [searchParams] = useSearchParams();
+  
+  const params = {
+    to: searchParams.get('to') || '',
+    subject: searchParams.get('subject') || '',
+    body: searchParams.get('body') || '',
+    draftId: searchParams.get('draftId') || '',
+    cc: searchParams.get('cc') || '',
+    bcc: searchParams.get('bcc') || '',
+  };
 
   return (
     <Dialog open={true}>
