@@ -1,4 +1,4 @@
-import { ClientProviders } from '@/providers/client-providers';
+import { BaseProviders } from '@/providers/client-providers';
 import { ServerProviders } from '@/providers/server-providers';
 import { getLocale } from '@/paraglide/runtime';
 import { siteConfig } from '@/lib/site-config';
@@ -15,10 +15,10 @@ const getUrl = () => {
 export function Layout({ children }: PropsWithChildren) {
   return (
     <ServerProviders connectionId="gmail">
-      <ClientProviders>
+      <BaseProviders>
         {children}
         <Scripts />
-      </ClientProviders>
+      </BaseProviders>
     </ServerProviders>
   );
 }

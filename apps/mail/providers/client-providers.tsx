@@ -9,31 +9,51 @@ import type { PropsWithChildren } from 'react';
 import Toaster from '@/components/ui/toast';
 import { ThemeProvider } from 'next-themes';
 
-export function ClientProviders({ children }: PropsWithChildren) {
-  const { data } = useSettings();
+// Providers that don't depend on React Router context
+export function BaseProviders({ children }: PropsWithChildren) {
   useKeyboardLayout();
 
+  return (
+    <JotaiProvider>
+      <ThemeProvider
+        attribute="class"
+        enableSystem
+        disableTransitionOnChange
+        defaultTheme="system"
+      >
+        <SidebarProvider>
+          <PostHogProvider>
+            <LoadingProvider>
+              {children}
+              <Toaster />
+            </LoadingProvider>
+          </PostHogProvider>
+        </SidebarProvider>
+      </ThemeProvider>
+    </JotaiProvider>
+  );
+}
+
+// Providers that depend on React Router context
+export function RouterProviders({ children }: PropsWithChildren) {
+  const { data } = useSettings();
   const theme = data?.settings.colorTheme || 'system';
 
   return (
     <NuqsAdapter>
-      <JotaiProvider>
-        <ThemeProvider
-          attribute="class"
-          enableSystem
-          disableTransitionOnChange
-          defaultTheme={theme}
-        >
-          <SidebarProvider>
-            <PostHogProvider>
-              <LoadingProvider>
-                {children}
-                <Toaster />
-              </LoadingProvider>
-            </PostHogProvider>
-          </SidebarProvider>
-        </ThemeProvider>
-      </JotaiProvider>
+      <ThemeProvider
+        attribute="class"
+        enableSystem
+        disableTransitionOnChange
+        defaultTheme={theme}
+      >
+        {children}
+      </ThemeProvider>
     </NuqsAdapter>
   );
+}
+
+// Legacy export for backward compatibility
+export function ClientProviders({ children }: PropsWithChildren) {
+  return <BaseProviders>{children}</BaseProviders>;
 }
