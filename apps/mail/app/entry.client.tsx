@@ -3,9 +3,18 @@ import '../instrument';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 
 // Import the root component
 import Root from './root';
+
+// Create a minimal data router to satisfy React Router's internal requirements
+const router = createBrowserRouter([
+  {
+    path: '*',
+    element: <Root />,
+  },
+]);
 
 startTransition(() => {
   let rootElement = document.getElementById('root');
@@ -31,13 +40,13 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // Simple approach - let React Router dev tools handle everything
-  // No data router requirement since we removed all clientLoader functions
+  // Use RouterProvider to ensure data router context is available
+  // This satisfies React Router's internal components that expect a data router
   hydrateRoot(
     rootElement,
     <StrictMode>
       <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
-        <Root />
+        <RouterProvider router={router} />
       </Sentry.ErrorBoundary>
     </StrictMode>
   );
