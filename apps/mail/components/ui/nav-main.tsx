@@ -92,10 +92,17 @@ export function NavMain({ items }: NavMainProps) {
     // Accept absolute paths as they are always internal
     if (url.startsWith('/')) return true;
     try {
+      // Validate BASE_URL first
+      if (!BASE_URL || BASE_URL === 'undefined' || BASE_URL === 'null') {
+        console.warn('Invalid BASE_URL in isValidInternalUrl');
+        return false;
+      }
+      
       const urlObj = new URL(url, BASE_URL);
       // Prevent redirects to external domains by checking against our base URL
       return urlObj.origin === BASE_URL;
-    } catch {
+    } catch (error) {
+      console.error('Error validating internal URL:', error);
       return false;
     }
   }, []);
@@ -151,23 +158,35 @@ export function NavMain({ items }: NavMainProps) {
 
   const isUrlActive = useCallback(
     (url: string) => {
-      const baseUrl = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
-      const urlObj = new URL(
-        url,
-        typeof window === 'undefined' ? baseUrl : window.location.origin,
-      );
-      const cleanPath = pathname.replace(/\/$/, '');
-      const cleanUrl = urlObj.pathname.replace(/\/$/, '');
+      try {
+        const baseUrl = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+        
+        // Validate that we have a proper base URL
+        if (!baseUrl || baseUrl === 'undefined' || baseUrl === 'null') {
+          console.warn('Invalid base URL, using fallback');
+          return false;
+        }
+        
+        const urlObj = new URL(
+          url,
+          typeof window === 'undefined' ? baseUrl : window.location.origin,
+        );
+        const cleanPath = pathname.replace(/\/$/, '');
+        const cleanUrl = urlObj.pathname.replace(/\/$/, '');
 
-      if (cleanPath !== cleanUrl) return false;
+        if (cleanPath !== cleanUrl) return false;
 
-      const urlParams = new URLSearchParams(urlObj.search);
-      const currentParams = new URLSearchParams(searchParams);
+        const urlParams = new URLSearchParams(urlObj.search);
+        const currentParams = new URLSearchParams(searchParams);
 
-      for (const [key, value] of urlParams) {
-        if (currentParams.get(key) !== value) return false;
+        for (const [key, value] of urlParams) {
+          if (currentParams.get(key) !== value) return false;
+        }
+        return true;
+      } catch (error) {
+        console.error('Error in isUrlActive:', error);
+        return false;
       }
-      return true;
     },
     [pathname, searchParams],
   );

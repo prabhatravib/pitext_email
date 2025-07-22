@@ -8,7 +8,24 @@ export const SIDEBAR_WIDTH = '14rem';
 export const SIDEBAR_WIDTH_MOBILE = '14rem';
 export const SIDEBAR_WIDTH_ICON = '3rem';
 export const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
-export const BASE_URL = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+export const BASE_URL = (() => {
+  try {
+    const url = import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    
+    // Validate the URL
+    if (!url || url === 'undefined' || url === 'null') {
+      console.warn('Invalid VITE_PUBLIC_APP_URL, using fallback');
+      return 'http://localhost:3000';
+    }
+    
+    // Test if it's a valid URL
+    new URL(url);
+    return url;
+  } catch (error) {
+    console.error('Error in BASE_URL construction:', error);
+    return 'http://localhost:3000';
+  }
+})();
 export const MAX_URL_LENGTH = 2000;
 export const CACHE_BURST_KEY = 'zero-cache-burst-v1';
 

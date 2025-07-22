@@ -84,8 +84,20 @@ const getQueryClient = (connectionId: string | null) => {
 };
 
 const getUrl = () => {
-  const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-  return backendUrl + '/api/trpc';
+  try {
+    const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    
+    // Validate the backend URL
+    if (!backendUrl || backendUrl === 'undefined' || backendUrl === 'null') {
+      console.warn('Invalid backend URL, using fallback');
+      return 'http://localhost:3000/api/trpc';
+    }
+    
+    return backendUrl + '/api/trpc';
+  } catch (error) {
+    console.error('Error in getUrl:', error);
+    return 'http://localhost:3000/api/trpc';
+  }
 };
 
 export const { TRPCProvider, useTRPC, useTRPCClient } = createTRPCContext<AppRouter>();
@@ -101,9 +113,14 @@ export const trpcClient = createTRPCClient<AppRouter>({
       fetch: (url, options) =>
         fetch(url, { ...options, credentials: 'include' }).then((res) => {
           if (typeof window !== 'undefined') {
-            const currentPath = new URL(window.location.href).pathname;
-            const redirectPath = res.headers.get('X-Zero-Redirect');
-            if (!!redirectPath && redirectPath !== currentPath) window.location.href = redirectPath;
+            try {
+              const currentPath = new URL(window.location.href).pathname;
+              const redirectPath = res.headers.get('X-Zero-Redirect');
+              if (!!redirectPath && redirectPath !== currentPath) window.location.href = redirectPath;
+            } catch (error) {
+              console.error('Error parsing window.location.href:', error);
+              // Continue without redirect if URL parsing fails
+            }
           }
           return res;
         }),
