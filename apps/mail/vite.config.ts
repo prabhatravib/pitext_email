@@ -17,14 +17,7 @@ export default defineConfig({
         plugins: []
       }
     }),
-    reactRouter({
-      ssr: true,
-      prerender: false,
-      // Ensure the HTML template is used
-      html: {
-        template: 'index.html',
-      },
-    }),
+    reactRouter(),
     // Remove babel plugin that was causing React compiler issues
   ],
   server: {
