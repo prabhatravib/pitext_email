@@ -8,12 +8,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 // Import the root component
 import Root from './root';
 
-// Check if we're in development mode
-const isDevelopment = import.meta.env.DEV;
+// Check if React Router dev tools are handling router creation
+// This is more reliable than checking import.meta.env.DEV
+const isDevToolsHandlingRouter = typeof window !== 'undefined' && 
+  (window as any).__reactRouterContext !== undefined;
 
-// In production, we need to create a data router explicitly
-// In development, React Router dev tools handle this automatically
-const router = !isDevelopment ? createBrowserRouter([
+// Only create router if dev tools aren't handling it
+const router = !isDevToolsHandlingRouter ? createBrowserRouter([
   {
     path: '*',
     element: <Root />,
@@ -44,16 +45,16 @@ startTransition(() => {
     document.body.appendChild(rootElement);
   }
 
-  // Use different approaches for dev and production
+  // Use different approaches based on whether dev tools are active
   hydrateRoot(
     rootElement,
     <StrictMode>
       <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
-        {isDevelopment ? (
-          // In development, let dev tools handle router creation
+        {isDevToolsHandlingRouter ? (
+          // Dev tools are handling router creation
           <Root />
         ) : (
-          // In production, use RouterProvider to ensure data router functionality
+          // We need to create the router ourselves
           <RouterProvider router={router!} />
         )}
       </Sentry.ErrorBoundary>
