@@ -5,6 +5,7 @@ import { siteConfig } from '@/lib/site-config';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Scripts, Outlet } from 'react-router';
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import { type PropsWithChildren } from 'react';
 
 const getUrl = () => {
@@ -16,7 +17,9 @@ export function Layout({ children }: PropsWithChildren) {
   return (
     <ServerProviders connectionId="gmail">
       <BaseProviders>
-        {children}
+        <NuqsAdapter>
+          {children}
+        </NuqsAdapter>
         <Scripts />
       </BaseProviders>
     </ServerProviders>
