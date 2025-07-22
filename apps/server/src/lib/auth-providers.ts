@@ -14,27 +14,29 @@ export interface ProviderConfig {
 export const customProviders: ProviderConfig[] = [];
 
 export const authProviders = (env: Record<string, string>): ProviderConfig[] => [
-  {
-    id: 'google',
-    name: 'Google',
-    requiredEnvVars: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
-    envVarInfo: [
-      { name: 'GOOGLE_CLIENT_ID', source: 'Google Cloud Console' },
-      { name: 'GOOGLE_CLIENT_SECRET', source: 'Google Cloud Console' },
-    ],
-    config: {
-      prompt: env.FORCE_GOOGLE_AUTH ? 'consent' : undefined,
-      accessType: 'offline',
-      scope: [
-        'https://www.googleapis.com/auth/gmail.modify',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/userinfo.email',
-      ],
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    },
-    required: true,
-  },
+  // Disabled better-auth OAuth provider - using custom implementation instead
+  // {
+  //   id: 'google',
+  //   name: 'Google',
+  //   requiredEnvVars: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
+  //   envVarInfo: [
+  //     { name: 'GOOGLE_CLIENT_ID', source: 'Google Cloud Console' },
+  //     { name: 'GOOGLE_CLIENT_SECRET', source: 'Google Cloud Console' },
+  //   ],
+  //   config: {
+  //     prompt: env.FORCE_GOOGLE_AUTH ? 'consent' : undefined,
+  //     accessType: 'offline',
+  //     scope: [
+  //       'https://www.googleapis.com/auth/gmail.modify',
+  //       'https://www.googleapis.com/auth/userinfo.profile',
+  //       'https://www.googleapis.com/auth/userinfo.email',
+  //     ],
+  //     clientId: env.GOOGLE_CLIENT_ID,
+  //     clientSecret: env.GOOGLE_CLIENT_SECRET,
+  //     redirectURI: `${env.VITE_PUBLIC_APP_URL}/api/auth/callback/google`,
+  //   },
+  //   required: true,
+  // },
 ];
 
 export function isProviderEnabled(provider: ProviderConfig, env: Record<string, string>): boolean {
