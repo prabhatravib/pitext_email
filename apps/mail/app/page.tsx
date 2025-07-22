@@ -7,6 +7,12 @@ export default function HomePage() {
 
   console.log('HomePage: activeConnection', { activeConnection, isLoading });
 
+  // Force show email interface for now to debug the issue
+  console.log('HomePage: Forcing email interface display');
+  return <MailLayout />;
+
+  // Original logic commented out for debugging
+  /*
   // If still loading, show loading state
   if (isLoading) {
     return (
@@ -28,4 +34,5 @@ export default function HomePage() {
   // Otherwise show the home page
   console.log('HomePage: Showing home content');
   return <HomeContent />;
+  */
 }

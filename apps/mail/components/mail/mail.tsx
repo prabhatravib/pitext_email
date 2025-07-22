@@ -405,12 +405,17 @@ export function MailLayout() {
       connectionId: activeConnection?.id 
     });
     
+    // Temporarily disable redirect for debugging
+    /*
     if (!activeConnection) {
       console.log('MailLayout: No Gmail connection, redirecting to settings');
       navigate('/settings/connections');
     }
+    */
   }, [activeConnection, navigate]);
 
+  // Temporarily bypass loading state for debugging
+  /*
   // Show loading state while checking connection
   if (!activeConnection) {
     return (
@@ -422,6 +427,9 @@ export function MailLayout() {
       </div>
     );
   }
+  */
+
+  console.log('MailLayout: Proceeding with email interface render');
 
   const [{ isFetching, refetch: refetchThreads }] = useThreads();
   const isDesktop = useMediaQuery('(min-width: 768px)');
