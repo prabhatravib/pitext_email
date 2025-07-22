@@ -12,6 +12,6 @@ export default {
     unstable_viteEnvironmentApi: true,
   },
   serverModuleFormat: 'esm',
-  // Ensure client-side rendering is properly configured
+  // Enable client-side rendering
   clientOnly: true,
 } satisfies Config;
