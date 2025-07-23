@@ -102,7 +102,7 @@ export default function HomeContent() {
           transition={{ duration: 0.5 }}
           className="border-input/50 mb-6 inline-flex items-center gap-4 rounded-full border border-[#2A2A2A] bg-[#1E1E1E] px-4 py-1"
         >
-          <Link to="https://yc.vc" target="_blank" className="flex items-center gap-2 text-sm">
+          <a href="https://yc.vc" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm">
             Backed by
             <span>
               <img
@@ -114,7 +114,7 @@ export default function HomeContent() {
               />
             </span>
             Combinator
-          </Link>
+          </a>
         </motion.div>
 
         {/* Get Started button - redirect to Gmail connection */}

@@ -281,13 +281,15 @@ export function Navigation() {
               {resources.map((resource) => {
                 const Icon = IconComponent[resource.platform];
                 return (
-                  <Link
+                  <a
                     key={resource.title}
-                    to={resource.href}
+                    href={resource.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-2 font-medium"
                   >
                     {resource.platform && <Icon className="dark:fill-muted-foreground h-5 w-5" />}
-                  </Link>
+                  </a>
                 );
               })}
             </div>
