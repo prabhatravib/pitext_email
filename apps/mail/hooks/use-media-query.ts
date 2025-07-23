@@ -4,19 +4,37 @@ export function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    const media = window.matchMedia(query);
+    // Safety check: ensure we're in a browser environment
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return;
+    }
 
-    setMatches(media.matches);
+    try {
+      const media = window.matchMedia(query);
 
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+      setMatches(media.matches);
 
-    media.addEventListener('change', listener);
+      const listener = (event: MediaQueryListEvent) => {
+        setMatches(event.matches);
+      };
 
-    return () => {
-      media.removeEventListener('change', listener);
-    };
+      // Safety check: ensure addEventListener exists
+      if (media && typeof media.addEventListener === 'function') {
+        media.addEventListener('change', listener);
+
+        return () => {
+          try {
+            media.removeEventListener('change', listener);
+          } catch (error) {
+            console.error('Error removing media query listener:', error);
+          }
+        };
+      } else {
+        console.warn('MediaQueryList addEventListener is not available');
+      }
+    } catch (error) {
+      console.error('Error setting up media query:', error);
+    }
   }, [query]);
 
   return matches;

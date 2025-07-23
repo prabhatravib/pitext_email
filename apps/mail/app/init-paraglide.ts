@@ -1,6 +1,6 @@
 // Initialize Paraglide with safe URL origin handling
 // This must be imported before any other Paraglide imports
-import { overwriteGetUrlOrigin } from '@/src/paraglide/runtime';
+import { overwriteGetUrlOrigin } from '@/paraglide/runtime';
 
 // Debug environment variables
 console.log('[Paraglide Init] VITE_PUBLIC_APP_URL:', import.meta.env.VITE_PUBLIC_APP_URL);
@@ -96,35 +96,29 @@ function getSafeOrigin(): string {
   }
 }
 
-// Override the global URL constructor immediately
-if (typeof globalThis !== 'undefined') {
-  globalThis.URL = SafeURL as any;
-  console.log('[Paraglide Init] URL constructor overridden with SafeURL');
-}
-
-// Also override on window if available (for extra safety)
-if (typeof window !== 'undefined') {
-  window.URL = SafeURL as any;
-  console.log('[Paraglide Init] window.URL constructor also overridden');
+// Only override URL constructor if we're in a browser environment
+if (typeof window !== 'undefined' && typeof globalThis !== 'undefined') {
+  try {
+    globalThis.URL = SafeURL as any;
+    console.log('[Paraglide Init] URL constructor overridden with SafeURL');
+    
+    // Also override on window if available (for extra safety)
+    window.URL = SafeURL as any;
+    console.log('[Paraglide Init] window.URL constructor also overridden');
+  } catch (error) {
+    console.error('[Paraglide Init] Failed to override URL constructor:', error);
+  }
 }
 
 // Override Paraglide's getUrlOrigin immediately to prevent Invalid URL errors
-overwriteGetUrlOrigin(() => {
-  const origin = getSafeOrigin();
-  console.log('[Paraglide] getUrlOrigin called, returning:', origin);
-  return origin;
-});
-
-// Additional safety: override URL constructor again after a short delay
-// to ensure it's not overridden by other code
-setTimeout(() => {
-  if (globalThis.URL !== SafeURL) {
-    console.warn('[Paraglide Init] URL constructor was overridden, re-applying SafeURL');
-    globalThis.URL = SafeURL as any;
-  }
-  if (typeof window !== 'undefined' && window.URL !== SafeURL) {
-    window.URL = SafeURL as any;
-  }
-}, 0);
+try {
+  overwriteGetUrlOrigin(() => {
+    const origin = getSafeOrigin();
+    console.log('[Paraglide] getUrlOrigin called, returning:', origin);
+    return origin;
+  });
+} catch (error) {
+  console.error('[Paraglide Init] Failed to override getUrlOrigin:', error);
+}
 
 console.log('[Paraglide Init] Override complete'); 

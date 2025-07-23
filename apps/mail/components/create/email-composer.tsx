@@ -221,6 +221,11 @@ export function EmailComposer({
 
   // Add this function to handle clicks outside the input fields
   useEffect(() => {
+    // Safety check: ensure we're in a browser environment
+    if (typeof document === 'undefined' || !document.addEventListener) {
+      return;
+    }
+
     function handleClickOutside(event: MouseEvent) {
       if (toWrapperRef.current && !toWrapperRef.current.contains(event.target as Node)) {
         setIsAddingRecipients(false);
@@ -233,12 +238,20 @@ export function EmailComposer({
       }
     }
 
-    // Add event listener
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      // Remove event listener on cleanup
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    try {
+      // Add event listener
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        // Remove event listener on cleanup
+        try {
+          document.removeEventListener('mousedown', handleClickOutside);
+        } catch (error) {
+          console.error('Error removing mousedown listener:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error adding mousedown listener:', error);
+    }
   }, []);
 
   const attachmentKeywords = [
@@ -419,6 +432,11 @@ export function EmailComposer({
   useEffect(() => {
     if (!editor) return;
 
+    // Safety check: ensure we're in a browser environment
+    if (typeof window === 'undefined' || !window.addEventListener) {
+      return;
+    }
+
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       const hasContent = editor?.getText()?.trim().length > 0;
       if (hasContent) {
@@ -427,8 +445,18 @@ export function EmailComposer({
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    try {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => {
+        try {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        } catch (error) {
+          console.error('Error removing beforeunload listener:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error adding beforeunload listener:', error);
+    }
   }, [editor]);
 
   // Perhaps add `hasUnsavedChanges` to the condition
@@ -446,8 +474,18 @@ export function EmailComposer({
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
+    try {
+      document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+      return () => {
+        try {
+          document.removeEventListener('keydown', handleKeyDown, true);
+        } catch (error) {
+          console.error('Error removing keydown listener:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error adding keydown listener:', error);
+    }
   }, [editor, draftId]);
 
   const proceedWithSend = async () => {
@@ -657,6 +695,11 @@ export function EmailComposer({
   }, [hasUnsavedChanges, saveDraft]);
 
   useEffect(() => {
+    // Safety check: ensure we're in a browser environment
+    if (typeof document === 'undefined' || !document.addEventListener) {
+      return;
+    }
+
     const handlePasteFiles = (event: ClipboardEvent) => {
       const clipboardData = event.clipboardData;
       if (!clipboardData || !clipboardData.files.length) return;
@@ -669,10 +712,18 @@ export function EmailComposer({
       }
     };
 
-    document.addEventListener('paste', handlePasteFiles);
-    return () => {
-      document.removeEventListener('paste', handlePasteFiles);
-    };
+    try {
+      document.addEventListener('paste', handlePasteFiles);
+      return () => {
+        try {
+          document.removeEventListener('paste', handlePasteFiles);
+        } catch (error) {
+          console.error('Error removing paste listener:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error adding paste listener:', error);
+    }
   }, [handleAttachment]);
 
   // useHotkeys('meta+y', async (e) => {

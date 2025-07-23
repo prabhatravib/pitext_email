@@ -1,12 +1,12 @@
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
-import { m } from '@/src/paraglide/messages';
 
 interface HotkeyRecorderProps {
   isOpen: boolean;
   onClose: () => void;
   onHotkeyRecorded: (keys: string[]) => void;
-  currentKeys: string[];
+  currentKeys?: string[];
 }
 
 export function HotkeyRecorder({
@@ -20,6 +20,12 @@ export function HotkeyRecorder({
 
   useEffect(() => {
     if (!isOpen) return;
+
+    // Safety check: ensure we're in a browser environment
+    if (typeof window === 'undefined' || !window.addEventListener) {
+      console.warn('window.addEventListener is not available');
+      return;
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -45,13 +51,21 @@ export function HotkeyRecorder({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    try {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
+      return () => {
+        try {
+          window.removeEventListener('keydown', handleKeyDown);
+          window.removeEventListener('keyup', handleKeyUp);
+        } catch (error) {
+          console.error('Error removing hotkey recorder listeners:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error adding hotkey recorder listeners:', error);
+    }
   }, [isOpen, isRecording, recordedKeys, onHotkeyRecorded, onClose]);
 
   useEffect(() => {
@@ -63,25 +77,28 @@ export function HotkeyRecorder({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>{m['pages.settings.shortcuts.actions.recordHotkey']()}</DialogTitle>
+          <DialogTitle>Record Hotkey</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col items-center gap-4 py-4">
-          <div className="text-muted-foreground text-center text-sm">
-            {isRecording
-              ? m['pages.settings.shortcuts.actions.pressKeys']()
-              : m['pages.settings.shortcuts.actions.releaseKeys']()}
-          </div>
-          <div className="flex gap-2">
-            {(recordedKeys.length > 0 ? recordedKeys : currentKeys).map((key) => (
-              <kbd
-                key={key}
-                className="border-muted-foreground/10 bg-accent h-6 rounded-[6px] border px-1.5 font-mono text-xs leading-6"
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Press the keys you want to use for this shortcut. Press any key to start recording.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {recordedKeys.map((key, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-muted rounded text-sm font-mono"
               >
                 {key}
-              </kbd>
+              </span>
             ))}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
           </div>
         </div>
       </DialogContent>

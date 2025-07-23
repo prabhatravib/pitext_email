@@ -41,6 +41,48 @@ function UnderConstructionWrapper() {
   return <MailUnderConstructionPage params={Promise.resolve({ path: params.path || '' })} />;
 }
 
+// Error boundary component for React Router
+function RouterErrorBoundary({ children }: { children: React.ReactNode }) {
+  return (
+    <Sentry.ErrorBoundary 
+      fallback={({ error, resetError }) => (
+        <div className="flex h-screen w-full items-center justify-center">
+          <div className="flex flex-col items-center gap-4 p-8">
+            <h1 className="text-2xl font-bold text-red-600">Something went wrong</h1>
+            <p className="text-muted-foreground text-center max-w-md">
+              An error occurred while loading this page. This might be due to a temporary issue.
+            </p>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Reload Page
+              </button>
+              <button 
+                onClick={resetError} 
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Try Again
+              </button>
+            </div>
+            {process.env.NODE_ENV === 'development' && (
+              <details className="mt-4 text-left">
+                <summary className="cursor-pointer text-sm text-gray-600">Error Details</summary>
+                <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto max-w-md">
+                  {error?.message || 'Unknown error'}
+                </pre>
+              </details>
+            )}
+          </div>
+        </div>
+      )}
+    >
+      {children}
+    </Sentry.ErrorBoundary>
+  );
+}
+
 // Create browser router with proper routes
 const router = createBrowserRouter([
   {
@@ -187,9 +229,9 @@ startTransition(() => {
   const root = createRoot(rootElement);
   root.render(
     <StrictMode>
-      <Sentry.ErrorBoundary fallback={<div>An error has occurred</div>}>
+      <RouterErrorBoundary>
         <RouterProvider router={router} />
-      </Sentry.ErrorBoundary>
+      </RouterErrorBoundary>
     </StrictMode>
   );
 });

@@ -592,5 +592,11 @@ export const commonKeyCodes = {
  * Initialize the keyboard layout mapper on module load
  */
 if (typeof window !== 'undefined') {
-  keyboardLayoutMapper.init().catch(console.error);
+  try {
+    keyboardLayoutMapper.init().catch((error) => {
+      console.error('Failed to initialize keyboard layout mapper:', error);
+    });
+  } catch (error) {
+    console.error('Error during keyboard layout mapper initialization:', error);
+  }
 }

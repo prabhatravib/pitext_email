@@ -150,27 +150,41 @@ export function MailContent({ id, html, senderEmail }: MailContentProps) {
   useEffect(() => {
     if (!shadowRootRef.current) return;
 
-    shadowRootRef.current.addEventListener('error', handleImageError, true);
+    // Safety check: ensure addEventListener exists
+    if (!shadowRootRef.current.addEventListener) {
+      console.warn('ShadowRoot addEventListener is not available');
+      return;
+    }
 
-    const handleClick = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'A') {
-        e.preventDefault();
-        const href = target.getAttribute('href');
-        if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
-          window.open(href, '_blank', 'noopener,noreferrer');
-        } else if (href && href.startsWith('mailto:')) {
-          window.location.href = href;
+    try {
+      shadowRootRef.current.addEventListener('error', handleImageError, true);
+
+      const handleClick = (e: Event) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'A') {
+          e.preventDefault();
+          const href = target.getAttribute('href');
+          if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+            window.open(href, '_blank', 'noopener,noreferrer');
+          } else if (href && href.startsWith('mailto:')) {
+            window.location.href = href;
+          }
         }
-      }
-    };
+      };
 
-    shadowRootRef.current.addEventListener('click', handleClick);
+      shadowRootRef.current.addEventListener('click', handleClick);
 
-    return () => {
-      shadowRootRef.current?.removeEventListener('error', handleImageError, true);
-      shadowRootRef.current?.removeEventListener('click', handleClick);
-    };
+      return () => {
+        try {
+          shadowRootRef.current?.removeEventListener('error', handleImageError, true);
+          shadowRootRef.current?.removeEventListener('click', handleClick);
+        } catch (error) {
+          console.error('Error removing shadow root event listeners:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error adding shadow root event listeners:', error);
+    }
   }, [handleImageError, processedData]);
 
   return (
