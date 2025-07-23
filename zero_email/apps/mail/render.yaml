@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: zero-email
+    env: docker
+    dockerfilePath: ./apps/mail/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: WRANGLER_ENV
+        value: render
+    healthCheckPath: /
+    autoDeploy: true
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @zero/mail run build
+    startCommand: cd apps/mail && NODE_ENV=production pnpm run start
