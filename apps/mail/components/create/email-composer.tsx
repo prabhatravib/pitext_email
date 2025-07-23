@@ -238,20 +238,25 @@ export function EmailComposer({
       }
     }
 
-    try {
-      // Add event listener
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        // Remove event listener on cleanup
-        try {
-          document.removeEventListener('mousedown', handleClickOutside);
-        } catch (error) {
-          console.error('Error removing mousedown listener:', error);
-        }
-      };
-    } catch (error) {
-      console.error('Error adding mousedown listener:', error);
+    // Only register the mousedown listener when running in a browser environment
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      try {
+        // Add event listener
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+          // Remove event listener on cleanup
+          try {
+            document.removeEventListener('mousedown', handleClickOutside);
+          } catch (error) {
+            console.error('Error removing mousedown listener:', error);
+          }
+        };
+      } catch (error) {
+        console.error('Error adding mousedown listener:', error);
+      }
     }
+    // Fallback: return undefined if not in a browser
+    return undefined;
   }, []);
 
   const attachmentKeywords = [
