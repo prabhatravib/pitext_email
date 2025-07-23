@@ -20,7 +20,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: './index.html'
+        main: './index.html',
+        'entry.client': './app/entry.client.tsx'
       },
       output: {
         manualChunks: undefined,

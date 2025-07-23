@@ -16,9 +16,7 @@
     "types": "wrangler types",
     "deploy": "wrangler deploy",
     "lint": "eslint .",
-    "machine-translate": "inlang machine translate --project project.inlang",
-    "test:patching": "node ../../scripts/test-patching.js",
-    "patch:create": "node ../../scripts/create-addEventListener-patches.js"
+    "machine-translate": "inlang machine translate --project project.inlang"
   },
   "dependencies": {
     "@ai-sdk/perplexity": "1.1.9",
