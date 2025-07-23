@@ -33,36 +33,28 @@ function patchAnimationListeners(filePath) {
       return `(${target} && typeof ${target}.addEventListener === 'function' ? ${target}.addEventListener("animationstart", ${handler}) : null)`;
     });
 
-    // Pattern 3: Generic addEventListener calls (fallback)
-    const genericAddEventListenerPattern = /(\w+)\.addEventListener\(/g;
-    content = content.replace(genericAddEventListenerPattern, (match, target) => {
+    // Pattern 3: Generic addEventListener calls with complete expression matching
+    // This matches the entire addEventListener call, but excludes the specific patterns we already handled
+    const genericAddEventListenerPattern = /(\w+)\.addEventListener\(([^)]+)\)/g;
+    content = content.replace(genericAddEventListenerPattern, (match, target, args) => {
+      // Skip if already patched or if it's one of our specific patterns
+      if (match.includes('typeof') || 
+          match.includes('"animationend"') || 
+          match.includes('"animationstart"')) {
+        return match;
+      }
+      modified = true;
+      return `(${target} && typeof ${target}.addEventListener === 'function' ? ${target}.addEventListener(${args}) : null)`;
+    });
+
+    // Pattern 4: Generic removeEventListener calls with complete expression matching
+    const genericRemoveEventListenerPattern = /(\w+)\.removeEventListener\(([^)]+)\)/g;
+    content = content.replace(genericRemoveEventListenerPattern, (match, target, args) => {
       // Skip if already patched
       if (match.includes('typeof')) return match;
       modified = true;
-      return `(${target} && typeof ${target}.addEventListener === 'function' ? ${target}.addEventListener(`;
+      return `(${target} && typeof ${target}.removeEventListener === 'function' ? ${target}.removeEventListener(${args}) : null)`;
     });
-
-    // Pattern 4: Generic removeEventListener calls
-    const genericRemoveEventListenerPattern = /(\w+)\.removeEventListener\(/g;
-    content = content.replace(genericRemoveEventListenerPattern, (match, target) => {
-      // Skip if already patched
-      if (match.includes('typeof')) return match;
-      modified = true;
-      return `(${target} && typeof ${target}.removeEventListener === 'function' ? ${target}.removeEventListener(`;
-    });
-
-    // Close any unclosed conditional expressions from generic patterns
-    if (modified) {
-      // Close addEventListener conditionals
-      content = content.replace(/\.addEventListener\(([^)]+)\)(?!\s*:)/g, (match, args) => {
-        return `.addEventListener(${args}) : null)`;
-      });
-      
-      // Close removeEventListener conditionals
-      content = content.replace(/\.removeEventListener\(([^)]+)\)(?!\s*:)/g, (match, args) => {
-        return `.removeEventListener(${args}) : null)`;
-      });
-    }
 
     if (modified) {
       fs.writeFileSync(filePath, content, 'utf8');
