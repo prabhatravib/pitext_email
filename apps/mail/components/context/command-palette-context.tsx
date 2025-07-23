@@ -195,8 +195,17 @@ export function CommandPalette({ children }: { children: React.ReactNode }) {
       }
     };
 
-    document.addEventListener('keydown', down, { capture: true });
-    return () => document.removeEventListener('keydown', down, { capture: true });
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      document.addEventListener('keydown', down, { capture: true });
+      return () => {
+        try {
+          document.removeEventListener('keydown', down, { capture: true });
+        } catch (error) {
+          console.error('Error removing command palette keydown listener:', error);
+        }
+      };
+    }
+    return undefined;
   }, [setOpen]);
 
   return (

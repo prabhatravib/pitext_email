@@ -150,8 +150,8 @@ export function MailContent({ id, html, senderEmail }: MailContentProps) {
   useEffect(() => {
     if (!shadowRootRef.current) return;
 
-    // Safety check: ensure addEventListener exists
-    if (!shadowRootRef.current.addEventListener) {
+    // Safety check: ensure shadowRootRef.current is a valid DOM element with addEventListener
+    if (!shadowRootRef.current || typeof shadowRootRef.current.addEventListener !== 'function') {
       console.warn('ShadowRoot addEventListener is not available');
       return;
     }
@@ -176,8 +176,10 @@ export function MailContent({ id, html, senderEmail }: MailContentProps) {
 
       return () => {
         try {
-          shadowRootRef.current?.removeEventListener('error', handleImageError, true);
-          shadowRootRef.current?.removeEventListener('click', handleClick);
+          if (shadowRootRef.current && typeof shadowRootRef.current.removeEventListener === 'function') {
+            shadowRootRef.current.removeEventListener('error', handleImageError, true);
+            shadowRootRef.current.removeEventListener('click', handleClick);
+          }
         } catch (error) {
           console.error('Error removing shadow root event listeners:', error);
         }
