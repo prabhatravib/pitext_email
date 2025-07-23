@@ -2,7 +2,7 @@ export const getLocale = () => 'en';
 export const setLocale = () => {};
 
 // Add the missing overwriteGetUrlOrigin function
-export const overwriteGetUrlOrigin = (fn: () => string) => {
+export const overwriteGetUrlOrigin = (fn) => {
   // This is a placeholder implementation
   // The actual function would override Paraglide's URL origin handling
   console.log('[Paraglide Runtime] overwriteGetUrlOrigin called');

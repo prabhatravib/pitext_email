@@ -1,6 +1,6 @@
 // Initialize Paraglide with safe URL origin handling
 // This must be imported before any other Paraglide imports
-import { overwriteGetUrlOrigin } from '@/paraglide/runtime';
+import { overwriteGetUrlOrigin } from '../paraglide/runtime';
 
 // Debug environment variables
 console.log('[Paraglide Init] VITE_PUBLIC_APP_URL:', import.meta.env.VITE_PUBLIC_APP_URL);
