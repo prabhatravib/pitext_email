@@ -268,11 +268,23 @@ export function useMailNavigation({ items, containerRef, onNavigate }: UseMailNa
       });
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    // Only register the event listener if we are running in a browser and the API exists
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      try {
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+          try {
+            window.removeEventListener('keydown', handleKeyDown);
+          } catch (error) {
+            console.error('Error removing mail navigation keydown listener:', error);
+          }
+        };
+      } catch (error) {
+        console.error('Error adding mail navigation keydown listener:', error);
+      }
+    }
+    // Fallback: no-op cleanup in non-browser environments
+    return undefined;
   }, [fastScroll, isCommandPaletteOpen]);
 
   useEffect(() => {

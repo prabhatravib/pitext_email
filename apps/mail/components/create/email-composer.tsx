@@ -474,18 +474,22 @@ export function EmailComposer({
       }
     };
 
-    try {
-      document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
-      return () => {
-        try {
-          document.removeEventListener('keydown', handleKeyDown, true);
-        } catch (error) {
-          console.error('Error removing keydown listener:', error);
-        }
-      };
-    } catch (error) {
-      console.error('Error adding keydown listener:', error);
+    // Register the keydown listener only when document exists and supports addEventListener
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      try {
+        document.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+        return () => {
+          try {
+            document.removeEventListener('keydown', handleKeyDown, true);
+          } catch (error) {
+            console.error('Error removing keydown listener:', error);
+          }
+        };
+      } catch (error) {
+        console.error('Error adding keydown listener:', error);
+      }
     }
+    return undefined;
   }, [editor, draftId]);
 
   const proceedWithSend = async () => {
@@ -712,18 +716,22 @@ export function EmailComposer({
       }
     };
 
-    try {
-      document.addEventListener('paste', handlePasteFiles);
-      return () => {
-        try {
-          document.removeEventListener('paste', handlePasteFiles);
-        } catch (error) {
-          console.error('Error removing paste listener:', error);
-        }
-      };
-    } catch (error) {
-      console.error('Error adding paste listener:', error);
+    // Register the paste listener only when document exists and supports addEventListener
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      try {
+        document.addEventListener('paste', handlePasteFiles);
+        return () => {
+          try {
+            document.removeEventListener('paste', handlePasteFiles);
+          } catch (error) {
+            console.error('Error removing paste listener:', error);
+          }
+        };
+      } catch (error) {
+        console.error('Error adding paste listener:', error);
+      }
     }
+    return undefined;
   }, [handleAttachment]);
 
   // useHotkeys('meta+y', async (e) => {

@@ -171,12 +171,15 @@ const EmailTemplate = ({ content, imagesEnabled, nonce }: EmailTemplateProps) =>
         />
         <script nonce={nonce}>
           {`
-            document.addEventListener('securitypolicyviolation', (e) => {
-              // Send the violation details to the parent window
-              window.parent.postMessage({
-                type: 'csp-violation',
-              }, '*');
-            });
+            // Only add the listener if document exists and supports addEventListener
+            if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+              document.addEventListener('securitypolicyviolation', (e) => {
+                // Send the violation details to the parent window
+                window.parent.postMessage({
+                  type: 'csp-violation',
+                }, '*');
+              });
+            }
           `}
         </script>
       </Head>

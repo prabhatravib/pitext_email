@@ -39,10 +39,23 @@ export function MailListHotkeys() {
       hoveredEmailId.current = event.detail.id;
     };
 
-    window.addEventListener('emailHover', handleEmailHover as EventListener);
-    return () => {
-      window.removeEventListener('emailHover', handleEmailHover as EventListener);
-    };
+    // Only register the event listener if we are running in a browser and the API exists
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      try {
+        window.addEventListener('emailHover', handleEmailHover as EventListener);
+        return () => {
+          try {
+            window.removeEventListener('emailHover', handleEmailHover as EventListener);
+          } catch (error) {
+            console.error('Error removing emailHover listener:', error);
+          }
+        };
+      } catch (error) {
+        console.error('Error adding emailHover listener:', error);
+      }
+    }
+    // Fallback: no-op cleanup in non-browser environments
+    return undefined;
   }, []);
 
   const selectAll = useCallback(() => {
