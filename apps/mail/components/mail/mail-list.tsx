@@ -709,8 +709,17 @@ export const MailList = memo(
         void refetch();
       };
 
-      window.addEventListener('refreshMailList', handleRefresh);
-      return () => window.removeEventListener('refreshMailList', handleRefresh);
+      if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+        window.addEventListener('refreshMailList', handleRefresh);
+        return () => {
+          try {
+            window.removeEventListener('refreshMailList', handleRefresh);
+          } catch (error) {
+            console.error('Error removing refreshMailList listener:', error);
+          }
+        };
+      }
+      return undefined;
     }, [refetch]);
 
     const handleNavigateToThread = useCallback(
