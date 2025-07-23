@@ -147,6 +147,16 @@ async function buildWithFallback() {
     } catch (error) {
       console.warn('⚠️ Asset reference fixing failed:', error.message);
     }
+
+    // Run the animation listener patching script
+    console.log('Running animation listener patching script...');
+    try {
+      const { execSync } = await import('child_process');
+      execSync('node ../../scripts/patch-animation-listeners.js build/client/assets', { stdio: 'inherit' });
+      console.log('✅ Animation listener patching completed');
+    } catch (error) {
+      console.warn('⚠️ Animation listener patching failed:', error.message);
+    }
     
     // Final verification
     console.log('Final verification...');
