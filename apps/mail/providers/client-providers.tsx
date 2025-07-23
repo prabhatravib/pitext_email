@@ -10,8 +10,6 @@ import { ThemeProvider } from 'next-themes';
 
 // Providers that don't depend on React Router context
 export function BaseProviders({ children }: PropsWithChildren) {
-  useKeyboardLayout();
-
   return (
     <JotaiProvider>
       <ThemeProvider
